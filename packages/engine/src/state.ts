@@ -19,6 +19,7 @@ const installRecordSchema = z
 export const appStateSchema = z
   .object({
     schemaVersion: z.literal(1),
+    layoutVersion: z.number().int().default(2),
     activePackId: z.string().nullable(),
     installs: z.record(z.string(), installRecordSchema),
     gamePathOverride: z.string().nullable(),
@@ -35,6 +36,7 @@ export function createEmptyState(): AppState {
   const now = new Date().toISOString()
   return {
     schemaVersion: 1,
+    layoutVersion: 2,
     activePackId: null,
     installs: {},
     gamePathOverride: null,

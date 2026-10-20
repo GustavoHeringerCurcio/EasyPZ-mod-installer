@@ -11,6 +11,8 @@ export interface AppPaths {
   extractRoot: string
   stateFile: string
   stateDir: string
+  storeDir: string
+  journalFile: string
   backupDir: string
   legacyProfileFile: string
   legacyMarkerFile: string
@@ -41,6 +43,8 @@ export function getAppPaths(env: PathEnv = process.env): AppPaths {
     extractRoot: path.join(easyPzDir, 'cache', 'extracted'),
     stateDir: path.join(zomboidDir, 'EasyPZ'),
     stateFile: path.join(zomboidDir, 'EasyPZ', 'state.json'),
+    storeDir: path.join(zomboidDir, 'EasyPZ', 'store'),
+    journalFile: path.join(zomboidDir, 'EasyPZ', 'move-journal.json'),
     backupDir: path.join(zomboidDir, 'backups'),
     legacyProfileFile: path.join(zomboidDir, 'ViewpointPacks', 'profile.txt'),
     legacyMarkerFile: path.join(zomboidDir, 'mods', '.pz-viewpoint-installed'),
@@ -60,4 +64,12 @@ export function defaultTxtPath(paths: AppPaths): string {
 
 export function hostIniPath(paths: AppPaths): string {
   return path.join(paths.zomboidDir, 'Server', 'servertest.ini')
+}
+
+export function storeModPath(paths: AppPaths, workshopId: string, folder: string): string {
+  return path.join(paths.storeDir, '108600', workshopId, 'mods', folder)
+}
+
+export function activeModPath(paths: AppPaths, folder: string): string {
+  return path.join(modsDir(paths), folder)
 }

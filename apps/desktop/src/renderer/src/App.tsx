@@ -10,6 +10,7 @@ import { InstallOverlay } from './components/InstallOverlay'
 import { LibraryPage } from './components/LibraryPage'
 import { SettingsPage } from './components/SettingsPage'
 import { LogsPage } from './components/LogsPage'
+import { ConfirmDialog, type ConfirmRequest } from './components/ConfirmDialog'
 import { Button } from './components/ui'
 import {
   createInstallState,
@@ -37,11 +38,20 @@ export default function App() {
   const [elevating, setElevating] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
   const [sessionLogs, setSessionLogs] = useState<InstallLogLine[]>([])
+  const [confirmRequest, setConfirmRequest] = useState<ConfirmRequest | null>(null)
+  const [confirmLoading, setConfirmLoading] = useState(false)
+  const [busyPackId, setBusyPackId] = useState<string | null>(null)
   const startedPending = useRef(false)
 
   const showToast = useCallback((kind: ToastKind, text: string) => {
     setToast({ kind, text })
   }, [])
+
+  const packNameFor = useCallback(
+    (packId: string | null) =>
+      packId ? (bootstrap?.catalog.packs.find((pack) => pack.id === packId)?.name ?? packId) : '',
+    [bootstrap],
+  )
 
   useEffect(() => {
     if (!toast) return
@@ -194,31 +204,149 @@ export default function App() {
     if (target) await window.easypz.openPath(target)
   }, [])
 
-  const activatePack = useCallback(
-    async (packId: string) => {
-      const result = await window.easypz.activate(packId)
-      if (!result.ok) {
-        showToast('error', result.message)
-        return
+  const performToggle = useCallback(
+    async (packId: string, enabled: boolean) => {
+      const previousPackId = bootstrap?.state.activePackId ?? null
+      setBusyPackId(packId)
+      try {
+        const result = await window.easypz.setPackEnabled(packId, enabled)
+        if (!result.ok) {
+          showToast('error', result.message)
+          return
+        }
+        await refreshBootstrap()
+        if (enabled) {
+          if (previousPackId && previousPackId !== packId) {
+            showToast(
+              'success',
+              t('toast.switched', {
+                pack: packNameFor(packId),
+                previous: packNameFor(previousPackId),
+              }),
+            )
+          } else {
+            showToast('success', t('toast.activated', { pack: packNameFor(packId) }))
+          }
+        } else {
+          showToast('success', t('toast.disabled', { pack: packNameFor(packId) }))
+        }
+      } finally {
+        setBusyPackId(null)
       }
-      await refreshBootstrap()
-      const packName = bootstrap?.catalog.packs.find((pack) => pack.id === packId)?.name ?? packId
-      showToast('success', t('toast.activated', { pack: packName }))
     },
-    [bootstrap, refreshBootstrap, showToast, t],
+    [bootstrap, packNameFor, refreshBootstrap, showToast, t],
   )
 
-  const deactivatePack = useCallback(
-    async (packId: string, purge: boolean) => {
-      const result = await window.easypz.deactivate(packId, purge)
-      if (!result.ok) {
-        showToast('error', result.message)
+  const requestToggle = useCallback(
+    (packId: string, enabled: boolean) => {
+      if (bootstrap?.game.gameRunning) {
+        showToast('info', t('catalog.gameRunningHint'))
         return
       }
-      await refreshBootstrap()
-      showToast('success', purge ? t('toast.purged') : t('toast.deactivated'))
+
+      const activePackId = bootstrap?.state.activePackId ?? null
+      if (!enabled) {
+        setConfirmRequest({
+          title: t('confirm.disableTitle', { pack: packNameFor(packId) }),
+          body: t('confirm.disableBody'),
+          confirmLabel: t('catalog.disable'),
+          onConfirm: async () => {
+            await performToggle(packId, false)
+          },
+        })
+        return
+      }
+
+      if (activePackId && activePackId !== packId) {
+        setConfirmRequest({
+          title: t('confirm.switchTitle', { pack: packNameFor(packId) }),
+          body: t('confirm.switchBody', {
+            pack: packNameFor(packId),
+            previous: packNameFor(activePackId),
+          }),
+          confirmLabel: t('confirm.switchAction', { pack: packNameFor(packId) }),
+          onConfirm: async () => {
+            await performToggle(packId, true)
+          },
+        })
+        return
+      }
+
+      void performToggle(packId, true)
     },
-    [refreshBootstrap, showToast, t],
+    [bootstrap, packNameFor, performToggle, showToast, t],
+  )
+
+  const requestInstall = useCallback(
+    (packId: string) => {
+      if (bootstrap?.game.gameRunning) {
+        showToast('info', t('catalog.gameRunningHint'))
+        return
+      }
+
+      const activePackId = bootstrap?.state.activePackId ?? null
+      if (activePackId && activePackId !== packId) {
+        setConfirmRequest({
+          title: t('confirm.installTitle', { pack: packNameFor(packId) }),
+          body: t('confirm.installBody', {
+            pack: packNameFor(packId),
+            previous: packNameFor(activePackId),
+          }),
+          confirmLabel: t('confirm.installAction'),
+          onConfirm: async () => {
+            await startInstall(packId)
+          },
+        })
+        return
+      }
+
+      void startInstall(packId)
+    },
+    [bootstrap, packNameFor, showToast, startInstall, t],
+  )
+
+  const repairPack = useCallback(
+    async (packId: string) => {
+      setBusyPackId(packId)
+      try {
+        const result = await window.easypz.repairPack(packId)
+        if (!result.ok) {
+          showToast('error', result.message)
+          return
+        }
+        await refreshBootstrap()
+        showToast('success', t('toast.repaired', { pack: packNameFor(packId) }))
+      } finally {
+        setBusyPackId(null)
+      }
+    },
+    [packNameFor, refreshBootstrap, showToast, t],
+  )
+
+  const requestDelete = useCallback(
+    (packId: string) => {
+      setConfirmRequest({
+        title: t('confirm.deleteTitle', { pack: packNameFor(packId) }),
+        body: t('confirm.deleteBody', { pack: packNameFor(packId) }),
+        confirmLabel: t('confirm.deleteAction'),
+        destructive: true,
+        onConfirm: async () => {
+          setBusyPackId(packId)
+          try {
+            const result = await window.easypz.deletePack(packId)
+            if (!result.ok) {
+              showToast('error', result.message)
+              return
+            }
+            await refreshBootstrap()
+            showToast('success', t('toast.deleted', { pack: packNameFor(packId) }))
+          } finally {
+            setBusyPackId(null)
+          }
+        },
+      })
+    },
+    [packNameFor, refreshBootstrap, showToast, t],
   )
 
   const verifyPack = useCallback(
@@ -250,9 +378,38 @@ export default function App() {
       } else {
         showToast('info', t('toast.hostMissing'))
       }
+      await refreshBootstrap()
     },
-    [showToast, t],
+    [refreshBootstrap, showToast, t],
   )
+
+  const requestHostSync = useCallback(
+    (packId: string) => {
+      setConfirmRequest({
+        title: t('confirm.hostTitle'),
+        body: t('confirm.hostBody'),
+        confirmLabel: t('confirm.hostAction'),
+        onConfirm: async () => {
+          await applyHost(packId)
+        },
+      })
+    },
+    [applyHost, t],
+  )
+
+  const confirmAction = useCallback(async () => {
+    if (!confirmRequest) return
+    setConfirmLoading(true)
+    try {
+      await confirmRequest.onConfirm()
+      setConfirmRequest(null)
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : String(error))
+      setConfirmRequest(null)
+    } finally {
+      setConfirmLoading(false)
+    }
+  }, [confirmRequest, showToast])
 
   const selectedPack = useMemo(
     () => bootstrap?.catalog.packs.find((pack) => pack.id === selectedPackId) ?? null,
@@ -296,7 +453,7 @@ export default function App() {
           setView(next)
           if (next !== 'catalog') setSelectedPackId(null)
         }}
-        installedCount={Object.keys(bootstrap.state.installs).length}
+        installedCount={bootstrap.availablePackIds.length}
         appVersion={bootstrap.appVersion}
         isElevated={bootstrap.isElevated}
         language={bootstrap.settings.language}
@@ -310,8 +467,10 @@ export default function App() {
               bootstrap={bootstrap}
               pack={selectedPack}
               onBack={() => setSelectedPackId(null)}
-              onInstall={(packId) => void startInstall(packId)}
-              installing={install.running && install.packId === selectedPack.id}
+              onInstall={requestInstall}
+              onToggle={requestToggle}
+              onRepair={repairPack}
+              busy={busyPackId === selectedPack.id || install.running}
             />
           ) : (
             <CatalogPage
@@ -319,6 +478,9 @@ export default function App() {
               search={search}
               onSearch={setSearch}
               onSelectPack={(packId) => setSelectedPackId(packId)}
+              onInstall={requestInstall}
+              onToggle={requestToggle}
+              busyPackId={busyPackId ?? (install.running ? install.packId : null)}
             />
           )
         ) : null}
@@ -330,11 +492,12 @@ export default function App() {
               setView('catalog')
               setSelectedPackId(null)
             }}
-            onRepair={(packId) => void startInstall(packId)}
-            onActivate={activatePack}
-            onDeactivate={deactivatePack}
+            onRepair={repairPack}
+            onToggle={requestToggle}
+            onDelete={requestDelete}
             onVerify={verifyPack}
-            onHost={applyHost}
+            onHost={requestHostSync}
+            busyPackId={busyPackId}
           />
         ) : null}
 
@@ -403,6 +566,17 @@ export default function App() {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {confirmRequest ? (
+        <ConfirmDialog
+          request={confirmRequest}
+          loading={confirmLoading}
+          onConfirm={() => void confirmAction()}
+          onCancel={() => {
+            if (!confirmLoading) setConfirmRequest(null)
+          }}
+        />
       ) : null}
 
       {toast ? (

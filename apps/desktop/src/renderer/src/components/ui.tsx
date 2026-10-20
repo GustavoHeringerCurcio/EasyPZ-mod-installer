@@ -110,6 +110,53 @@ export function Spinner({ className }: { className?: string }) {
   return <Loader2 className={cn('size-4 animate-spin text-acid', className)} />
 }
 
+export function Switch({
+  checked,
+  onChange,
+  disabled,
+  label,
+  className,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+  label?: string
+  className?: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'inline-flex items-center gap-2.5 rounded-full border px-2 py-1.5 text-xs font-medium transition-colors',
+        checked
+          ? 'border-acid/35 bg-acid/10 text-bone'
+          : 'border-line bg-panel-2 text-muted hover:border-muted/50 hover:text-bone',
+        'disabled:cursor-not-allowed disabled:opacity-45',
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          'relative h-5 w-9 rounded-full transition-colors',
+          checked ? 'bg-acid' : 'bg-white/15',
+        )}
+      >
+        <span
+          className={cn(
+            'absolute top-0.5 size-4 rounded-full bg-ink transition-transform',
+            checked ? 'translate-x-[18px]' : 'translate-x-0.5',
+          )}
+        />
+      </span>
+      {label ? <span>{label}</span> : null}
+    </button>
+  )
+}
+
 export function Panel({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('rounded-2xl border border-line bg-panel/80', className)}>{children}</div>

@@ -36,12 +36,13 @@ Publish the SHA256 checksum with every build so testers can verify the file.
 3. Install or repair and confirm the old archive cache is reused when the hash matches.
 4. Confirm `%USERPROFILE%\Zomboid\EasyPZ\state.json` exists.
 
-### Switching packs
+### Toggling and switching packs
 
-1. Install Advanced, then install Medium.
-2. Confirm Advanced-only folders move to `Zomboid\backups`.
-3. Confirm shared Medium folders are kept.
-4. Switch back and confirm the mods return.
+1. Install Advanced. The card switch turns on.
+2. Turn Advanced off. Its folders move to `Zomboid\EasyPZ\store`; `Zomboid\mods` keeps only unmanaged folders.
+3. Turn Medium on. Advanced moves to the store and Medium moves into `Zomboid\mods`.
+4. Confirm only one switch is on and only one pack’s folders are in `Zomboid\mods`.
+5. Confirm unrelated IDs in `default.txt` are preserved.
 
 ### Failure cases
 

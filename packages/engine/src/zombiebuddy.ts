@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { AppPaths } from './paths.js'
+import { storeModPath } from './paths.js'
 import { EasyPzError, toError } from './errors.js'
 
 export type ZombieBuddyStatus = 'already-installed' | 'installed' | 'missing-source' | 'skipped'
@@ -32,6 +33,7 @@ export async function findZombieBuddySource(
   const candidates = [
     path.join(extractRoot, '108600', '3619862853', 'mods', 'ZombieBuddy'),
     path.join(extractRoot, '3619862853', 'mods', 'ZombieBuddy'),
+    storeModPath(paths, '3619862853', 'ZombieBuddy'),
     path.join(paths.zomboidDir, 'mods', 'ZombieBuddy'),
   ]
 

@@ -8,7 +8,7 @@ import {
   ExternalLink,
   Gamepad2,
   HardDrive,
-  Layers,
+  Power,
   Search,
   Server,
   ShieldAlert,
@@ -28,20 +28,24 @@ export function PackDetailPage({
   pack,
   onBack,
   onInstall,
-  installing,
+  onToggle,
+  onRepair,
+  busy,
 }: {
   bootstrap: Bootstrap
   pack: PackView
   onBack: () => void
   onInstall: (packId: string) => void
-  installing: boolean
+  onToggle: (packId: string, enabled: boolean) => void
+  onRepair: (packId: string) => void
+  busy: boolean
 }) {
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('overview')
   const [modSearch, setModSearch] = useState('')
 
-  const installed = Boolean(bootstrap.state.installs[pack.id])
-  const active = bootstrap.state.activePackId === pack.id && installed
+  const available = bootstrap.availablePackIds.includes(pack.id)
+  const active = bootstrap.state.activePackId === pack.id && available
   const groups = useMemo(
     () => getEffectiveGroups(bootstrap.catalog, pack.id),
     [bootstrap.catalog, pack.id],
@@ -64,8 +68,12 @@ export function PackDetailPage({
     }))
     .filter((group) => group.mods.length > 0)
 
-  const actionLabel = active ? t('pack.repair') : installed ? t('pack.switch') : t('pack.install')
-  const ActionIcon = active ? Wrench : installed ? Layers : Download
+  const actionLabel = !available
+    ? t('catalog.install')
+    : active
+      ? t('catalog.disable')
+      : t('catalog.enable')
+  const ActionIcon = available ? Power : Download
 
   return (
     <div className="mx-auto w-full max-w-6xl px-8 py-7">
@@ -90,7 +98,7 @@ export function PackDetailPage({
         <div className="border-t border-line p-7">
           <div className="flex flex-wrap items-center gap-2">
             {active ? <Badge tone="acid">{t('pack.active')}</Badge> : null}
-            {!active && installed ? <Badge>{t('pack.installed')}</Badge> : null}
+            {!active && available ? <Badge>{t('pack.installed')}</Badge> : null}
             <Badge tone="muted">
               {t('pack.build')} {pack.gameBuild}
             </Badge>
@@ -320,7 +328,7 @@ export function PackDetailPage({
                 </span>
                 {active ? (
                   <CheckCircle2 className="size-4 text-acid" />
-                ) : installed ? (
+                ) : available ? (
                   <Badge>{t('pack.installedBadge')}</Badge>
                 ) : null}
               </div>
@@ -344,14 +352,30 @@ export function PackDetailPage({
                 variant="primary"
                 size="lg"
                 className="w-full"
-                onClick={() => onInstall(pack.id)}
-                loading={installing}
+                onClick={() => (available ? onToggle(pack.id, !active) : onInstall(pack.id))}
+                loading={busy}
               >
                 <ActionIcon className="size-4" />
                 {actionLabel}
               </Button>
+              {active ? (
+                <Button
+                  variant="secondary"
+                  size="md"
+                  className="mt-2 w-full"
+                  onClick={() => onRepair(pack.id)}
+                  disabled={busy}
+                >
+                  <Wrench className="size-4" />
+                  {t('pack.repair')}
+                </Button>
+              ) : null}
               <p className="mt-3 text-center text-[10px] leading-relaxed text-muted">
-                {active ? t('pack.activeHint') : t('pack.installHint')}
+                {active
+                  ? t('pack.activeHint')
+                  : available
+                    ? t('pack.enableHint')
+                    : t('pack.installHint')}
               </p>
             </div>
           </Panel>

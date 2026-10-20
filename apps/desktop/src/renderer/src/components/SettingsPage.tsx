@@ -187,6 +187,11 @@ export function SettingsPage({
               onClick={() => onOpen(paths.cache)}
             />
             <MaintenanceButton
+              icon={HardDrive}
+              label={t('settings.openStore')}
+              onClick={() => onOpen(paths.store)}
+            />
+            <MaintenanceButton
               icon={FolderOpen}
               label={t('settings.openMods')}
               onClick={() => onOpen(paths.mods)}

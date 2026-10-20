@@ -24,9 +24,40 @@ export function buildDefaultTxt(modIds: string[]): string {
   return lines.join('\r\n')
 }
 
+export function parseDefaultModIds(raw: string): string[] {
+  const ids: string[] = []
+  for (const match of raw.matchAll(/^\s*mod\s*=\s*([^,]+),?\s*$/gm)) {
+    const id = match[1]?.trim()
+    if (id && !ids.includes(id)) ids.push(id)
+  }
+  return ids
+}
+
 export interface ActivationResult {
   modCount: number
+  totalModCount: number
   backupPath: string | null
+}
+
+async function readDefaultTxt(modsDir: string): Promise<{ text: string | null; ids: string[] }> {
+  try {
+    const text = await fs.readFile(path.join(modsDir, 'default.txt'), 'utf8')
+    return { text, ids: parseDefaultModIds(text) }
+  } catch {
+    return { text: null, ids: [] }
+  }
+}
+
+async function backupDefaultTxt(modsDir: string, backupDir: string): Promise<string | null> {
+  const defaultTxt = path.join(modsDir, 'default.txt')
+  await fs.mkdir(backupDir, { recursive: true })
+  const backupPath = path.join(backupDir, 'default.txt.bak')
+  try {
+    await fs.copyFile(defaultTxt, backupPath)
+    return backupPath
+  } catch {
+    return null
+  }
 }
 
 export async function writeDefaultTxt(options: {
@@ -36,21 +67,50 @@ export async function writeDefaultTxt(options: {
 }): Promise<ActivationResult> {
   const { modIds, modsDir, backupDir } = options
   await ensureResetFile(modsDir)
-  await fs.mkdir(backupDir, { recursive: true })
+  const backupPath = await backupDefaultTxt(modsDir, backupDir)
+  await fs.writeFile(path.join(modsDir, 'default.txt'), buildDefaultTxt(modIds), 'ascii')
+  return {
+    modCount: modIds.length,
+    totalModCount: modIds.length,
+    backupPath,
+  }
+}
 
-  const defaultTxt = path.join(modsDir, 'default.txt')
-  const backupPath = path.join(backupDir, 'default.txt.bak')
+/**
+ * Adds and removes only the given mod IDs, preserving any unrelated mods the
+ * user activated themselves.
+ */
+export async function updateDefaultTxt(options: {
+  addIds: string[]
+  removeIds: string[]
+  modsDir: string
+  backupDir: string
+}): Promise<ActivationResult> {
+  const { addIds, removeIds, modsDir, backupDir } = options
+  await ensureResetFile(modsDir)
 
-  let backup: string | null = null
-  try {
-    await fs.copyFile(defaultTxt, backupPath)
-    backup = backupPath
-  } catch {
-    backup = null
+  const { ids } = await readDefaultTxt(modsDir)
+  const remove = new Set(removeIds)
+  const merged = ids.filter((id) => !remove.has(id))
+  for (const id of addIds) {
+    if (!merged.includes(id)) merged.push(id)
   }
 
-  await fs.writeFile(defaultTxt, buildDefaultTxt(modIds), 'ascii')
-  return { modCount: modIds.length, backupPath: backup }
+  const backupPath = await backupDefaultTxt(modsDir, backupDir)
+  await fs.writeFile(path.join(modsDir, 'default.txt'), buildDefaultTxt(merged), 'ascii')
+  return {
+    modCount: addIds.length,
+    totalModCount: merged.length,
+    backupPath,
+  }
+}
+
+export async function removeDefaultModIds(options: {
+  removeIds: string[]
+  modsDir: string
+  backupDir: string
+}): Promise<ActivationResult> {
+  return updateDefaultTxt({ addIds: [], ...options })
 }
 
 export async function clearDefaultTxt(options: {
@@ -61,10 +121,6 @@ export async function clearDefaultTxt(options: {
 }
 
 export async function countActiveMods(modsDir: string): Promise<number> {
-  try {
-    const raw = await fs.readFile(path.join(modsDir, 'default.txt'), 'utf8')
-    return raw.split(/\r?\n/).filter((line) => /^\s*mod\s*=/.test(line)).length
-  } catch {
-    return 0
-  }
+  const { ids } = await readDefaultTxt(modsDir)
+  return ids.length
 }

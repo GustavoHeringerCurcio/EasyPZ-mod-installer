@@ -1,20 +1,19 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
-import { getActiveModIds, getPack } from '@easypz/catalog'
+import { getPack } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
-import { modsDir, hostIniPath, defaultTxtPath } from './paths.js'
+import { modsDir, defaultTxtPath } from './paths.js'
 import { getGameInfo, type GameInfo } from './detect.js'
 import { downloadFile, fileExists, hashFile } from './download.js'
 import { extractArchive, extractCacheComplete } from './archive.js'
-import { applyMods, removeModsNotInPack } from './apply.js'
-import { writeDefaultTxt } from './activation.js'
-import { applyHostIni } from './host.js'
 import { applyGameConfig } from './gameConfig.js'
 import { ensureZombieBuddy, isZombieBuddyInstalled, type ZombieBuddyStatus } from './zombiebuddy.js'
 import type { EngineEvent, EventSink, InstallSummary } from './events.js'
 import { EasyPzError, cancelledError, isEasyPzError, toError } from './errors.js'
 import { loadState, recordInstall, saveState } from './state.js'
+import { storePackMods } from './storage.js'
+import { setPackEnabled } from './operations.js'
 
 export interface InstallOptions {
   catalog: Catalog
@@ -22,10 +21,8 @@ export interface InstallOptions {
   paths: AppPaths
   gamePathOverride?: string | null
   forceRedownload?: boolean
-  forceMods?: boolean
   skipZombieBuddy?: boolean
   skipActivate?: boolean
-  skipHost?: boolean
   signal?: AbortSignal
   onEvent?: EventSink
 }
@@ -45,10 +42,6 @@ function stageEvent(
 
 function ensureNotCancelled(signal?: AbortSignal): void {
   if (signal?.aborted) throw cancelledError()
-}
-
-function timestamp(): string {
-  return new Date().toISOString().replace(/[:.]/g, '-')
 }
 
 async function resolveArchive(options: {
@@ -233,42 +226,12 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
 
     ensureNotCancelled(signal)
 
-    const state = await loadState(paths, { catalog, migrate: true })
-    const previousPackId = state.activePackId
-    const previousManagedFolders =
-      previousPackId && previousPackId !== packId
-        ? (state.installs[previousPackId]?.managedFolders ?? [])
-        : []
-
-    const backupRoot = path.join(paths.backupDir, `easypz-${timestamp()}`)
     stageEvent(onEvent, 'apply', 'start')
-
-    if (previousManagedFolders.length > 0) {
-      const removed = await removeModsNotInPack({
-        catalog,
-        targetPackId: packId,
-        previousManagedFolders,
-        modsDir: modsDir(paths),
-        backupRoot,
-        signal,
-        onEvent,
-      })
-      if (removed.length > 0) {
-        emit(onEvent, {
-          type: 'log',
-          level: 'info',
-          message: `Moved ${removed.length} mod(s) from the previous pack to backup.`,
-        })
-      }
-    }
-
-    const applied = await applyMods({
+    const stored = await storePackMods({
       catalog,
       packId,
       extractRoot,
-      modsDir: modsDir(paths),
-      backupRoot,
-      force: options.forceMods,
+      paths,
       signal,
       onEvent,
     })
@@ -276,7 +239,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
     emit(onEvent, {
       type: 'log',
       level: 'info',
-      message: `Mods ready: ${applied.moved} moved, ${applied.kept} kept, ${applied.backedUp} backed up.`,
+      message: `Stored ${stored.stored} mod folder(s); ${stored.skipped} already available.`,
     })
 
     ensureNotCancelled(signal)
@@ -329,39 +292,25 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
     if (options.skipActivate) {
       stageEvent(onEvent, 'activate', 'skip')
     } else {
-      const clientIds = getActiveModIds(catalog, packId, false)
-      await writeDefaultTxt({
-        modIds: clientIds,
-        modsDir: modsDir(paths),
-        backupDir: paths.backupDir,
+      const toggle = await setPackEnabled({
+        catalog,
+        packId,
+        paths,
+        enabled: true,
+        signal,
+        onEvent,
+        skipGameCheck: true,
       })
-      stageEvent(onEvent, 'activate', 'done', `${clientIds.length} client mods`)
+      stageEvent(onEvent, 'activate', 'done', `${toggle.modCount} client mods`)
     }
 
     ensureNotCancelled(signal)
 
-    let hostUpdated = false
-    stageEvent(onEvent, 'host', 'start')
-    if (options.skipHost) {
-      stageEvent(onEvent, 'host', 'skip')
-    } else {
-      const serverIds = getActiveModIds(catalog, packId, true)
-      const hostResult = await applyHostIni({
-        iniPath: hostIniPath(paths),
-        modIds: serverIds,
-        backupDir: paths.backupDir,
-      })
-      hostUpdated = hostResult.updated
-      stageEvent(
-        onEvent,
-        'host',
-        hostResult.updated ? 'done' : 'skip',
-        hostResult.reason ?? `${hostResult.modCount} mods`,
-      )
-    }
+    stageEvent(onEvent, 'host', 'skip')
 
     stageEvent(onEvent, 'state', 'start')
-    const nextState = recordInstall(state, catalog, packId)
+    const finalState = await loadState(paths, { catalog, migrate: true })
+    const nextState = recordInstall(finalState, catalog, packId)
     await saveState(paths, nextState)
     stageEvent(onEvent, 'state', 'done')
 
@@ -373,7 +322,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       downloadedBytes,
       installedAt: nextState.installs[packId]?.installedAt ?? new Date().toISOString(),
       zombieBuddy,
-      hostUpdated,
+      hostUpdated: false,
     }
 
     emit(onEvent, { type: 'done', summary })

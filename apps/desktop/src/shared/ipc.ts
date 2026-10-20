@@ -1,11 +1,14 @@
 import type { Catalog, IndexedPack } from '@easypz/catalog'
 import type {
   AppState,
+  DeletePackResult,
   EngineEvent,
   GameInfo,
   HostApplyResult,
+  HostStatus,
   InstallSummary,
   PackHealth,
+  PackToggleResult,
 } from '@easypz/engine'
 
 export type Language = 'en' | 'pt-BR'
@@ -31,6 +34,7 @@ export interface CatalogView extends Omit<Catalog, 'packs'> {
 
 export interface AppPathView {
   cache: string
+  store: string
   mods: string
   backups: string
   zomboid: string
@@ -44,6 +48,8 @@ export interface Bootstrap {
   catalog: CatalogView
   game: GameInfo
   state: AppState
+  availablePackIds: string[]
+  host: HostStatus
   settings: Settings
   legacyDetected: boolean
   isElevated: boolean
@@ -62,18 +68,13 @@ export type OperationResult<T = void> =
       needsElevation?: boolean
     }
 
-export interface DeactivateResult {
-  removed: number
-  purged: boolean
-  backupRoot: string | null
-}
-
 export interface EasyPzApi {
   getBootstrap: () => Promise<Bootstrap>
   startInstall: (packId: string) => Promise<OperationResult<InstallSummary>>
   cancelInstall: () => Promise<void>
-  activate: (packId: string) => Promise<OperationResult<{ modCount: number }>>
-  deactivate: (packId: string, purge: boolean) => Promise<OperationResult<DeactivateResult>>
+  setPackEnabled: (packId: string, enabled: boolean) => Promise<OperationResult<PackToggleResult>>
+  repairPack: (packId: string) => Promise<OperationResult<PackToggleResult>>
+  deletePack: (packId: string) => Promise<OperationResult<DeletePackResult>>
   verify: (packId: string) => Promise<OperationResult<PackHealth>>
   applyHost: (packId: string) => Promise<OperationResult<HostApplyResult>>
   setGamePath: (gamePath: string | null) => Promise<OperationResult<Bootstrap>>
@@ -90,8 +91,9 @@ export const IPC = {
   getBootstrap: 'app:getBootstrap',
   startInstall: 'install:start',
   cancelInstall: 'install:cancel',
-  activate: 'pack:activate',
-  deactivate: 'pack:deactivate',
+  setPackEnabled: 'pack:setEnabled',
+  repairPack: 'pack:repair',
+  deletePack: 'pack:delete',
   verify: 'pack:verify',
   applyHost: 'host:apply',
   setGamePath: 'settings:setGamePath',

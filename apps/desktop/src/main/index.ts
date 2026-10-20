@@ -5,27 +5,29 @@ import { promisify } from 'node:util'
 import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } from 'electron'
 import {
   EasyPzError,
-  activateInstalledPack,
   applyHostForPack,
-  deactivatePack,
+  deletePack,
   getAppPaths,
+  getAvailablePackIds,
   getGameInfo,
+  getHostStatus,
   getPackHealth,
+  hostIniPath,
   installPack,
   isEasyPzError,
   loadState,
+  reconcileActivePack,
+  recoverStorageJournal,
+  repairPack,
   saveState,
   setGamePathOverride,
+  setPackEnabled,
+  type DeletePackResult,
   type EngineEvent,
+  type PackToggleResult,
 } from '@easypz/engine'
-import { getPack, type Catalog } from '@easypz/catalog'
-import type {
-  Bootstrap,
-  DeactivateResult,
-  OperationResult,
-  PendingAction,
-  Settings,
-} from '../shared/ipc'
+import { getActiveModIds, getPack, type Catalog } from '@easypz/catalog'
+import type { Bootstrap, OperationResult, PendingAction, Settings } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { loadCatalog, toCatalogView } from './catalog'
 import { ensureLogsDir, log, logsDir } from './logger'
@@ -113,7 +115,31 @@ async function buildBootstrap(): Promise<Bootstrap> {
   const catalog = await loadCatalog()
   const catalogView = await toCatalogView(catalog)
   const game = await getGameInfo(paths, { gamePathOverride: settings.gamePathOverride })
-  const state = await loadState(paths, { catalog, migrate: true })
+
+  let recoveredMoves = 0
+  if (!game.gameRunning) {
+    try {
+      recoveredMoves = await recoverStorageJournal(paths)
+      if (recoveredMoves > 0) log.info(`Recovered ${recoveredMoves} pack file move(s).`)
+    } catch (error) {
+      log.warn('Could not recover the previous pack move', error)
+    }
+  }
+
+  await fs.mkdir(paths.storeDir, { recursive: true })
+  let state = await loadState(paths, { catalog, migrate: true })
+  if (recoveredMoves > 0) {
+    try {
+      state = await reconcileActivePack({ catalog, paths })
+    } catch (error) {
+      log.warn('Could not reconcile the active pack after recovery', error)
+    }
+  }
+  const availablePackIds = await getAvailablePackIds(catalog, paths)
+  const hostExpectedIds = state.activePackId
+    ? getActiveModIds(catalog, state.activePackId, true)
+    : null
+  const host = await getHostStatus(hostIniPath(paths), hostExpectedIds)
   const legacyDetected =
     (await fileExists(paths.legacyProfileFile)) ||
     (await fileExists(paths.legacyMarkerFile)) ||
@@ -129,12 +155,15 @@ async function buildBootstrap(): Promise<Bootstrap> {
     catalog: catalogView,
     game,
     state,
+    availablePackIds,
+    host,
     settings,
     legacyDetected,
     isElevated: game.elevated,
     logsPath: logsDir,
     paths: {
       cache: paths.cacheDir,
+      store: paths.storeDir,
       mods: path.join(paths.zomboidDir, 'mods'),
       backups: paths.backupDir,
       zomboid: paths.zomboidDir,
@@ -218,7 +247,31 @@ function registerIpc(): void {
     activeInstall?.abort()
   })
 
-  ipcMain.handle(IPC.activate, async (_event, packId: unknown) => {
+  ipcMain.handle(IPC.setPackEnabled, async (_event, packId: unknown, enabled: unknown) => {
+    if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
+    if (typeof enabled !== 'boolean') return fail(new Error('Invalid pack state.'))
+    if (activeInstall) {
+      return {
+        ok: false,
+        code: 'BUSY',
+        message: 'Wait for the installation to finish.',
+      } satisfies OperationResult<never>
+    }
+    try {
+      const result = await setPackEnabled({
+        catalog: await loadCatalogForOperation(),
+        packId,
+        paths: getAppPaths(),
+        enabled,
+        onEvent: sendInstallEvent,
+      })
+      return { ok: true, data: result } satisfies OperationResult<PackToggleResult>
+    } catch (error) {
+      return fail(error)
+    }
+  })
+
+  ipcMain.handle(IPC.repairPack, async (_event, packId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
     if (activeInstall) {
       return {
@@ -228,31 +281,37 @@ function registerIpc(): void {
       } satisfies OperationResult<never>
     }
     try {
-      const result = await activateInstalledPack({
+      const settings = await readSettings()
+      const result = await repairPack({
         catalog: await loadCatalogForOperation(),
         packId,
         paths: getAppPaths(),
+        gamePathOverride: settings.gamePathOverride,
         onEvent: sendInstallEvent,
       })
-      return { ok: true, data: { modCount: result.modCount } } satisfies OperationResult<{
-        modCount: number
-      }>
+      return { ok: true, data: result } satisfies OperationResult<PackToggleResult>
     } catch (error) {
       return fail(error)
     }
   })
 
-  ipcMain.handle(IPC.deactivate, async (_event, packId: unknown, purge: unknown) => {
+  ipcMain.handle(IPC.deletePack, async (_event, packId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
+    if (activeInstall) {
+      return {
+        ok: false,
+        code: 'BUSY',
+        message: 'Wait for the installation to finish.',
+      } satisfies OperationResult<never>
+    }
     try {
-      const result = await deactivatePack({
+      const result = await deletePack({
         catalog: await loadCatalogForOperation(),
         packId,
         paths: getAppPaths(),
-        purge: Boolean(purge),
         onEvent: sendInstallEvent,
       })
-      return { ok: true, data: result } satisfies OperationResult<DeactivateResult>
+      return { ok: true, data: result } satisfies OperationResult<DeletePackResult>
     } catch (error) {
       return fail(error)
     }

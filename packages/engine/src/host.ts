@@ -58,3 +58,37 @@ export async function readHostMods(iniPath: string): Promise<string[] | null> {
     return null
   }
 }
+
+export interface HostStatus {
+  exists: boolean
+  modCount: number | null
+  matchesActivePack: boolean | null
+}
+
+export async function getHostStatus(
+  iniPath: string,
+  expectedModIds: string[] | null,
+): Promise<HostStatus> {
+  const hostMods = await readHostMods(iniPath)
+  if (!hostMods) {
+    const exists = await fs
+      .access(iniPath)
+      .then(() => true)
+      .catch(() => false)
+    return {
+      exists,
+      modCount: exists ? 0 : null,
+      matchesActivePack: expectedModIds ? false : null,
+    }
+  }
+
+  if (!expectedModIds) {
+    return { exists: true, modCount: hostMods.length, matchesActivePack: null }
+  }
+
+  const expected = new Set(expectedModIds)
+  const actual = new Set(hostMods)
+  const matches = expected.size === actual.size && [...expected].every((id) => actual.has(id))
+
+  return { exists: true, modCount: hostMods.length, matchesActivePack: matches }
+}

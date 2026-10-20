@@ -48,14 +48,12 @@ Steam / Project Zomboid / %USERPROFILE%\Zomboid / %LOCALAPPDATA%\EasyPZ
 2. **Resolve archive** — use a valid cached archive, then a valid legacy archive, otherwise download.
 3. **Verify** — SHA256 against the catalog.
 4. **Extract** — into `%LOCALAPPDATA%\EasyPZ\cache\extracted\<sha256>`.
-5. **Plan** — compute the target pack's effective mods, including inherited groups.
-6. **Switch** — if the active pack differs, move folders that belong to the old pack but not the new pack into a backup.
-7. **Apply** — move mods from the extract cache into `Zomboid\mods`; keep valid existing mods unless forced; back up replaced folders; roll back on failure.
-8. **ZombieBuddy** — manual copy of `ZombieBuddy.jar` and `zbNative.dll` when available.
-9. **Configure** — heap, agent, texture compression.
-10. **Activate** — write client mod IDs to `default.txt`.
-11. **Host** — update `servertest.ini` when it exists.
-12. **Record** — write install state and active pack.
+5. **Store** — move mods from the extract cache into the EasyPZ pack store, keyed by workshop ID and folder.
+6. **ZombieBuddy** — manual copy of `ZombieBuddy.jar` and `zbNative.dll` when available.
+7. **Configure** — heap, agent, texture compression.
+8. **Activate** — move the previous active pack to the store, move the target pack from the store into `Zomboid\mods`, update only EasyPZ-owned IDs in `default.txt`, and record the active pack.
+9. **Host** — do not modify `servertest.ini`; Library offers an explicit sync when it is out of date.
+10. **Record** — write the install record for provenance and update availability.
 
 Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warning`, `log`, `done`, `error`) and forwarded to the renderer over `install:event`.
 
@@ -66,6 +64,7 @@ Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warnin
 ```json
 {
   "schemaVersion": 1,
+  "layoutVersion": 2,
   "activePackId": "advanced",
   "installs": {
     "advanced": {
@@ -83,7 +82,17 @@ Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warnin
 }
 ```
 
-Only folders tracked in an install record are ever moved or deleted by EasyPZ. Unmanaged mods are left alone.
+`layoutVersion: 2` introduced the pack store. Only folders tracked by an EasyPZ pack are ever moved or deleted; unmanaged mods and unmanaged `default.txt` IDs are preserved.
+
+## Pack store and toggles
+
+- Inactive packs live in `%USERPROFILE%\Zomboid\EasyPZ\store\108600\<workshopId>\mods\<folder>`.
+- The active pack lives in `%USERPROFILE%\Zomboid\mods`.
+- `getAvailablePackIds` marks a pack available when every managed mod is in the store or active.
+- Enabling or disabling a pack is a directory-move transaction, not an install.
+- Moves are journaled to `%USERPROFILE%\Zomboid\EasyPZ\move-journal.json`. On startup, an interrupted move is completed and the active pack is reconciled from the physical folder state.
+- Shared mods are stored once under their workshop/folder key.
+- Deleting a pack removes only store folders not referenced by another available pack.
 
 ## Legacy migration
 

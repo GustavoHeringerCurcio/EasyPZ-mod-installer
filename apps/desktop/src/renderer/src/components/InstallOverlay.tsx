@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import type { InstallUiState, StageName } from '../lib/install'
 import { STAGE_ORDER } from '../lib/install'
 import { Badge, Button, Progress, Spinner } from './ui'
-import { cn, formatBytes, formatEta, formatSpeed } from '../lib/format'
+import { cn, formatBytes, formatDate, formatEta, formatSpeed } from '../lib/format'
 
 export function InstallOverlay({
   state,
@@ -130,8 +130,8 @@ export function InstallOverlay({
                   value={state.summary.zombieBuddy.replaceAll('-', ' ')}
                 />
                 <SummaryStat
-                  label={t('install.summary.host')}
-                  value={state.summary.hostUpdated ? t('common.yes') : t('common.no')}
+                  label={t('install.summary.installedAt')}
+                  value={formatDate(state.summary.installedAt)}
                 />
                 <SummaryStat
                   label={t('install.summary.download')}

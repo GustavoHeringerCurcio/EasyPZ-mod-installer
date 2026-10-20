@@ -7,8 +7,10 @@ const api: EasyPzApi = {
   getBootstrap: () => ipcRenderer.invoke(IPC.getBootstrap),
   startInstall: (packId: string) => ipcRenderer.invoke(IPC.startInstall, packId),
   cancelInstall: () => ipcRenderer.invoke(IPC.cancelInstall),
-  activate: (packId: string) => ipcRenderer.invoke(IPC.activate, packId),
-  deactivate: (packId: string, purge: boolean) => ipcRenderer.invoke(IPC.deactivate, packId, purge),
+  setPackEnabled: (packId: string, enabled: boolean) =>
+    ipcRenderer.invoke(IPC.setPackEnabled, packId, enabled),
+  repairPack: (packId: string) => ipcRenderer.invoke(IPC.repairPack, packId),
+  deletePack: (packId: string) => ipcRenderer.invoke(IPC.deletePack, packId),
   verify: (packId: string) => ipcRenderer.invoke(IPC.verify, packId),
   applyHost: (packId: string) => ipcRenderer.invoke(IPC.applyHost, packId),
   setGamePath: (gamePath: string | null) => ipcRenderer.invoke(IPC.setGamePath, gamePath),

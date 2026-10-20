@@ -18,6 +18,12 @@ const en = {
     subtitle:
       'One click installs the full Project Zomboid modpack: mods, ZombieBuddy, launcher settings, and activation.',
     search: 'Search packs and mods',
+    install: 'Install',
+    enable: 'Enable',
+    disable: 'Disable',
+    on: 'On',
+    off: 'Off',
+    gameRunningHint: 'Close Project Zomboid to change the active pack.',
     empty: 'No packs match your search.',
     alphaNote:
       'Private alpha catalog. Artwork is placeholder and will be replaced before the public launch.',
@@ -66,7 +72,8 @@ const en = {
     installedBadge: 'Installed',
     modCount: '{{count}} mods',
     free: 'free',
-    activeHint: 'Mods are already active. Reinstalling repairs files and settings.',
+    activeHint: 'Mods are active in Project Zomboid. Disabling keeps them stored on disk.',
+    enableHint: 'Enable this pack to load its mods. Only one pack can be active.',
     installHint: 'Installs mods, ZombieBuddy, launcher settings, and the active mod list.',
   },
   install: {
@@ -144,11 +151,18 @@ const en = {
     purgeConfirm:
       'Permanently delete this pack’s managed mods? Your saves and unmanaged mods are not touched.',
     active: 'Active',
+    stored: 'Stored',
     notActive: 'Installed, not active',
     defaultTxtCount: '{{count}} entries',
     hostNotConfigured: 'No host found',
     setup: 'Setup',
     modsCount: '{{installed}}/{{total}} mods',
+    activeCount: '{{count}} active now',
+    deleteMods: 'Delete mods',
+    hostOutOfSync: 'Server mod list is out of sync',
+    hostOutOfSyncHint:
+      'This PC hosts a Project Zomboid server. Its mod list does not match {{pack}}.',
+    syncHost: 'Sync host mods',
   },
   settings: {
     title: 'Settings',
@@ -169,6 +183,7 @@ const en = {
     maintenance: 'Maintenance',
     openLogs: 'Open logs',
     openCache: 'Open download cache',
+    openStore: 'Open pack storage',
     openMods: 'Open mods folder',
     openBackups: 'Open backups',
     openGame: 'Open game folder',
@@ -199,6 +214,25 @@ const en = {
     open: 'Open log folder',
     clear: 'Clear session log',
   },
+  confirm: {
+    disableTitle: 'Disable {{pack}}?',
+    disableBody:
+      'Its mods will stay installed in EasyPZ storage, but they will not load in Project Zomboid until you enable the pack again.',
+    switchTitle: 'Enable {{pack}}?',
+    switchBody: '{{previous}} will be disabled. Both packs stay installed.',
+    switchAction: 'Switch to {{pack}}',
+    installTitle: 'Install {{pack}}?',
+    installBody: '{{previous}} will be disabled and moved to storage after installation.',
+    installAction: 'Install and switch',
+    deleteTitle: 'Delete {{pack}} mods?',
+    deleteBody:
+      'Only mods unique to this pack will be deleted. Folders shared with another stored pack are kept.',
+    deleteAction: 'Delete mods',
+    hostTitle: 'Sync the server mod list?',
+    hostBody:
+      'This updates servertest.ini to match the active pack and creates a backup of the current file.',
+    hostAction: 'Sync host',
+  },
   elevation: {
     title: 'Administrator access required',
     body: 'Project Zomboid is in a protected folder. EasyPZ will restart with administrator access and continue the install.',
@@ -226,6 +260,10 @@ const en = {
   toast: {
     installDone: '{{pack}} is installed.',
     activated: '{{pack}} is now active.',
+    switched: '{{pack}} enabled. {{previous}} moved to storage.',
+    disabled: '{{pack}} disabled. Its mods stay stored.',
+    repaired: '{{pack}} repaired from the local pack store.',
+    deleted: '{{pack}} mods deleted.',
     deactivated: 'Mods moved to the EasyPZ backup folder.',
     purged: 'Managed mods were deleted.',
     verifiedOk: 'All managed mods are present.',

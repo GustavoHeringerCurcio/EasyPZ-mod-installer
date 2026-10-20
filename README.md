@@ -8,14 +8,26 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 
 ## What it does
 
-- Catalog with pack covers, descriptions, tags, requirements, and full mod lists.
-- One-click install of the complete pack: mods, ZombieBuddy, launcher heap/agent configuration, `default.txt`, and host INI when present.
+- Catalog with pack covers, tags, requirements, and full mod lists.
+- One-click install of the complete pack: mods, ZombieBuddy, launcher heap/agent configuration, and activation.
+- One active pack at a time. Inactive packs stay installed in EasyPZ storage and can be toggled on instantly.
 - Download progress, checksum verification, extraction progress, cancellation, and actionable errors.
-- Package switching with managed-folder diffs; unmanaged mods are never touched.
-- Library health checks, activation, deactivation to backup, purge, repair, and host setup.
+- Switching moves only EasyPZ-managed mod folders; unmanaged mods and `default.txt` entries are preserved.
+- Library health checks, toggles, delete, repair, and explicit host sync.
 - Legacy migration: reuses the old profile, marker, and archive cache when the hash matches.
 - English by default, Portuguese (BR) toggle.
 - Remote-catalog-ready architecture; the alpha build uses a bundled catalog because the repository is private.
+
+## How activation works
+
+Only one EasyPZ modpack can be ready to play at a time.
+
+- The active pack’s folders live in `%USERPROFILE%\Zomboid\mods`.
+- Inactive packs stay installed in `%USERPROFILE%\Zomboid\EasyPZ\store`.
+- Enabling a pack moves the previous pack’s managed folders to the store and the target pack’s folders into `Zomboid\mods`.
+- Disabling a pack moves it to the store and removes its IDs from `default.txt`.
+- Mods are moved, not re-downloaded, so switching is fast once a pack is installed.
+- The app preserves unrelated mod IDs the user added to `default.txt`.
 
 ## Requirements
 
@@ -103,10 +115,17 @@ Read [docs/alpha.md](docs/alpha.md). In short:
 | `%LOCALAPPDATA%\EasyPZ\cache\archives`    | Verified pack archives                                  |
 | `%LOCALAPPDATA%\EasyPZ\cache\extracted`   | Extracted archives keyed by SHA256                      |
 | `%USERPROFILE%\Zomboid\EasyPZ\state.json` | Active pack and install records                         |
-| `%USERPROFILE%\Zomboid\mods`              | Installed mods                                          |
+| `%USERPROFILE%\Zomboid\EasyPZ\store`      | Inactive downloaded pack mods                           |
+| `%USERPROFILE%\Zomboid\mods`              | Mods for the one active pack                            |
 | `%USERPROFILE%\Zomboid\backups`           | EasyPZ backups, `default.txt` backups, host INI backups |
 
 EasyPZ does **not** back up saves. Make a manual save backup before switching packs.
+
+## Hosting a server
+
+`%USERPROFILE%\Zomboid\Server\servertest.ini` is the config for a Project Zomboid server hosted from this PC. Single-player users do not have it and do not need it.
+
+If it exists and its `Mods=` list does not match the active pack, EasyPZ shows a banner in Library with a **Sync host mods** action. EasyPZ never modifies that file silently; syncing creates a backup first.
 
 ## Security
 
