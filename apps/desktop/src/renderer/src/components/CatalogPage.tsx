@@ -44,9 +44,9 @@ function PackCard({
       }}
       className={cn(
         'group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-panel/80 text-left transition-all duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
         active
-          ? 'border-acid/45 shadow-[0_0_40px_rgba(183,240,74,0.08)]'
+          ? 'border-brand/45 shadow-[0_0_40px_rgba(253,26,4,0.1)]'
           : 'border-line hover:-translate-y-0.5 hover:border-muted/50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]',
       )}
     >
@@ -73,7 +73,7 @@ function PackCard({
         <div className="mt-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 text-[11px] text-muted">
             <span className="inline-flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-acid/80" />
+              <Sparkles className="size-3.5 text-brand/80" />
               {t('catalog.mods', { count: pack.stats.clientMods })}
             </span>
             <span className="inline-flex items-center gap-1.5">
@@ -111,7 +111,7 @@ function PackCard({
           </div>
         </div>
         {gameRunning ? (
-          <div className="text-[10px] text-rust">{t('catalog.gameRunningHint')}</div>
+          <div className="text-[10px] text-warn">{t('catalog.gameRunningHint')}</div>
         ) : null}
       </div>
     </article>
@@ -163,7 +163,7 @@ export function CatalogPage({
           value={search}
           onChange={(event) => onSearch(event.target.value)}
           placeholder={t('catalog.search')}
-          className="h-11 w-full rounded-xl border border-line bg-panel/70 pl-11 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-acid/50 focus:ring-2 focus:ring-acid/15"
+          className="h-11 w-full rounded-xl border border-line bg-panel/70 pl-11 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-brand/50 focus:ring-2 focus:ring-brand/15"
         />
       </div>
 

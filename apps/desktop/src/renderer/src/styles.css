@@ -5,15 +5,17 @@
   --font-display: 'Space Grotesk Variable', 'Segoe UI', sans-serif;
   --font-mono: 'Cascadia Code', 'Consolas', monospace;
 
-  --color-ink: #080b0a;
-  --color-panel: #0f1513;
-  --color-panel-2: #151d1a;
-  --color-line: #24302b;
-  --color-bone: #f2f0e9;
-  --color-muted: #8a948f;
-  --color-acid: #b7f04a;
-  --color-rust: #ff6b35;
-  --color-danger: #e5484d;
+  --color-ink: #080606;
+  --color-panel: #120c0c;
+  --color-panel-2: #1a1212;
+  --color-line: #2e2020;
+  --color-bone: #ffffff;
+  --color-muted: #a39a9a;
+  --color-brand: #fd1a04;
+  --color-brand-hover: #ff3d26;
+  --color-brand-active: #d81400;
+  --color-warn: #ff8a78;
+  --color-danger: #ff3b30;
 }
 
 html,
@@ -37,7 +39,7 @@ body {
 }
 
 ::selection {
-  background: rgba(183, 240, 74, 0.28);
+  background: rgba(253, 26, 4, 0.3);
 }
 
 ::-webkit-scrollbar {
@@ -50,13 +52,13 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a3832;
+  background: #3a2828;
   border-radius: 999px;
   border: 2px solid var(--color-ink);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a4b43;
+  background: #4d3333;
 }
 
 button,
@@ -70,6 +72,6 @@ a {
 
 .noise {
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(183, 240, 74, 0.07), transparent 38%),
-    radial-gradient(circle at 85% 0%, rgba(255, 107, 53, 0.06), transparent 32%);
+    radial-gradient(circle at 15% 20%, rgba(253, 26, 4, 0.08), transparent 38%),
+    radial-gradient(circle at 85% 0%, rgba(255, 138, 120, 0.06), transparent 32%);
 }

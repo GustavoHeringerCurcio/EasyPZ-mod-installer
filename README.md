@@ -18,6 +18,16 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 - English by default, Portuguese (BR) toggle.
 - Remote-catalog-ready architecture; the alpha build uses a bundled catalog because the repository is private.
 
+## Packs
+
+| Pack           | Client mods | Download | Notes                                                      |
+| -------------- | ----------: | -------: | ---------------------------------------------------------- |
+| **Essentials** |           6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
+| **Medium**     |          38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
+| **Advanced**   |          45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
+
+Essentials is standalone. Medium and Advanced are additive to each other, but Essentials is a smaller independent starter pack.
+
 ## How activation works
 
 Only one EasyPZ modpack can be ready to play at a time.
@@ -129,7 +139,7 @@ If it exists and its `Mods=` list does not match the active pack, EasyPZ shows a
 
 ## Security
 
-- Catalog is validated with Zod; archive URLs must be HTTPS on the pinned GitHub repository and match the expected file name.
+- Catalog is validated with Zod; archive URLs must be HTTPS on the pinned GitHub repositories (`EasyPZ-mod-installer` or `EasyPZ-assets`) and match the expected file name.
 - SHA256 is mandatory for every archive.
 - Archive extraction rejects path traversal.
 - Renderer runs with `contextIsolation`, no Node integration, a narrow preload bridge, and a Content Security Policy.

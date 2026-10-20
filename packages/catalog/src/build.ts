@@ -8,6 +8,7 @@ import { catalogIndexPath, packsRoot } from './paths.js'
 const ALPHA_HOST = 'github.com'
 const ALPHA_PATH_PREFIX = '/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/'
 const PUBLIC_PATH_PREFIX = '/GustavoHeringerCurcio/EasyPZ-mod-installer/releases/download/'
+const ASSETS_PATH_PREFIX = '/GustavoHeringerCurcio/EasyPZ-assets/releases/download/'
 
 function formatZodError(error: unknown): string {
   if (error && typeof error === 'object' && 'issues' in error) {
@@ -65,8 +66,11 @@ function validateArchiveUrl(mode: CatalogMode, pack: PackDefinition): string {
     throw new Error(`${pack.id}: archive URL must be HTTPS on ${ALPHA_HOST}: ${url}`)
   }
 
-  const allowedPrefix = mode === 'alpha' ? ALPHA_PATH_PREFIX : PUBLIC_PATH_PREFIX
-  if (!parsed.pathname.startsWith(allowedPrefix)) {
+  const allowedPrefixes =
+    mode === 'alpha'
+      ? [ALPHA_PATH_PREFIX, ASSETS_PATH_PREFIX]
+      : [PUBLIC_PATH_PREFIX, ASSETS_PATH_PREFIX]
+  if (!allowedPrefixes.some((prefix) => parsed.pathname.startsWith(prefix))) {
     throw new Error(`${pack.id}: archive URL is outside the allowed release path: ${url}`)
   }
 

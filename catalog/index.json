@@ -1,8 +1,120 @@
 {
   "schemaVersion": 1,
   "mode": "alpha",
-  "generatedAt": "2026-10-20T20:46:36.283Z",
+  "generatedAt": "2026-10-20T22:23:17.045Z",
   "packs": [
+    {
+      "schemaVersion": 1,
+      "id": "essentials",
+      "name": "Essentials",
+      "tagline": "The core Viewpoint experience, without the extras.",
+      "description": "A lightweight starter pack with ZombieBuddy, Viewpoint, the 3D model pack, the first-person interface, recoil and ADS, and the right-click fix. No tactical, atmosphere, survival, or immersion extras.",
+      "cover": "packs/essentials/cover.svg",
+      "gallery": [],
+      "placeholderArt": true,
+      "gameBuild": "42.21",
+      "tags": [
+        "starter",
+        "lightweight",
+        "viewpoint",
+        "client-side"
+      ],
+      "extends": null,
+      "order": 5,
+      "archive": {
+        "fileName": "PZ-Viewpoint-Essentials.tar",
+        "sha256": "b863706c20720f02daa6b097e3ab2295b09e91e1e69a67a75f9ad285704f7473",
+        "sizeBytes": 540411392,
+        "requiredDiskGB": 3,
+        "releaseTag": "essentials-v1",
+        "url": "https://github.com/GustavoHeringerCurcio/EasyPZ-assets/releases/download/essentials-v1/PZ-Viewpoint-Essentials.tar"
+      },
+      "requirements": {
+        "freeDiskGB": 3,
+        "ramGB": 8,
+        "recommendedRamGB": 16,
+        "vramGB": 8
+      },
+      "groups": [
+        {
+          "name": "Core",
+          "mods": [
+            {
+              "id": "ZombieBuddy",
+              "name": "ZombieBuddy",
+              "folder": "ZombieBuddy",
+              "workshopId": "3619862853",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853",
+              "serverOnly": false
+            },
+            {
+              "id": "Viewpoint",
+              "name": "Viewpoint",
+              "folder": "Viewpoint",
+              "workshopId": "3809306528",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528",
+              "serverOnly": false
+            },
+            {
+              "id": "PZVoxelStudioViewpoint",
+              "name": "6277 3D models for Viewpoint [sour_kisel]",
+              "folder": "PZVoxelStudioViewpoint",
+              "workshopId": "3810302175",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810302175",
+              "serverOnly": false
+            },
+            {
+              "id": "ViewpointUI",
+              "name": "Viewpoint - Interface",
+              "folder": "ViewpointUI",
+              "workshopId": "3812616893",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812616893",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Aim & Fixes",
+          "mods": [
+            {
+              "id": "ProjectViewpointADS",
+              "name": "Project Viewpoint: Recoil & ADS (Viewpoint add-on)",
+              "folder": "ProjectViewpointADS",
+              "workshopId": "3812612054",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
+              "serverOnly": false
+            },
+            {
+              "id": "ViewpointRightClick",
+              "name": "Viewpoint - Right Click Fix",
+              "folder": "ViewpointRightClick",
+              "workshopId": "3819018807",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+              "serverOnly": false
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        "Close Project Zomboid before installing.",
+        "Back up your save manually before switching an existing world.",
+        "ZombieBuddy may ask you to approve its JAR on first launch.",
+        "Only one EasyPZ pack can be active at a time.",
+        "If this PC hosts a server, sync servertest.ini from Library after switching."
+      ],
+      "credits": [
+        "All mods belong to their respective authors.",
+        "The release archive is a convenience mirror for this pack; it is not claimed as original work.",
+        "Not affiliated with The Indie Stone."
+      ],
+      "updatedAt": "2026-10-20",
+      "stats": {
+        "clientMods": 6,
+        "serverMods": 0,
+        "totalMods": 6,
+        "workshopCount": 6
+      }
+    },
     {
       "schemaVersion": 1,
       "id": "medium",

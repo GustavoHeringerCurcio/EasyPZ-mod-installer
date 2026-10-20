@@ -7,8 +7,8 @@ type ButtonSize = 'sm' | 'md' | 'lg'
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-acid text-ink hover:bg-[#c9ff63] active:bg-[#a8df3f] shadow-[0_0_28px_rgba(183,240,74,0.18)]',
-  secondary: 'bg-panel-2 text-bone border border-line hover:border-muted/60 hover:bg-[#1a2420]',
+    'bg-brand text-ink hover:bg-brand-hover active:bg-brand-active shadow-[0_0_28px_rgba(253,26,4,0.22)]',
+  secondary: 'bg-panel-2 text-bone border border-line hover:border-muted/60 hover:bg-[#221717]',
   ghost: 'text-muted hover:text-bone hover:bg-white/5',
   danger:
     'bg-danger/10 text-danger border border-danger/35 hover:bg-danger/20 hover:border-danger/60',
@@ -39,7 +39,7 @@ export function Button({
       disabled={disabled || loading}
       className={cn(
         'inline-flex items-center justify-center font-medium transition-colors duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
         'disabled:cursor-not-allowed disabled:opacity-50',
         variantClasses[variant],
         sizeClasses[size],
@@ -52,12 +52,12 @@ export function Button({
   )
 }
 
-type BadgeTone = 'neutral' | 'acid' | 'rust' | 'danger' | 'muted'
+type BadgeTone = 'neutral' | 'brand' | 'warn' | 'danger' | 'muted'
 
 const badgeTones: Record<BadgeTone, string> = {
   neutral: 'bg-white/5 text-bone border-white/10',
-  acid: 'bg-acid/10 text-acid border-acid/25',
-  rust: 'bg-rust/10 text-rust border-rust/25',
+  brand: 'bg-brand/10 text-brand border-brand/25',
+  warn: 'bg-warn/10 text-warn border-warn/25',
   danger: 'bg-danger/10 text-danger border-danger/25',
   muted: 'bg-white/[0.03] text-muted border-white/10',
 }
@@ -97,7 +97,7 @@ export function Progress({
     <div className={cn('h-2 w-full overflow-hidden rounded-full bg-white/[0.07]', className)}>
       <div
         className={cn(
-          'h-full rounded-full bg-acid transition-[width] duration-300',
+          'h-full rounded-full bg-brand transition-[width] duration-300',
           indeterminate && 'w-1/3 animate-pulse',
         )}
         style={indeterminate ? undefined : { width: `${Math.max(0, Math.min(100, value))}%` }}
@@ -107,7 +107,7 @@ export function Progress({
 }
 
 export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cn('size-4 animate-spin text-acid', className)} />
+  return <Loader2 className={cn('size-4 animate-spin text-brand', className)} />
 }
 
 export function Switch({
@@ -133,7 +133,7 @@ export function Switch({
       className={cn(
         'inline-flex items-center gap-2.5 rounded-full border px-2 py-1.5 text-xs font-medium transition-colors',
         checked
-          ? 'border-acid/35 bg-acid/10 text-bone'
+          ? 'border-brand/35 bg-brand/10 text-bone'
           : 'border-line bg-panel-2 text-muted hover:border-muted/50 hover:text-bone',
         'disabled:cursor-not-allowed disabled:opacity-45',
         className,
@@ -142,7 +142,7 @@ export function Switch({
       <span
         className={cn(
           'relative h-5 w-9 rounded-full transition-colors',
-          checked ? 'bg-acid' : 'bg-white/15',
+          checked ? 'bg-brand' : 'bg-white/15',
         )}
       >
         <span

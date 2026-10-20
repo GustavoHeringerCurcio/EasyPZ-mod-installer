@@ -457,7 +457,7 @@ function createWindow(): void {
     minWidth: 980,
     minHeight: 660,
     show: false,
-    backgroundColor: '#0a0d0c',
+    backgroundColor: '#080606',
     autoHideMenuBar: true,
     title: 'EasyPZ Mod Installer',
     icon: app.isPackaged

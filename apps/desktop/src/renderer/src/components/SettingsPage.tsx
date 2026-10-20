@@ -51,9 +51,9 @@ export function SettingsPage({
           <SectionTitle
             aside={
               game.found ? (
-                <Badge tone="acid">{t('settings.detected')}</Badge>
+                <Badge tone="brand">{t('settings.detected')}</Badge>
               ) : (
-                <Badge tone="rust">{t('settings.notFound')}</Badge>
+                <Badge tone="warn">{t('settings.notFound')}</Badge>
               )
             }
           >
@@ -103,7 +103,7 @@ export function SettingsPage({
             </div>
 
             {!game.found && game.detectionError ? (
-              <div className="flex gap-2 border-t border-line bg-rust/[0.05] px-5 py-3 text-[11px] text-rust">
+              <div className="flex gap-2 border-t border-line bg-warn/[0.05] px-5 py-3 text-[11px] text-warn">
                 <AlertTriangle className="size-3.5 shrink-0" />
                 {game.detectionError}
               </div>
@@ -118,13 +118,13 @@ export function SettingsPage({
               icon={game.gameRunning ? AlertTriangle : ShieldCheck}
               label={t('settings.gameProcess')}
               value={game.gameRunning ? t('settings.running') : t('settings.closed')}
-              tone={game.gameRunning ? 'rust' : 'acid'}
+              tone={game.gameRunning ? 'warn' : 'brand'}
             />
             <FactRow
               icon={game.canWriteGame ? ShieldCheck : Shield}
               label={t('settings.writeAccess')}
               value={game.canWriteGame ? t('settings.writable') : t('settings.needsAdmin')}
-              tone={game.canWriteGame ? 'acid' : 'muted'}
+              tone={game.canWriteGame ? 'brand' : 'muted'}
             />
             <FactRow
               icon={Globe2}
@@ -135,7 +135,7 @@ export function SettingsPage({
               icon={ShieldCheck}
               label={t('settings.admin')}
               value={bootstrap.isElevated ? t('settings.adminYes') : t('settings.adminNo')}
-              tone={bootstrap.isElevated ? 'acid' : 'muted'}
+              tone={bootstrap.isElevated ? 'brand' : 'muted'}
             />
           </Panel>
         </section>
@@ -162,7 +162,7 @@ export function SettingsPage({
                   onClick={() => onLanguage(code)}
                   className={
                     bootstrap.settings.language === code
-                      ? 'rounded-lg bg-acid px-3 py-1.5 text-xs font-semibold text-ink'
+                      ? 'rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-ink'
                       : 'rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:text-bone'
                   }
                 >
@@ -233,7 +233,7 @@ export function SettingsPage({
         </section>
 
         <p className="flex items-start gap-2 text-[11px] leading-relaxed text-muted">
-          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-rust" />
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-warn" />
           {t('settings.saveWarning')}
         </p>
       </div>
@@ -270,16 +270,16 @@ function FactRow({
   icon: typeof Cpu
   label: string
   value: string
-  tone?: 'default' | 'acid' | 'rust' | 'muted'
+  tone?: 'default' | 'brand' | 'warn' | 'muted'
 }) {
   return (
     <div className="flex items-center gap-3 px-5 py-3">
       <Icon
         className={
-          tone === 'acid'
-            ? 'size-3.5 text-acid'
-            : tone === 'rust'
-              ? 'size-3.5 text-rust'
+          tone === 'brand'
+            ? 'size-3.5 text-brand'
+            : tone === 'warn'
+              ? 'size-3.5 text-warn'
               : 'size-3.5 text-muted'
         }
       />

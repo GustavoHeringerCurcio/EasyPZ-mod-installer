@@ -52,7 +52,7 @@ export function LogsPage({
                     line.level === 'error'
                       ? 'text-danger/90'
                       : line.level === 'warn'
-                        ? 'text-rust/90'
+                        ? 'text-warn/90'
                         : 'text-muted',
                   )}
                 >

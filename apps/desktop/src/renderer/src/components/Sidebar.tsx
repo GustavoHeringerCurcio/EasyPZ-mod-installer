@@ -2,6 +2,7 @@ import { HardDrive, LayoutGrid, Settings, Shield, ShieldCheck, Terminal } from '
 import { useTranslation } from 'react-i18next'
 import type { Language } from '../../../shared/ipc'
 import { cn } from '../lib/format'
+import logo from '../assets/logo.png'
 
 export type View = 'catalog' | 'library' | 'settings' | 'logs'
 
@@ -34,15 +35,12 @@ export function Sidebar({
   return (
     <aside className="flex w-[232px] shrink-0 flex-col border-r border-line bg-panel/60">
       <div className="flex items-center gap-3 px-5 pb-5 pt-6">
-        <div className="relative flex size-10 items-center justify-center rounded-xl border border-line bg-panel-2">
-          <span className="font-display text-sm font-bold tracking-tight text-bone">EZ</span>
-          <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-acid shadow-[0_0_10px_rgba(183,240,74,0.8)]" />
-        </div>
+        <img src={logo} alt="" className="size-10 shrink-0 object-contain" />
         <div>
           <div className="font-display text-[15px] font-bold leading-none tracking-tight text-bone">
             {t('app.name')}
           </div>
-          <div className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-acid">
+          <div className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-brand">
             {t('app.suffix')}
           </div>
         </div>
@@ -59,14 +57,14 @@ export function Sidebar({
               className={cn(
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-acid/10 text-bone'
+                  ? 'bg-brand/10 text-bone'
                   : 'text-muted hover:bg-white/[0.04] hover:text-bone',
               )}
             >
               <Icon
                 className={cn(
                   'size-[18px] transition-colors',
-                  active ? 'text-acid' : 'text-muted group-hover:text-bone',
+                  active ? 'text-brand' : 'text-muted group-hover:text-bone',
                 )}
               />
               <span className="flex-1 text-left">{t(item.key)}</span>
@@ -75,7 +73,7 @@ export function Sidebar({
                   {installedCount}
                 </span>
               ) : null}
-              {active ? <span className="h-4 w-0.5 rounded-full bg-acid" /> : null}
+              {active ? <span className="h-4 w-0.5 rounded-full bg-brand" /> : null}
             </button>
           )
         })}
@@ -93,7 +91,7 @@ export function Sidebar({
                 onClick={() => onLanguage(code)}
                 className={cn(
                   'rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition-colors',
-                  language === code ? 'bg-acid text-ink' : 'text-muted hover:text-bone',
+                  language === code ? 'bg-brand text-ink' : 'text-muted hover:text-bone',
                 )}
               >
                 {code === 'en' ? 'EN' : 'PT'}
@@ -104,7 +102,7 @@ export function Sidebar({
 
         <div className="flex items-center gap-2 text-[11px] text-muted">
           {isElevated ? (
-            <ShieldCheck className="size-3.5 text-acid" />
+            <ShieldCheck className="size-3.5 text-brand" />
           ) : (
             <Shield className="size-3.5" />
           )}
@@ -113,7 +111,7 @@ export function Sidebar({
 
         <div className="flex items-center justify-between text-[10px] text-muted">
           <span>v{appVersion}</span>
-          <span className="rounded-full border border-acid/25 bg-acid/10 px-2 py-0.5 font-semibold uppercase tracking-wider text-acid">
+          <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-semibold uppercase tracking-wider text-brand">
             {t('app.alpha')}
           </span>
         </div>

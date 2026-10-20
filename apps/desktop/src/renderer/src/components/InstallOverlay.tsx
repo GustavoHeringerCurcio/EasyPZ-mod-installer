@@ -52,7 +52,7 @@ export function InstallOverlay({
         <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-acid">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">
                 {state.summary
                   ? t('install.doneTitle')
                   : state.error
@@ -102,8 +102,8 @@ export function InstallOverlay({
             </div>
           ) : state.summary ? (
             <div className="space-y-5">
-              <div className="flex gap-3 rounded-2xl border border-acid/25 bg-acid/[0.06] p-4">
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-acid" />
+              <div className="flex gap-3 rounded-2xl border border-brand/25 bg-brand/[0.06] p-4">
+                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-brand" />
                 <div>
                   <div className="text-sm font-semibold text-bone">{t('install.doneTitle')}</div>
                   <div className="mt-1 text-xs leading-relaxed text-muted">
@@ -280,7 +280,7 @@ function StageRow({
     >
       <div className="flex size-5 items-center justify-center">
         {status === 'done' ? (
-          <CheckCircle2 className="size-4 text-acid" />
+          <CheckCircle2 className="size-4 text-brand" />
         ) : status === 'skip' ? (
           <SkipForward className="size-3.5 text-muted" />
         ) : status === 'start' ? (
@@ -338,7 +338,7 @@ function LogList({ state }: { state: InstallUiState }) {
               line.level === 'error'
                 ? 'text-danger/90'
                 : line.level === 'warn'
-                  ? 'text-rust/90'
+                  ? 'text-warn/90'
                   : 'text-muted',
             )}
           >

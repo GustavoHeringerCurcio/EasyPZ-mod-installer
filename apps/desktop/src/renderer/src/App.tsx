@@ -21,6 +21,7 @@ import {
   type InstallUiState,
 } from './lib/install'
 import { cn } from './lib/format'
+import logo from './assets/logo.png'
 
 type ToastKind = 'success' | 'error' | 'info'
 type Toast = { kind: ToastKind; text: string }
@@ -429,7 +430,7 @@ export default function App() {
     return (
       <div className="flex h-full items-center justify-center bg-ink p-8">
         <div className="w-full max-w-lg rounded-3xl border border-line bg-panel p-8 text-center">
-          <AlertTriangle className="mx-auto size-8 text-rust" />
+          <AlertTriangle className="mx-auto size-8 text-warn" />
           <h1 className="mt-4 font-display text-2xl font-bold text-bone">{t('errors.generic')}</h1>
           <p className="mt-2 break-words text-sm text-muted">{bootError}</p>
           <div className="mt-6 flex justify-center gap-2">
@@ -538,8 +539,8 @@ export default function App() {
         <div className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/85 p-6 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-line bg-panel p-6 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
             <div className="flex items-start justify-between">
-              <div className="flex size-11 items-center justify-center rounded-xl border border-acid/25 bg-acid/10">
-                <ShieldCheck className="size-5 text-acid" />
+              <div className="flex size-11 items-center justify-center rounded-xl border border-brand/25 bg-brand/10">
+                <ShieldCheck className="size-5 text-brand" />
               </div>
               <button
                 onClick={() => void dismissElevation()}
@@ -584,18 +585,18 @@ export default function App() {
           className={cn(
             'fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-xl border px-4 py-3 text-xs shadow-2xl',
             toast.kind === 'success'
-              ? 'border-acid/30 bg-[#15200f] text-bone'
+              ? 'border-brand/30 bg-[#1c0906] text-bone'
               : toast.kind === 'error'
-                ? 'border-danger/35 bg-[#221011] text-bone'
+                ? 'border-danger/35 bg-[#210b0b] text-bone'
                 : 'border-line bg-panel text-bone',
           )}
         >
           {toast.kind === 'error' ? (
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-danger" />
           ) : toast.kind === 'success' ? (
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-acid" />
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-brand" />
           ) : (
-            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-rust" />
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
           )}
           <span className="leading-relaxed">{toast.text}</span>
           <button
@@ -615,12 +616,9 @@ function LoadingScreen() {
   const { t } = useTranslation()
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 bg-ink">
-      <div className="relative flex size-14 items-center justify-center rounded-2xl border border-line bg-panel-2">
-        <span className="font-display text-lg font-bold text-bone">EZ</span>
-        <span className="absolute -right-1 -top-1 size-2.5 rounded-full bg-acid shadow-[0_0_12px_rgba(183,240,74,0.9)]" />
-      </div>
+      <img src={logo} alt="" className="size-16 object-contain" />
       <div className="flex items-center gap-2 text-xs text-muted">
-        <Loader2 className="size-3.5 animate-spin text-acid" />
+        <Loader2 className="size-3.5 animate-spin text-brand" />
         {t('common.loading')}
       </div>
     </div>

@@ -97,7 +97,7 @@ export function PackDetailPage({
         </div>
         <div className="border-t border-line p-7">
           <div className="flex flex-wrap items-center gap-2">
-            {active ? <Badge tone="acid">{t('pack.active')}</Badge> : null}
+            {active ? <Badge tone="brand">{t('pack.active')}</Badge> : null}
             {!active && available ? <Badge>{t('pack.installed')}</Badge> : null}
             <Badge tone="muted">
               {t('pack.build')} {pack.gameBuild}
@@ -127,7 +127,7 @@ export function PackDetailPage({
                 className={cn(
                   '-mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors',
                   tab === id
-                    ? 'border-acid text-bone'
+                    ? 'border-brand text-bone'
                     : 'border-transparent text-muted hover:text-bone',
                 )}
               >
@@ -171,9 +171,9 @@ export function PackDetailPage({
                   {pack.warnings.map((warning) => (
                     <div
                       key={warning}
-                      className="flex gap-3 rounded-xl border border-rust/20 bg-rust/[0.06] px-4 py-3"
+                      className="flex gap-3 rounded-xl border border-warn/20 bg-warn/[0.06] px-4 py-3"
                     >
-                      <ShieldAlert className="mt-0.5 size-4 shrink-0 text-rust" />
+                      <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warn" />
                       <p className="text-[13px] leading-relaxed text-bone/85">{warning}</p>
                     </div>
                   ))}
@@ -220,7 +220,7 @@ export function PackDetailPage({
                   value={modSearch}
                   onChange={(event) => setModSearch(event.target.value)}
                   placeholder={t('pack.searchMods')}
-                  className="h-10 w-full rounded-xl border border-line bg-panel-2/60 pl-10 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-acid/50"
+                  className="h-10 w-full rounded-xl border border-line bg-panel-2/60 pl-10 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-brand/50"
                 />
               </div>
 
@@ -243,7 +243,7 @@ export function PackDetailPage({
                           {mod.serverOnly ? (
                             <Server className="size-3.5 text-muted" />
                           ) : (
-                            <Sparkles className="size-3.5 text-acid/80" />
+                            <Sparkles className="size-3.5 text-brand/80" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -327,7 +327,7 @@ export function PackDetailPage({
                   {t('pack.requires')}
                 </span>
                 {active ? (
-                  <CheckCircle2 className="size-4 text-acid" />
+                  <CheckCircle2 className="size-4 text-brand" />
                 ) : available ? (
                   <Badge>{t('pack.installedBadge')}</Badge>
                 ) : null}
@@ -397,7 +397,7 @@ function RequirementRow({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-line bg-panel-2/50 px-4 py-3">
       <div className="flex size-8 items-center justify-center rounded-lg bg-panel">
-        <Icon className="size-3.5 text-acid/80" />
+        <Icon className="size-3.5 text-brand/80" />
       </div>
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">

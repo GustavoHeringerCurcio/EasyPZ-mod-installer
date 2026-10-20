@@ -31,11 +31,11 @@ export function ConfirmDialog({
             className={
               request.destructive
                 ? 'flex size-11 items-center justify-center rounded-xl border border-danger/30 bg-danger/10'
-                : 'flex size-11 items-center justify-center rounded-xl border border-acid/25 bg-acid/10'
+                : 'flex size-11 items-center justify-center rounded-xl border border-brand/25 bg-brand/10'
             }
           >
             <AlertTriangle
-              className={request.destructive ? 'size-5 text-danger' : 'size-5 text-acid'}
+              className={request.destructive ? 'size-5 text-danger' : 'size-5 text-brand'}
             />
           </div>
           <button

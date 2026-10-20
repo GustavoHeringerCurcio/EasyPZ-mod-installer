@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
 import { getEffectiveMods } from '@easypz/catalog'
@@ -263,7 +263,7 @@ export async function assertPackAvailable(
   if (missing.length > 0) {
     throw new EasyPzError(
       'MISSING_MODS',
-      `Pack files are missing: ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''}. Install or repair the pack.`,
+      `Pack files are missing: ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '...' : ''}. Install or repair the pack.`,
     )
   }
 }

@@ -11,14 +11,17 @@ import {
 } from './schema.js'
 
 describe('catalog', () => {
-  it('builds both packs in alpha mode', async () => {
+  it('builds all packs in alpha mode', async () => {
     const catalog = await buildCatalog({ mode: 'alpha', write: false })
     catalogSchema.parse(catalog)
 
-    expect(catalog.packs.map((pack) => pack.id)).toEqual(['medium', 'advanced'])
+    expect(catalog.packs.map((pack) => pack.id)).toEqual(['essentials', 'medium', 'advanced'])
+    expect(getPack(catalog, 'essentials').stats.clientMods).toBe(6)
     expect(getPack(catalog, 'medium').stats.clientMods).toBe(38)
     expect(getPack(catalog, 'advanced').stats.clientMods).toBe(45)
+    expect(getPack(catalog, 'essentials').extends).toBeNull()
     expect(getPack(catalog, 'advanced').extends).toBe('medium')
+    expect(getPack(catalog, 'essentials').archive.url).toContain('EasyPZ-assets')
   })
 
   it('points alpha archives at the legacy mirror and public archives at this repo', async () => {

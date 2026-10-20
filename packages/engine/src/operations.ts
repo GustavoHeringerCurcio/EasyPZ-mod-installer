@@ -1,4 +1,4 @@
-import path from 'node:path'
+﻿import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
 import { getActiveModIds, getPack } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
@@ -80,7 +80,7 @@ export async function setPackEnabled(options: {
           onEvent?.({
             type: 'log',
             level: 'info',
-            message: `Preparing mod ${index}/${total}…`,
+            message: `Preparing mod ${index}/${total}...`,
           })
         },
       },

@@ -86,8 +86,8 @@ export function LibraryPage({
       </header>
 
       {bootstrap.legacyDetected ? (
-        <Panel className="mt-5 flex gap-3 border-acid/20 bg-acid/[0.04] p-4">
-          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-acid" />
+        <Panel className="mt-5 flex gap-3 border-brand/20 bg-brand/[0.04] p-4">
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand" />
           <div>
             <div className="text-xs font-semibold text-bone">{t('settings.legacy')}</div>
             <div className="mt-1 text-[11px] leading-relaxed text-muted">
@@ -98,9 +98,9 @@ export function LibraryPage({
       ) : null}
 
       {hostOutOfSync && activePackId ? (
-        <Panel className="mt-5 flex flex-col gap-3 border-rust/25 bg-rust/[0.05] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <Panel className="mt-5 flex flex-col gap-3 border-warn/25 bg-warn/[0.05] p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-3">
-            <Server className="mt-0.5 size-4 shrink-0 text-rust" />
+            <Server className="mt-0.5 size-4 shrink-0 text-warn" />
             <div>
               <div className="text-xs font-semibold text-bone">{t('library.hostOutOfSync')}</div>
               <div className="mt-1 text-[11px] leading-relaxed text-muted">
@@ -125,7 +125,7 @@ export function LibraryPage({
           return (
             <Panel
               key={pack.id}
-              className={active ? 'overflow-hidden border-acid/35' : 'overflow-hidden'}
+              className={active ? 'overflow-hidden border-brand/35' : 'overflow-hidden'}
             >
               <div className="flex flex-col gap-5 p-5 sm:flex-row">
                 <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-xl border border-line bg-panel-2 sm:w-48">
@@ -133,7 +133,7 @@ export function LibraryPage({
                     <img src={pack.coverDataUrl} alt="" className="h-full w-full object-cover" />
                   ) : null}
                   <div className="absolute left-2 top-2">
-                    {active ? <Badge tone="acid">{t('library.active')}</Badge> : null}
+                    {active ? <Badge tone="brand">{t('library.active')}</Badge> : null}
                   </div>
                 </div>
 
@@ -162,9 +162,9 @@ export function LibraryPage({
                     <div className="mt-3 rounded-xl border border-line bg-panel-2/50 px-3 py-2.5">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-bone">
                         {healthForPack.missing.length === 0 ? (
-                          <ShieldCheck className="size-3.5 text-acid" />
+                          <ShieldCheck className="size-3.5 text-brand" />
                         ) : (
-                          <AlertTriangle className="size-3.5 text-rust" />
+                          <AlertTriangle className="size-3.5 text-warn" />
                         )}
                         {t('library.health')}
                       </div>
@@ -187,7 +187,7 @@ export function LibraryPage({
                         </span>
                       </div>
                       {healthForPack.missing.length > 0 ? (
-                        <div className="mt-1 text-[10px] text-rust">
+                        <div className="mt-1 text-[10px] text-warn">
                           {t('library.healthMissing', { count: healthForPack.missing.length })}
                         </div>
                       ) : null}
@@ -239,7 +239,7 @@ export function LibraryPage({
       </div>
 
       <p className="mt-6 flex items-start gap-2 text-[11px] leading-relaxed text-muted">
-        <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-rust" />
+        <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-warn" />
         {t('settings.saveWarning')}
       </p>
     </div>
