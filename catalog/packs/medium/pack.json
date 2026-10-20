@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "id": "medium",
+  "name": "Medium",
+  "tagline": "The balanced Viewpoint experience",
+  "description": "The complete first and third-person Viewpoint setup: tactical gunplay, atmosphere, survival, quality-of-life, and immersion mods. Designed as the safest choice for an existing save.",
+  "cover": "packs/medium/cover.svg",
+  "gallery": [],
+  "placeholderArt": true,
+  "gameBuild": "42.21",
+  "tags": ["balanced", "viewpoint", "save-safe", "multiplayer"],
+  "extends": null,
+  "order": 10,
+  "archive": {
+    "fileName": "PZ-Viewpoint-Mods.tar",
+    "sha256": "f3999811acf25c531772e8d2faf8d20bb4bd0b760b4812dc59eb22d2818a3b5e",
+    "sizeBytes": 1181116006,
+    "requiredDiskGB": 4,
+    "releaseTag": "mods-v1",
+    "urls": {
+      "alpha": "https://github.com/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/mods-v1/PZ-Viewpoint-Mods.tar",
+      "public": "https://github.com/GustavoHeringerCurcio/EasyPZ-mod-installer/releases/download/mods-v1/PZ-Viewpoint-Mods.tar"
+    }
+  },
+  "requirements": {
+    "freeDiskGB": 4,
+    "ramGB": 8,
+    "recommendedRamGB": 16,
+    "vramGB": 8
+  },
+  "groups": [
+    {
+      "name": "Core",
+      "mods": [
+        {
+          "id": "ZombieBuddy",
+          "name": "Zombie Buddy",
+          "folder": "ZombieBuddy",
+          "workshopId": "3619862853",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853",
+          "serverOnly": false
+        },
+        {
+          "id": "Viewpoint",
+          "name": "Viewpoint",
+          "folder": "Viewpoint",
+          "workshopId": "3809306528",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528",
+          "serverOnly": false
+        },
+        {
+          "id": "PZVoxelStudioViewpoint",
+          "name": "Viewpoint Voxel Studio",
+          "folder": "PZVoxelStudioViewpoint",
+          "workshopId": "3810302175",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810302175",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointUI",
+          "name": "Viewpoint Interface",
+          "folder": "ViewpointUI",
+          "workshopId": "3812616893",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812616893",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Tactical",
+      "mods": [
+        {
+          "id": "ViewpointAdvancedMovement",
+          "name": "Advanced Movement",
+          "folder": "ViewpointAdvancedMovement",
+          "workshopId": "3812702301",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812702301",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointAdvancedMovementServer",
+          "name": "Advanced Movement (Server)",
+          "folder": "ViewpointAdvancedMovementServer",
+          "workshopId": "3812702301",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812702301",
+          "serverOnly": true
+        },
+        {
+          "id": "ViewpointEquipmentOverlays",
+          "name": "Equipment Overlays",
+          "folder": "ViewpointEquipmentOverlays",
+          "workshopId": "3813230118",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813230118",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointAdvancedThrowables",
+          "name": "Advanced Throwables",
+          "folder": "ViewpointAdvancedThrowables",
+          "workshopId": "3813194971",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813194971",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointTrueBallistics",
+          "name": "True Ballistics",
+          "folder": "ViewpointTrueBallistics",
+          "workshopId": "3812864848",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812864848",
+          "serverOnly": false
+        },
+        {
+          "id": "ProjectViewpointADS",
+          "name": "Project Viewpoint ADS",
+          "folder": "ProjectViewpointADS",
+          "workshopId": "3812612054",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Atmosphere",
+      "mods": [
+        {
+          "id": "ViewpointTrueWeathers",
+          "name": "True Weathers",
+          "folder": "ViewpointTrueWeathers",
+          "workshopId": "3813908957",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
+          "serverOnly": false
+        },
+        {
+          "id": "aparosa_pz3dMinimap",
+          "name": "3D Minimap",
+          "folder": "pz3dMinimap",
+          "workshopId": "3810179295",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810179295",
+          "serverOnly": false
+        },
+        {
+          "id": "RainCleansBlood",
+          "name": "Rain Cleans Blood",
+          "folder": "RainCleansBlood",
+          "workshopId": "2956146279",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2956146279",
+          "serverOnly": false
+        },
+        {
+          "id": "ImmersiveBlackouts",
+          "name": "Immersive Blackouts",
+          "folder": "ImmersiveBlackouts",
+          "workshopId": "3607686447",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3607686447",
+          "serverOnly": false
+        },
+        {
+          "id": "ThumpingWithFriends",
+          "name": "Thump With Friends",
+          "folder": "thumpwithfriends",
+          "workshopId": "3504753006",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3504753006",
+          "serverOnly": false
+        },
+        {
+          "id": "SkullysZombieCollision",
+          "name": "Skully's Zombie Collision",
+          "folder": "SkullysZombieCollision",
+          "workshopId": "3778511497",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3778511497",
+          "serverOnly": false
+        },
+        {
+          "id": "CyesPushDoors",
+          "name": "Push Doors",
+          "folder": "CyesPushDoors",
+          "workshopId": "3780683663",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3780683663",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Survival",
+      "mods": [
+        {
+          "id": "VanillaFoodsExpanded",
+          "name": "Vanilla Foods Expanded",
+          "folder": "Vanilla Foods Expanded",
+          "workshopId": "3577903007",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3577903007",
+          "serverOnly": false
+        },
+        {
+          "id": "TakeABathAndShowerNew",
+          "name": "Take a Bath and Shower",
+          "folder": "Take A Bath And Shower New",
+          "workshopId": "3592172476",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3592172476",
+          "serverOnly": false
+        },
+        {
+          "id": "ATakeABathAndShowerDepthMap",
+          "name": "Bath & Shower Depth Map Fix",
+          "folder": "Take A Bath And Shower DepthMap Fix",
+          "workshopId": "3592172476",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3592172476",
+          "serverOnly": false
+        },
+        {
+          "id": "RepairAnyClothes",
+          "name": "Repair Any Clothes",
+          "folder": "RepairAnyClothes",
+          "workshopId": "2142622992",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2142622992",
+          "serverOnly": false
+        },
+        {
+          "id": "ZVirusVaccine42BETA",
+          "name": "Virus Vaccine (B42)",
+          "folder": "ZVirusVaccine42BETA",
+          "workshopId": "3615135168",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3615135168",
+          "serverOnly": false
+        },
+        {
+          "id": "LGExtendedPlumbing",
+          "name": "Extended Plumbing",
+          "folder": "LGExtendedPlumbing",
+          "workshopId": "3779561845",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3779561845",
+          "serverOnly": false
+        },
+        {
+          "id": "damnlib",
+          "name": "Damnlib",
+          "folder": "damnlib",
+          "workshopId": "3171167894",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3171167894",
+          "serverOnly": false
+        },
+        {
+          "id": "isoContainers",
+          "name": "Containers!",
+          "folder": "isoContainers",
+          "workshopId": "2625625421",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2625625421",
+          "serverOnly": false
+        },
+        {
+          "id": "alicesWeaponSling",
+          "name": "Alice's Weapon Sling",
+          "folder": "alicesWeaponSling",
+          "workshopId": "3775549570",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3775549570",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Quality of Life",
+      "mods": [
+        {
+          "id": "DRAW_ON_MAP",
+          "name": "Draw On The Map",
+          "folder": "DrawOnMap",
+          "workshopId": "2804531012",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2804531012",
+          "serverOnly": false
+        },
+        {
+          "id": "SkillRecoveryJournal",
+          "name": "Skill Recovery Journal",
+          "folder": "Skill Recovery Journal",
+          "workshopId": "2503622437",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2503622437",
+          "serverOnly": false
+        },
+        {
+          "id": "errorMagnifier",
+          "name": "Error Magnifier",
+          "folder": "errorMagnifier",
+          "workshopId": "2896041179",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2896041179",
+          "serverOnly": false
+        },
+        {
+          "id": "ChuckleberryFinnAlertSystem",
+          "name": "Mod Update Alert",
+          "folder": "chuckleberryModdingAlertSystem",
+          "workshopId": "3077900375",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3077900375",
+          "serverOnly": false
+        },
+        {
+          "id": "SpawnSelector",
+          "name": "Spawn Selector",
+          "folder": "SpawnSelector",
+          "workshopId": "3772052709",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3772052709",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Extras",
+      "mods": [
+        {
+          "id": "Faster Reading",
+          "name": "Faster Reading (B42)",
+          "folder": "[B42] Faster Reading",
+          "workshopId": "3713362869",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3713362869",
+          "serverOnly": false
+        },
+        {
+          "id": "ImmersiveDriving",
+          "name": "Immersive Driving",
+          "folder": "ImmersiveDriving",
+          "workshopId": "3817413313",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817413313",
+          "serverOnly": false
+        },
+        {
+          "id": "VisceralViewpoint",
+          "name": "Visceral",
+          "folder": "Visceral",
+          "workshopId": "3820965001",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820965001",
+          "serverOnly": false
+        },
+        {
+          "id": "PZCrossbows",
+          "name": "Simple Crossbows",
+          "folder": "PZCrossbows",
+          "workshopId": "3758880254",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3758880254",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Immersion",
+      "mods": [
+        {
+          "id": "ViewpointImmersiveEffects",
+          "name": "Immersive Effects",
+          "folder": "ViewpointImmersiveEffects",
+          "workshopId": "3812984535",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812984535",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointBodycam",
+          "name": "Bodycam",
+          "folder": "ViewpointBodycam",
+          "workshopId": "3818432217",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3818432217",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointVisibleLoot",
+          "name": "Visible Loot",
+          "folder": "ViewpointVisibleLoot",
+          "workshopId": "3818189653",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3818189653",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointRoofs",
+          "name": "Roofs (WIP)",
+          "folder": "ViewpointRoofs",
+          "workshopId": "3817294484",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817294484",
+          "serverOnly": false
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    "Close Project Zomboid before installing.",
+    "Back up your save manually. EasyPZ does not back up saves.",
+    "Do not combine with Knox Inventory, Tactical Grid Inventory, Equipment UI, CleanUI, Modern Status, or Clean HotBar."
+  ],
+  "credits": [
+    "All mods belong to their respective authors.",
+    "The release archive is a convenience mirror for this pack; it is not claimed as original work.",
+    "Not affiliated with The Indie Stone."
+  ],
+  "updatedAt": "2026-10-20"
+}

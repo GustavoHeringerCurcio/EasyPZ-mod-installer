@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "id": "advanced",
+  "name": "Advanced",
+  "tagline": "Medium, plus mechanics, UI, and swimming",
+  "description": "Everything in Medium with additional fixes, realism, and survival mechanics. Advanced is additive: it does not remove or replace the Medium base.",
+  "cover": "packs/advanced/cover.svg",
+  "gallery": [],
+  "placeholderArt": true,
+  "gameBuild": "42.21",
+  "tags": ["mechanics", "realism", "swimming", "additive"],
+  "extends": "medium",
+  "order": 20,
+  "archive": {
+    "fileName": "PZ-Viewpoint-Mods-Advanced.tar",
+    "sha256": "abb58fcb08995847c0d8c8212def05dea69ad441529a31a7ea33e84abac2090c",
+    "sizeBytes": 1073741824,
+    "requiredDiskGB": 5,
+    "releaseTag": "mods-v3",
+    "urls": {
+      "alpha": "https://github.com/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/mods-v3/PZ-Viewpoint-Mods-Advanced.tar",
+      "public": "https://github.com/GustavoHeringerCurcio/EasyPZ-mod-installer/releases/download/mods-v3/PZ-Viewpoint-Mods-Advanced.tar"
+    }
+  },
+  "requirements": {
+    "freeDiskGB": 5,
+    "ramGB": 8,
+    "recommendedRamGB": 16,
+    "vramGB": 8
+  },
+  "groups": [
+    {
+      "name": "Advanced Fixes",
+      "mods": [
+        {
+          "id": "ProjectViewpointQOL",
+          "name": "Viewpoint QOL",
+          "folder": "ProjectViewpointQOL",
+          "workshopId": "3811256204",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3811256204",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointRightClick",
+          "name": "Right Click Fix",
+          "folder": "ViewpointRightClick",
+          "workshopId": "3819018807",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Advanced Realism",
+      "mods": [
+        {
+          "id": "ViewpointTrueWeathersGameplay",
+          "name": "True Weathers Gameplay",
+          "folder": "ViewpointTrueWeathersGameplay",
+          "workshopId": "3813908957",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointImmersiveMap",
+          "name": "Immersive Map",
+          "folder": "ViewpointImmersiveMap",
+          "workshopId": "3815544725",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3815544725",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointForaging",
+          "name": "Foraging",
+          "folder": "ViewpointForaging",
+          "workshopId": "3814994364",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3814994364",
+          "serverOnly": false
+        },
+        {
+          "id": "FishingView",
+          "name": "Fishing View",
+          "folder": "FishingView",
+          "workshopId": "3814560827",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3814560827",
+          "serverOnly": false
+        },
+        {
+          "id": "TrueSwimming",
+          "name": "True Swimming",
+          "folder": "TrueSwimming",
+          "workshopId": "3802372726",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802372726",
+          "serverOnly": false
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    "Close Project Zomboid before installing.",
+    "Back up your save manually before switching from an RV save.",
+    "Every player on a co-op server must use the same pack and archive version."
+  ],
+  "credits": [
+    "All mods belong to their respective authors.",
+    "The release archive is a convenience mirror for this pack; it is not claimed as original work.",
+    "Not affiliated with The Indie Stone."
+  ],
+  "updatedAt": "2026-10-20"
+}

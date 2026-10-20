@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Variable', 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Segoe UI', sans-serif;
+  --font-mono: 'Cascadia Code', 'Consolas', monospace;
+
+  --color-ink: #080b0a;
+  --color-panel: #0f1513;
+  --color-panel-2: #151d1a;
+  --color-line: #24302b;
+  --color-bone: #f2f0e9;
+  --color-muted: #8a948f;
+  --color-acid: #b7f04a;
+  --color-rust: #ff6b35;
+  --color-danger: #e5484d;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(183, 240, 74, 0.28);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a3832;
+  border-radius: 999px;
+  border: 2px solid var(--color-ink);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4b43;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.noise {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(183, 240, 74, 0.07), transparent 38%),
+    radial-gradient(circle at 85% 0%, rgba(255, 107, 53, 0.06), transparent 32%);
+}

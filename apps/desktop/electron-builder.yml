@@ -1,0 +1,43 @@
+appId: com.easypz.installer
+productName: EasyPZ Mod Installer
+copyright: Copyright © 2026 Gustavo Heringer Curcio
+
+directories:
+  output: ../../release
+  buildResources: build
+
+files:
+  - out/**/*
+  - package.json
+
+extraResources:
+  - from: ../../catalog
+    to: catalog
+  - from: build/icon.png
+    to: icon.png
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: zip
+      arch: [x64]
+  icon: build/icon.png
+  signAndEditExecutable: false
+  artifactName: EasyPZ-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: EasyPZ Mod Installer
+  artifactName: EasyPZ-${version}-setup.${ext}
+  deleteAppDataOnUninstall: false
+
+publish:
+  provider: github
+  owner: GustavoHeringerCurcio
+  repo: EasyPZ-mod-installer
+  private: true

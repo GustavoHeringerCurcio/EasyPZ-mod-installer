@@ -1,0 +1,29 @@
+{
+  "name": "easypz-mod-installer",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "description": "EasyPZ Mod Installer - Project Zomboid modpack catalog and installer",
+  "license": "MIT",
+  "author": "Gustavo Heringer Curcio",
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm build:libs && pnpm --filter @easypz/desktop dev",
+    "build:libs": "pnpm --filter @easypz/catalog build && pnpm --filter @easypz/engine build",
+    "catalog:generate": "pnpm --filter @easypz/catalog generate",
+    "catalog:validate": "pnpm --filter @easypz/catalog validate",
+    "build": "pnpm build:libs && pnpm catalog:generate && pnpm --filter @easypz/desktop build",
+    "typecheck": "pnpm build:libs && pnpm -r typecheck",
+    "test": "pnpm --filter @easypz/catalog test && pnpm --filter @easypz/engine test",
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "package:win": "pnpm build && pnpm --filter @easypz/desktop package:win"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "sharp": "^0.35.5",
+    "typescript": "^5.7.2"
+  }
+}
