@@ -135,15 +135,12 @@ export async function ensureSteamCmd(
   return exe
 }
 
-async function runSteamCmdBatch(
+async function runSteamCmdItem(
   steamCmd: string,
-  ids: string[],
+  id: string,
   signal?: AbortSignal,
-): Promise<{ code: number; output: string }> {
-  if (ids.length === 0) return { code: 0, output: '' }
-  const args = ['+login', 'anonymous']
-  for (const id of ids) args.push('+workshop_download_item', APP_ID, id)
-  args.push('+quit')
+): Promise<{ code: number; output: string; timedOut: boolean }> {
+  const args = ['+login', 'anonymous', '+workshop_download_item', APP_ID, id, '+quit']
 
   return new Promise((resolve, reject) => {
     const child = spawn(steamCmd, args, {
@@ -154,36 +151,50 @@ async function runSteamCmdBatch(
 
     let settled = false
     let output = ''
+    let idleTimer: NodeJS.Timeout | null = null
+
+    const resetIdle = (): void => {
+      if (idleTimer) clearTimeout(idleTimer)
+      idleTimer = setTimeout(() => {
+        child.kill()
+        finish(-1, true)
+      }, 120_000)
+    }
+
     const append = (chunk: Buffer): void => {
       output += chunk.toString('utf8')
       if (output.length > 20_000) output = output.slice(-20_000)
+      resetIdle()
     }
-    child.stdout?.on('data', append)
-    child.stderr?.on('data', append)
 
-    const timeout = setTimeout(
+    const totalTimer = setTimeout(
       () => {
         child.kill()
-        finish(-1, new EasyPzError('IO', 'SteamCMD timed out while downloading Workshop items.'))
+        finish(-1, true)
       },
-      20 * 60 * 1000,
+      10 * 60 * 1000,
     )
 
-    const finish = (code: number, error?: Error): void => {
+    const finish = (code: number, timedOut = false, error?: Error): void => {
       if (settled) return
       settled = true
-      clearTimeout(timeout)
+      clearTimeout(totalTimer)
+      if (idleTimer) clearTimeout(idleTimer)
       if (signal) signal.removeEventListener('abort', onAbort)
       if (error) reject(error)
-      else resolve({ code, output })
+      else resolve({ code, output, timedOut })
     }
     const onAbort = (): void => {
       child.kill()
-      finish(-1, cancelledError())
+      finish(-1, false, cancelledError())
     }
-    signal?.addEventListener('abort', onAbort, { once: true })
 
-    child.on('error', (error) => finish(-1, error))
+    child.stdout?.on('data', append)
+    child.stderr?.on('data', append)
+    signal?.addEventListener('abort', onAbort, { once: true })
+    resetIdle()
+
+    child.on('error', (error) => finish(-1, false, error))
     child.on('close', (code) => finish(code ?? -1))
   })
 }
@@ -341,79 +352,68 @@ export async function downloadWorkshopPack(options: {
     })
   }
 
-  const batchSize = 5
-  for (let offset = 0; offset < items.length; offset += batchSize) {
-    if (signal?.aborted) throw cancelledError()
-    const batch = items.slice(offset, offset + batchSize)
-    const missing: typeof batch = []
+  for (const item of items) {
+    ensureNotCancelled(signal)
+    let root = findItemRoot(item.id, workshopRoot, paths)
 
-    for (const item of batch) {
-      const root = findItemRoot(item.id, workshopRoot, paths)
-      if (!root) {
-        missing.push(item)
-      }
-    }
-
-    if (missing.length > 0) {
+    if (!root) {
       onEvent?.({
         type: 'log',
         level: 'info',
-        message: `Downloading ${missing.length} Workshop item(s) with SteamCMD...`,
+        message: `Downloading Workshop item ${processed + 1}/${items.length}: ${item.name}`,
       })
-      await runSteamCmdBatch(
-        steamCmd,
-        missing.map((item) => item.id),
-        signal,
-      )
-    }
-
-    for (const item of batch) {
-      ensureNotCancelled(signal)
-      const root = findItemRoot(item.id, workshopRoot, paths)
+      const result = await runSteamCmdItem(steamCmd, item.id, signal)
+      root = findItemRoot(item.id, workshopRoot, paths)
       if (!root) {
-        failedItems.push({ id: item.id, name: item.name, reason: 'SteamCMD did not download it.' })
+        failedItems.push({
+          id: item.id,
+          name: item.name,
+          reason: result.timedOut
+            ? 'SteamCMD timed out or stalled on this item.'
+            : `SteamCMD failed with code ${result.code}.`,
+        })
         processed += 1
         emitProgress(item.name)
         continue
       }
-
-      try {
-        const itemMods = await discoverItemMods(root, item.id)
-        if (itemMods.length === 0) {
-          failedItems.push({ id: item.id, name: item.name, reason: 'No mod.info found.' })
-        } else {
-          for (const mod of itemMods) {
-            const destination = storeModPath(paths, mod.workshopId, mod.folder)
-            if (!(await hasModInfo(destination))) {
-              await fs.mkdir(path.dirname(destination), { recursive: true })
-              await fs.cp(mod.source, destination, { recursive: true, force: true })
-            }
-            discovered.push(mod)
-          }
-          downloadedItems += 1
-
-          const storeRoot = getStoreItemRoot(paths, item.id)
-          await fs.mkdir(storeRoot, { recursive: true })
-          await fs.writeFile(
-            path.join(storeRoot, '.easypz-workshop-complete'),
-            `${new Date().toISOString()}\n`,
-            'utf8',
-          )
-          completedIds.add(item.id)
-          await writeProgress(paths, packId, collection.collectionId, [...completedIds])
-
-          const steamCmdContent = getSteamCmdContentRoot(paths, item.id)
-          if (path.resolve(root) === path.resolve(steamCmdContent)) {
-            await fs.rm(root, { recursive: true, force: true }).catch(() => undefined)
-          }
-        }
-      } catch (error) {
-        failedItems.push({ id: item.id, name: item.name, reason: toError(error).message })
-      }
-
-      processed += 1
-      emitProgress(item.name)
     }
+
+    try {
+      const itemMods = await discoverItemMods(root, item.id)
+      if (itemMods.length === 0) {
+        failedItems.push({ id: item.id, name: item.name, reason: 'No mod.info found.' })
+      } else {
+        for (const mod of itemMods) {
+          const destination = storeModPath(paths, mod.workshopId, mod.folder)
+          if (!(await hasModInfo(destination))) {
+            await fs.mkdir(path.dirname(destination), { recursive: true })
+            await fs.cp(mod.source, destination, { recursive: true, force: true })
+          }
+          discovered.push(mod)
+        }
+        downloadedItems += 1
+
+        const storeRoot = getStoreItemRoot(paths, item.id)
+        await fs.mkdir(storeRoot, { recursive: true })
+        await fs.writeFile(
+          path.join(storeRoot, '.easypz-workshop-complete'),
+          `${new Date().toISOString()}\n`,
+          'utf8',
+        )
+        completedIds.add(item.id)
+        await writeProgress(paths, packId, collection.collectionId, [...completedIds])
+
+        const steamCmdContent = getSteamCmdContentRoot(paths, item.id)
+        if (path.resolve(root) === path.resolve(steamCmdContent)) {
+          await fs.rm(root, { recursive: true, force: true }).catch(() => undefined)
+        }
+      }
+    } catch (error) {
+      failedItems.push({ id: item.id, name: item.name, reason: toError(error).message })
+    }
+
+    processed += 1
+    emitProgress(item.name)
   }
 
   const seen = new Set<string>()

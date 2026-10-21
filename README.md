@@ -52,6 +52,7 @@ The Addons collection is a reference index, not a tested modpack. It contains ob
 - The app discovers each item’s real mod ID and folder from `mod.info`.
 - Failed or removed items are reported and skipped; the rest of the collection continues.
 - Already downloaded items are reused, so restarting or retrying resumes instead of downloading everything again.
+- Each item is downloaded in its own SteamCMD process. A stalled item is killed after two minutes of inactivity and skipped, so it cannot block the rest of the collection.
 - The collection changes when Workshop items update. For a stable test, use a new save and keep a manual backup.
 - This is a large, uncurated collection. It appears under **More modpacks**, not the recommended section.
 
