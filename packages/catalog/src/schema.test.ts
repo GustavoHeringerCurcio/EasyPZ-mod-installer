@@ -20,11 +20,13 @@ describe('catalog', () => {
       'medium',
       'advanced',
       'viewpoint-collection',
+      'viewpoint-addons',
     ])
     expect(getPack(catalog, 'essentials').stats.clientMods).toBe(6)
     expect(getPack(catalog, 'medium').stats.clientMods).toBe(38)
     expect(getPack(catalog, 'advanced').stats.clientMods).toBe(45)
     expect(getPack(catalog, 'viewpoint-collection').stats.clientMods).toBe(90)
+    expect(getPack(catalog, 'viewpoint-addons').stats.clientMods).toBe(198)
     expect(getPack(catalog, 'essentials').extends).toBeNull()
     expect(getPack(catalog, 'advanced').extends).toBe('medium')
     expect(getPack(catalog, 'essentials').archive?.url).toContain('EasyPZ-assets')

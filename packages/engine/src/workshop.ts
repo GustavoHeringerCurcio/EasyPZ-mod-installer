@@ -32,6 +32,49 @@ export function getSteamClientContentRoot(workshopRoot: string, workshopId: stri
   return path.join(workshopRoot, workshopId)
 }
 
+export function getStoreItemRoot(paths: AppPaths, workshopId: string): string {
+  return path.join(paths.storeDir, APP_ID, workshopId)
+}
+
+function getProgressPath(paths: AppPaths): string {
+  return path.join(paths.stateDir, 'workshop-progress.json')
+}
+
+interface WorkshopProgress {
+  packId: string
+  collectionId: string
+  completedItemIds: string[]
+  updatedAt: string
+}
+
+async function readProgress(paths: AppPaths): Promise<WorkshopProgress | null> {
+  try {
+    return JSON.parse(await fs.readFile(getProgressPath(paths), 'utf8')) as WorkshopProgress
+  } catch {
+    return null
+  }
+}
+
+async function writeProgress(
+  paths: AppPaths,
+  packId: string,
+  collectionId: string,
+  completedItemIds: string[],
+): Promise<void> {
+  await fs.mkdir(paths.stateDir, { recursive: true })
+  const progress: WorkshopProgress = {
+    packId,
+    collectionId,
+    completedItemIds,
+    updatedAt: new Date().toISOString(),
+  }
+  await fs.writeFile(getProgressPath(paths), `${JSON.stringify(progress, null, 2)}\n`, 'utf8')
+}
+
+async function clearProgress(paths: AppPaths): Promise<void> {
+  await fs.rm(getProgressPath(paths), { force: true })
+}
+
 async function pathExists(target: string): Promise<boolean> {
   try {
     await fs.access(target)
@@ -96,8 +139,8 @@ async function runSteamCmdBatch(
   steamCmd: string,
   ids: string[],
   signal?: AbortSignal,
-): Promise<number> {
-  if (ids.length === 0) return 0
+): Promise<{ code: number; output: string }> {
+  if (ids.length === 0) return { code: 0, output: '' }
   const args = ['+login', 'anonymous']
   for (const id of ids) args.push('+workshop_download_item', APP_ID, id)
   args.push('+quit')
@@ -110,12 +153,29 @@ async function runSteamCmdBatch(
     })
 
     let settled = false
+    let output = ''
+    const append = (chunk: Buffer): void => {
+      output += chunk.toString('utf8')
+      if (output.length > 20_000) output = output.slice(-20_000)
+    }
+    child.stdout?.on('data', append)
+    child.stderr?.on('data', append)
+
+    const timeout = setTimeout(
+      () => {
+        child.kill()
+        finish(-1, new EasyPzError('IO', 'SteamCMD timed out while downloading Workshop items.'))
+      },
+      20 * 60 * 1000,
+    )
+
     const finish = (code: number, error?: Error): void => {
       if (settled) return
       settled = true
+      clearTimeout(timeout)
       if (signal) signal.removeEventListener('abort', onAbort)
       if (error) reject(error)
-      else resolve(code)
+      else resolve({ code, output })
     }
     const onAbort = (): void => {
       child.kill()
@@ -200,11 +260,19 @@ export async function discoverItemMods(
 }
 
 function findItemRoot(workshopId: string, workshopRoot: string, paths: AppPaths): string | null {
+  const storeRoot = getStoreItemRoot(paths, workshopId)
   const candidates = [
+    storeRoot,
     getSteamClientContentRoot(workshopRoot, workshopId),
     getSteamCmdContentRoot(paths, workshopId),
   ]
-  return candidates.find((candidate) => existsSync(candidate)) ?? null
+  return (
+    candidates.find(
+      (candidate) =>
+        existsSync(candidate) &&
+        (candidate === storeRoot ? existsSync(path.join(candidate, 'mods')) : true),
+    ) ?? null
+  )
 }
 
 export interface WorkshopInstallResult {
@@ -234,6 +302,29 @@ export async function downloadWorkshopPack(options: {
   const discovered: DiscoveredMod[] = []
   let downloadedItems = 0
   let processed = 0
+
+  const storedCount = items.filter((item) =>
+    existsSync(path.join(getStoreItemRoot(paths, item.id), 'mods')),
+  ).length
+  const previousProgress = await readProgress(paths)
+  if (
+    storedCount > 0 ||
+    (previousProgress?.packId === packId &&
+      previousProgress.collectionId === collection.collectionId &&
+      previousProgress.completedItemIds.length > 0)
+  ) {
+    onEvent?.({
+      type: 'log',
+      level: 'info',
+      message: `Resuming Workshop collection: ${storedCount}/${items.length} items already stored.`,
+    })
+  }
+
+  const completedIds = new Set<string>(
+    previousProgress?.packId === packId && previousProgress.collectionId === collection.collectionId
+      ? previousProgress.completedItemIds
+      : [],
+  )
 
   const emitProgress = (name: string): void => {
     onEvent?.({
@@ -301,6 +392,16 @@ export async function downloadWorkshopPack(options: {
           }
           downloadedItems += 1
 
+          const storeRoot = getStoreItemRoot(paths, item.id)
+          await fs.mkdir(storeRoot, { recursive: true })
+          await fs.writeFile(
+            path.join(storeRoot, '.easypz-workshop-complete'),
+            `${new Date().toISOString()}\n`,
+            'utf8',
+          )
+          completedIds.add(item.id)
+          await writeProgress(paths, packId, collection.collectionId, [...completedIds])
+
           const steamCmdContent = getSteamCmdContentRoot(paths, item.id)
           if (path.resolve(root) === path.resolve(steamCmdContent)) {
             await fs.rm(root, { recursive: true, force: true }).catch(() => undefined)
@@ -345,6 +446,8 @@ export async function downloadWorkshopPack(options: {
       'No Workshop mods were downloaded. Check your connection and SteamCMD, then try again.',
     )
   }
+
+  await clearProgress(paths)
 
   onEvent?.({
     type: 'log',

@@ -1,0 +1,1035 @@
+{
+  "schemaVersion": 1,
+  "id": "viewpoint-addons",
+  "name": "Project Viewpoint - Addons",
+  "tagline": "A curated index of Viewpoint add-ons.",
+  "description": "The full 198-item Project Viewpoint - Addons Workshop collection. Includes Viewpoint add-ons, fixes, HUDs, shaders, 3D content, vehicles, compatibility patches, and experimental entries. This is a large reference collection, not a tested modpack.",
+  "cover": "packs/viewpoint-addons/cover.jpg",
+  "gallery": [],
+  "accent": "#38bdf8",
+  "featured": false,
+  "placeholderArt": false,
+  "gameBuild": "42.21",
+  "tags": ["collection", "workshop", "viewpoint", "addons", "large"],
+  "extends": null,
+  "order": 40,
+  "source": "workshop",
+  "archive": null,
+  "workshop": {
+    "collectionId": "3812839109",
+    "downloadBytes": 6462169871,
+    "items": [
+      {
+        "id": "3809306528",
+        "name": "Project Viewpoint",
+        "sizeBytes": 34153469
+      },
+      {
+        "id": "3810302175",
+        "name": "6244 3D models for Viewpoint [sour_kisel]",
+        "sizeBytes": 450786523
+      },
+      {
+        "id": "3619862853",
+        "name": "ZombieBuddy",
+        "sizeBytes": 14466055
+      },
+      {
+        "id": "3816830877",
+        "name": "PZVR",
+        "sizeBytes": 5760011
+      },
+      {
+        "id": "3812978679",
+        "name": "Viewpoint Extended Support",
+        "sizeBytes": 141917
+      },
+      {
+        "id": "3811256204",
+        "name": "Project Viewpoint QOL",
+        "sizeBytes": 1189002
+      },
+      {
+        "id": "3812702301",
+        "name": "Viewpoint Advanced Movement",
+        "sizeBytes": 56134761
+      },
+      {
+        "id": "3812612054",
+        "name": "Project Viewpoint: Recoil \u0026 ADS",
+        "sizeBytes": 1391740
+      },
+      {
+        "id": "3812864848",
+        "name": "Viewpoint True Ballistics",
+        "sizeBytes": 772927
+      },
+      {
+        "id": "3819623420",
+        "name": "Zombie Dismemberment x True Ballistics (compat add-on)",
+        "sizeBytes": 56235
+      },
+      {
+        "id": "3812616893",
+        "name": "Viewpoint - Interface",
+        "sizeBytes": 2147565
+      },
+      {
+        "id": "3821752867",
+        "name": "[OBSOLETE] Viewpoint Interface - Extras \u0026 Fixes (merged into Viewpoint Interface)",
+        "sizeBytes": 152695
+      },
+      {
+        "id": "3816819422",
+        "name": "Viewpoint DayZ",
+        "sizeBytes": 51650821
+      },
+      {
+        "id": "3818297469",
+        "name": "DayZ Health HUD",
+        "sizeBytes": 1433671
+      },
+      {
+        "id": "3815014026",
+        "name": "Viewpoint Compass",
+        "sizeBytes": 82481
+      },
+      {
+        "id": "3819018807",
+        "name": "Viewpoint - Right Click Fix",
+        "sizeBytes": 355470
+      },
+      {
+        "id": "3816749403",
+        "name": "Ultimate Context Menu - Viewpoint",
+        "sizeBytes": 8466
+      },
+      {
+        "id": "3821900767",
+        "name": "Project Viewpoint - Radial Cursor",
+        "sizeBytes": 234397
+      },
+      {
+        "id": "3818237096",
+        "name": "IEUI - Inventory and Screens for Viewpoint",
+        "sizeBytes": 2865637
+      },
+      {
+        "id": "3823537384",
+        "name": "Viewpoint Clean UI",
+        "sizeBytes": 3561502
+      },
+      {
+        "id": "3818558537",
+        "name": "Viewpoint HUD TPS - Interface de survie en perspective [B42.21]",
+        "sizeBytes": 782553
+      },
+      {
+        "id": "3819316734",
+        "name": "Viewpoint Hands: Loot \u0026 Inventory [B42] + Controller support",
+        "sizeBytes": 1158069
+      },
+      {
+        "id": "3815612755",
+        "name": "Quick Loot PZ - PZ3D \u0026 Viewpoint",
+        "sizeBytes": 82169
+      },
+      {
+        "id": "3819385365",
+        "name": "Viewpoint Tactical - 3D GUNS, ANIMATIONS \u0026 BULLET HOLES [ALPHA]",
+        "sizeBytes": 443994812
+      },
+      {
+        "id": "3813194971",
+        "name": "Viewpoint - Advanced Throwables",
+        "sizeBytes": 1302734
+      },
+      {
+        "id": "3812984535",
+        "name": "Viewpoint - Immersive Effects",
+        "sizeBytes": 403128
+      },
+      {
+        "id": "3813230118",
+        "name": "Viewpoint - Equipment Overlays",
+        "sizeBytes": 5717707
+      },
+      {
+        "id": "3813581445",
+        "name": "Project Viewpoint - Magnified Optics",
+        "sizeBytes": 358460
+      },
+      {
+        "id": "3814919342",
+        "name": "BRITA\u0027S WP FOR VIEWPORT ADS",
+        "sizeBytes": 162821
+      },
+      {
+        "id": "3813771373",
+        "name": "Project Viewpoint - Weapon Handling (ABANDONED)",
+        "sizeBytes": 21272
+      },
+      {
+        "id": "3813032735",
+        "name": "Shoot to Thrill (formerly I SEE THEM)",
+        "sizeBytes": 214733007
+      },
+      {
+        "id": "3817137006",
+        "name": "Viewpoint - World Actions Fix",
+        "sizeBytes": 1164625
+      },
+      {
+        "id": "3812312558",
+        "name": "Construction 1P Viewpoint",
+        "sizeBytes": 745568
+      },
+      {
+        "id": "3815631078",
+        "name": "Project Viewpoint: Visible Construction",
+        "sizeBytes": 408768
+      },
+      {
+        "id": "3816521966",
+        "name": "Viewpoint Placement Fix",
+        "sizeBytes": 267899
+      },
+      {
+        "id": "3819166046",
+        "name": "Project Viewpoint - Isometric No More",
+        "sizeBytes": 780744
+      },
+      {
+        "id": "3815931973",
+        "name": "Project Viewpoint: KK\u0027s Shelves in 3D",
+        "sizeBytes": 184844234
+      },
+      {
+        "id": "3818189653",
+        "name": "Viewpoint - Visible Loot",
+        "sizeBytes": 188736546
+      },
+      {
+        "id": "3816442251",
+        "name": "Viewpoint: Living Props",
+        "sizeBytes": 81759686
+      },
+      {
+        "id": "3821610732",
+        "name": "Viewpoint - Working TVs",
+        "sizeBytes": 267631733
+      },
+      {
+        "id": "3812583935",
+        "name": "PZ HD Walls ×2",
+        "sizeBytes": 646821334
+      },
+      {
+        "id": "3812259313",
+        "name": "PZ HD Floors \u0026 Terrain",
+        "sizeBytes": 467863027
+      },
+      {
+        "id": "3818700431",
+        "name": "Viewpoint’s Models Overhaul",
+        "sizeBytes": 95890852
+      },
+      {
+        "id": "3814635273",
+        "name": "RVV+Viewpoint",
+        "sizeBytes": 798498
+      },
+      {
+        "id": "3816586790",
+        "name": "Immersive Snow - Viewpoint",
+        "sizeBytes": 164269
+      },
+      {
+        "id": "3819972196",
+        "name": "WinterFX",
+        "sizeBytes": 1805374
+      },
+      {
+        "id": "3813172420",
+        "name": "Project Viewpoint: KK\u0027s TREE in 3D （Animated \u0026 Seasonal）",
+        "sizeBytes": 110883666
+      },
+      {
+        "id": "3817695454",
+        "name": "Dead Forest 42.20+",
+        "sizeBytes": 117965739
+      },
+      {
+        "id": "3815166404",
+        "name": "|Mvdox Grass \"grass mods for viewpoint\" Unofficial mods|",
+        "sizeBytes": 3100422
+      },
+      {
+        "id": "3818319436",
+        "name": "Workshop item 3818319436",
+        "sizeBytes": 0
+      },
+      {
+        "id": "3818853354",
+        "name": "Viewpoint - Grassier Grass Port",
+        "sizeBytes": 802240
+      },
+      {
+        "id": "3816856700",
+        "name": "Yeah it\u0027s water bitch-(fix-update)",
+        "sizeBytes": 6151240
+      },
+      {
+        "id": "3820523053",
+        "name": "Check out my big log, bitch (yes its a tree mod)",
+        "sizeBytes": 597680006
+      },
+      {
+        "id": "3814486926",
+        "name": "Viewpoint - 3D Fences",
+        "sizeBytes": 2991662
+      },
+      {
+        "id": "3813723091",
+        "name": "Viewpoint 3D Fences and Gates (Beta)",
+        "sizeBytes": 180159758
+      },
+      {
+        "id": "3820190473",
+        "name": "Viewpoint - 3D Log Walls \u0026 Construction [B42] [WIP]",
+        "sizeBytes": 94698268
+      },
+      {
+        "id": "3814178814",
+        "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
+        "sizeBytes": 229203342
+      },
+      {
+        "id": "3817294484",
+        "name": "Viewpoint - Roofs (WIP)",
+        "sizeBytes": 81606554
+      },
+      {
+        "id": "3818941548",
+        "name": "Viewpoint - Proper Roofs",
+        "sizeBytes": 133039401
+      },
+      {
+        "id": "3815531837",
+        "name": "Viewpoint Bunker Fix",
+        "sizeBytes": 736171
+      },
+      {
+        "id": "3811344119",
+        "name": "Light Fix - Project Viewpoint",
+        "sizeBytes": 160248
+      },
+      {
+        "id": "3812151347",
+        "name": "Door Fix - Project Viewpoint",
+        "sizeBytes": 250578
+      },
+      {
+        "id": "3820462383",
+        "name": "Project Viewpoint - Actual Door Rattling",
+        "sizeBytes": 179695
+      },
+      {
+        "id": "3818859807",
+        "name": "Project Viewpoint - 3D Doors, Gates \u0026 Garages",
+        "sizeBytes": 36621221
+      },
+      {
+        "id": "3814398576",
+        "name": "Surface Fix - Project Viewpoint",
+        "sizeBytes": 548863
+      },
+      {
+        "id": "3815033191",
+        "name": "Barricade Fix - Project Viewpoint",
+        "sizeBytes": 284968
+      },
+      {
+        "id": "3814787969",
+        "name": "Workshop item 3814787969",
+        "sizeBytes": 0
+      },
+      {
+        "id": "3818873810",
+        "name": "[V2] 3D Curtains \u0026 Blinds - Project Viewpoint [B42]",
+        "sizeBytes": 24054024
+      },
+      {
+        "id": "3820833348",
+        "name": "3D All Windows for Viewpoint [B42] byDGV",
+        "sizeBytes": 112303748
+      },
+      {
+        "id": "3820609079",
+        "name": "Wall Texture Fix for Viewpoint",
+        "sizeBytes": 709690
+      },
+      {
+        "id": "3821308495",
+        "name": "Viewpoint Visual Fixes",
+        "sizeBytes": 50570
+      },
+      {
+        "id": "3814560827",
+        "name": "Viewpoint Fishing",
+        "sizeBytes": 310761
+      },
+      {
+        "id": "3814918750",
+        "name": "Viewpoint Fixes (Unofficial)",
+        "sizeBytes": 53907
+      },
+      {
+        "id": "3812510377",
+        "name": "Project Viewpoint - Fixes",
+        "sizeBytes": 387480
+      },
+      {
+        "id": "3815539888",
+        "name": "Quick adds - QOL for  Viewpoint",
+        "sizeBytes": 8646923
+      },
+      {
+        "id": "3818587612",
+        "name": "Vandalism",
+        "sizeBytes": 1095039
+      },
+      {
+        "id": "3813477039",
+        "name": "KNOX TV",
+        "sizeBytes": 296281556
+      },
+      {
+        "id": "3816050608",
+        "name": "Polaroid Camera \u0026 Photo Wall",
+        "sizeBytes": 14450453
+      },
+      {
+        "id": "3814046234",
+        "name": "ViewpointFPS+",
+        "sizeBytes": 1136917
+      },
+      {
+        "id": "3812559973",
+        "name": "Viewpoint Turbo - Light Performance Improvement [B42]",
+        "sizeBytes": 3012397
+      },
+      {
+        "id": "3822818373",
+        "name": "Viewpoint Perfomance",
+        "sizeBytes": 190279
+      },
+      {
+        "id": "3816784011",
+        "name": "Viewpoint - Smooth Frames",
+        "sizeBytes": 99178
+      },
+      {
+        "id": "3821747909",
+        "name": "Project Viewpoint FrameGen",
+        "sizeBytes": 4531416
+      },
+      {
+        "id": "3818838508",
+        "name": "Viewpoint DLSS Frame Generation [B42] [Beta]",
+        "sizeBytes": 4519230
+      },
+      {
+        "id": "3812932905",
+        "name": "Viewpoint - Building Alignment Fix",
+        "sizeBytes": 24997
+      },
+      {
+        "id": "3814074009",
+        "name": "Viewpoint Precision FIX",
+        "sizeBytes": 25644
+      },
+      {
+        "id": "3812659173",
+        "name": "Viewpoint - Crop Visibility Fix [B42.21]",
+        "sizeBytes": 25937
+      },
+      {
+        "id": "3812723539",
+        "name": "Viewpoint - Butcher Hook 3D Compatibility [B42.21]",
+        "sizeBytes": 2954850
+      },
+      {
+        "id": "3812659488",
+        "name": "Viewpoint - Papa_Chad Vehicle Compatibility [B42.21]",
+        "sizeBytes": 45070
+      },
+      {
+        "id": "3818039291",
+        "name": "Steel Sights: Tank Gunner Overhaul + M1 Abrams [B42]",
+        "sizeBytes": 26221527
+      },
+      {
+        "id": "3813760573",
+        "name": "HorseMod + Viewpoint Controls Patch",
+        "sizeBytes": 270690
+      },
+      {
+        "id": "3820421584",
+        "name": "Project Viewpoint - Solid Horses",
+        "sizeBytes": 118763
+      },
+      {
+        "id": "3821174725",
+        "name": "Viewpoint - 3D RV Van",
+        "sizeBytes": 57157437
+      },
+      {
+        "id": "3820158673",
+        "name": "Viewpoint - 3D RVs [B42.21] [WIP]",
+        "sizeBytes": 277822266
+      },
+      {
+        "id": "3817030886",
+        "name": "RV Viewpoint Patch",
+        "sizeBytes": 4083
+      },
+      {
+        "id": "3820972331",
+        "name": "Xanny Arms - Viewpoint Compatibility",
+        "sizeBytes": 152246
+      },
+      {
+        "id": "3819820321",
+        "name": "Viewpoint of Marz",
+        "sizeBytes": 1258111
+      },
+      {
+        "id": "3819976507",
+        "name": "Hot Brass for Viewpoint",
+        "sizeBytes": 688957
+      },
+      {
+        "id": "3814993552",
+        "name": "Bullet Holes + (Viewpoint optional)",
+        "sizeBytes": 10407063
+      },
+      {
+        "id": "3812307739",
+        "name": "Viewpoint Gael Aim",
+        "sizeBytes": 36070
+      },
+      {
+        "id": "3820279516",
+        "name": "Viewpoint Directional Melee",
+        "sizeBytes": 136228
+      },
+      {
+        "id": "3812396995",
+        "name": "Viewpoint Threat Detector",
+        "sizeBytes": 4001291
+      },
+      {
+        "id": "3821892101",
+        "name": "Viewpoint Tension",
+        "sizeBytes": 2874512
+      },
+      {
+        "id": "3820063546",
+        "name": "Viewpoint: Free Aim",
+        "sizeBytes": 161847
+      },
+      {
+        "id": "3815538848",
+        "name": "Drag Bodies - Project Viewpoint (First \u0026 Third Person)",
+        "sizeBytes": 13867
+      },
+      {
+        "id": "3812198995",
+        "name": "Project Viewpoint - Shovel Graves(SUBMOD)",
+        "sizeBytes": 224806
+      },
+      {
+        "id": "3812518796",
+        "name": "Project Viewpoint - Place Items (SUB-MOD)",
+        "sizeBytes": 50863
+      },
+      {
+        "id": "3817135911",
+        "name": "Viewpoint - Physics \u0026 Collision",
+        "sizeBytes": 785964
+      },
+      {
+        "id": "3818585720",
+        "name": "Viewpoint Binoculars",
+        "sizeBytes": 486347
+      },
+      {
+        "id": "3815721297",
+        "name": "A-Life x Viewpoint Compat",
+        "sizeBytes": 45357
+      },
+      {
+        "id": "3811955583",
+        "name": "Backrooms Sandbox by Azakaela",
+        "sizeBytes": 40399341
+      },
+      {
+        "id": "3811640626",
+        "name": "Project Viewpoint - 3D Tracer Fix",
+        "sizeBytes": 32723
+      },
+      {
+        "id": "3814742214",
+        "name": "Camera Tweaks for Viewpoint",
+        "sizeBytes": 186793
+      },
+      {
+        "id": "3816823515",
+        "name": "Project Viewpoint Free Look",
+        "sizeBytes": 11606
+      },
+      {
+        "id": "3815999052",
+        "name": "OldPoint - Rotating Overhead Camera [B42 / Viewpoint]",
+        "sizeBytes": 775882
+      },
+      {
+        "id": "3818432217",
+        "name": "Immersive Camera Motion : Project Viewpoint Add-on",
+        "sizeBytes": 285234
+      },
+      {
+        "id": "3823573829",
+        "name": "Worn Lens - Camera Footage Shader for Project Viewpoint",
+        "sizeBytes": 529517
+      },
+      {
+        "id": "3812617196",
+        "name": "Simple Viewpoint Lock - First \u0026 Third Person Only",
+        "sizeBytes": 273723
+      },
+      {
+        "id": "3814419826",
+        "name": "Better Third Person for Viewpoint",
+        "sizeBytes": 49665
+      },
+      {
+        "id": "3818586767",
+        "name": "Viewpoint Local Splitscreen Add-on",
+        "sizeBytes": 144259
+      },
+      {
+        "id": "3823092551",
+        "name": "Co-op Overhaul",
+        "sizeBytes": 13558693
+      },
+      {
+        "id": "3821860091",
+        "name": "VoidFix - Viewpoint Eye Culling Fix (+3P Flashlight Fix)",
+        "sizeBytes": 88711
+      },
+      {
+        "id": "3816820295",
+        "name": "Bubby\u0027s Mega Modpack",
+        "sizeBytes": 2024684
+      },
+      {
+        "id": "3817129409",
+        "name": "Viewpoint Stability Fix",
+        "sizeBytes": 48607
+      },
+      {
+        "id": "3817501459",
+        "name": "Viewpoint Texture Fix",
+        "sizeBytes": 64337
+      },
+      {
+        "id": "3816311689",
+        "name": "ViewpointChess",
+        "sizeBytes": 612304
+      },
+      {
+        "id": "3816311907",
+        "name": "Triage",
+        "sizeBytes": 137290
+      },
+      {
+        "id": "3821252123",
+        "name": "Emissive Eyes for Viewpoint",
+        "sizeBytes": 424795
+      },
+      {
+        "id": "3821185516",
+        "name": "Viewpoint Size Matters",
+        "sizeBytes": 823987
+      },
+      {
+        "id": "3820965001",
+        "name": "Viewpoint - Visceral",
+        "sizeBytes": 809551
+      },
+      {
+        "id": "3820872629",
+        "name": "TripFX - Psychedelic Visuals for Viewpoint (N\u0026C\u0027s Narcotics)",
+        "sizeBytes": 1035296
+      },
+      {
+        "id": "3811472160",
+        "name": "3d Blood VFX for Viewpoint (experimental)",
+        "sizeBytes": 457200
+      },
+      {
+        "id": "3813801053",
+        "name": "Blood FX for Viewpoint - Fixes",
+        "sizeBytes": 75400
+      },
+      {
+        "id": "3813932543",
+        "name": "Blood Screen",
+        "sizeBytes": 1208793
+      },
+      {
+        "id": "3822336435",
+        "name": "Zed Time For Blood FX",
+        "sizeBytes": 47856
+      },
+      {
+        "id": "3822667831",
+        "name": "Viewpoint Audio Fix",
+        "sizeBytes": 429978
+      },
+      {
+        "id": "3814208706",
+        "name": "Viewpoint Aim Smoothing",
+        "sizeBytes": 81059
+      },
+      {
+        "id": "3812195130",
+        "name": "Weapon Calibration for Viewpoint 枪械姿态校准",
+        "sizeBytes": 143171
+      },
+      {
+        "id": "3812132692",
+        "name": "3D枪口后坐力 / 3D Muzzle Recoil [Project Viewpoint]",
+        "sizeBytes": 597030
+      },
+      {
+        "id": "3812048943",
+        "name": "3D越肩瞄准 / 3D Shoulder Aim [Project Viewpoint]",
+        "sizeBytes": 878297
+      },
+      {
+        "id": "3811444257",
+        "name": "3d镭射瞄准",
+        "sizeBytes": 145702
+      },
+      {
+        "id": "3816588758",
+        "name": "Death Cam Mod for Project Viewpoint",
+        "sizeBytes": 247908
+      },
+      {
+        "id": "3821523334",
+        "name": "This Is How Zombies Died - Sniper Cam",
+        "sizeBytes": 19425783
+      },
+      {
+        "id": "3822775022",
+        "name": "Car Battery Charger 3D Model (+ Viewpoint patch)",
+        "sizeBytes": 504101
+      },
+      {
+        "id": "3819357845",
+        "name": "Civilian Transport Pack",
+        "sizeBytes": 36657128
+      },
+      {
+        "id": "3815025536",
+        "name": "BALLS (project viewpoint)",
+        "sizeBytes": 131178
+      },
+      {
+        "id": "3814994364",
+        "name": "Viewpoint Foraging",
+        "sizeBytes": 1753896
+      },
+      {
+        "id": "3822411039",
+        "name": "Viewpoint - Forage 3D",
+        "sizeBytes": 239589
+      },
+      {
+        "id": "3816712699",
+        "name": "“You do not have permission to interact with this object in this safehouse” Fix",
+        "sizeBytes": 3592
+      },
+      {
+        "id": "3813008614",
+        "name": "Viewpoint Interim HUD",
+        "sizeBytes": 778520
+      },
+      {
+        "id": "3815544725",
+        "name": "Viewpoint Immersive Map",
+        "sizeBytes": 702665
+      },
+      {
+        "id": "3810179295",
+        "name": "Project Viewpoint Minimap (PZ3D Minimap) [B42.21.0] [SP/MP]",
+        "sizeBytes": 6331190
+      },
+      {
+        "id": "3813889000",
+        "name": "Project Viewpoint Marking Beams (PZ3D Marking Beams) [B42.21.0] [SP/MP]",
+        "sizeBytes": 4090622
+      },
+      {
+        "id": "3818120333",
+        "name": "Project Viewpoint Map Mod Furniture - Temporary Edition: Project Russia [B42.21.0][SP/MP]",
+        "sizeBytes": 9797769
+      },
+      {
+        "id": "3818605173",
+        "name": "Any Wall Posters 3D - Project Viewpoint [B42]",
+        "sizeBytes": 35307331
+      },
+      {
+        "id": "3818605688",
+        "name": "Any Wall Flags 3D - Project Viewpoint [B42]",
+        "sizeBytes": 26769811
+      },
+      {
+        "id": "3820322189",
+        "name": "Oz Street 3D",
+        "sizeBytes": 40764796
+      },
+      {
+        "id": "3813929757",
+        "name": "Project Viewpoint: KK\u0027s General Mod Map Fix",
+        "sizeBytes": 26445
+      },
+      {
+        "id": "3815033432",
+        "name": "Silent View(point)",
+        "sizeBytes": 507121
+      },
+      {
+        "id": "3813908957",
+        "name": "Project Viewpoint: True Weathers \u0026 Lighting",
+        "sizeBytes": 1815182
+      },
+      {
+        "id": "3820195046",
+        "name": "coldFog Shaders",
+        "sizeBytes": 152699
+      },
+      {
+        "id": "3818548144",
+        "name": "Redraw (Project viewpoint shader pack)",
+        "sizeBytes": 394536
+      },
+      {
+        "id": "3816746100",
+        "name": "Nobel Shaders",
+        "sizeBytes": 37089030
+      },
+      {
+        "id": "3816312077",
+        "name": "Halcyon (Viewpoint shader pack)",
+        "sizeBytes": 55810
+      },
+      {
+        "id": "3812833283",
+        "name": "Viewpoint: Director\u0027s Cut - Cinematic Cameras \u0026 Tank Controls [B42]",
+        "sizeBytes": 2046783
+      },
+      {
+        "id": "3815225881",
+        "name": "Viewpoint PZO Eclipse Shader Compatibility",
+        "sizeBytes": 1204222
+      },
+      {
+        "id": "3815669816",
+        "name": "Minecraft Game Shader Pack",
+        "sizeBytes": 2297597
+      },
+      {
+        "id": "3819221828",
+        "name": "Mitypoint Shaders - Viewpoint",
+        "sizeBytes": 5426769
+      },
+      {
+        "id": "3818656834",
+        "name": "Deadwood Shaders - Cinematic Shaders for Viewpoint",
+        "sizeBytes": 553030
+      },
+      {
+        "id": "3820467974",
+        "name": "Wasteland Shaders (Viewpoint)",
+        "sizeBytes": 131507
+      },
+      {
+        "id": "3821241473",
+        "name": "Project Viewpoint: Kentucky Nights",
+        "sizeBytes": 1395654
+      },
+      {
+        "id": "3821721515",
+        "name": "Hollow Light (Viewpoint shader pack)",
+        "sizeBytes": 5170646
+      },
+      {
+        "id": "3823639135",
+        "name": "Viewpoint Shader Panini",
+        "sizeBytes": 100578
+      },
+      {
+        "id": "3822953581",
+        "name": "Viewpoint Shader Tracers",
+        "sizeBytes": 111512
+      },
+      {
+        "id": "3811141563",
+        "name": "Source Movement for Viewpoint (Bhop)",
+        "sizeBytes": 393658
+      },
+      {
+        "id": "3811645644",
+        "name": "Project Viewpoint Parkour",
+        "sizeBytes": 9402245
+      },
+      {
+        "id": "3815223174",
+        "name": "Viewpoint Better Terrain",
+        "sizeBytes": 6312501
+      },
+      {
+        "id": "3821216065",
+        "name": "Knox Real Terrain",
+        "sizeBytes": 10621375
+      },
+      {
+        "id": "3820772682",
+        "name": "Viewpoint Terrain Lights Fix [B42]",
+        "sizeBytes": 434852
+      },
+      {
+        "id": "3815630947",
+        "name": "Viewpoint Rolling Hills",
+        "sizeBytes": 304280
+      },
+      {
+        "id": "3817555882",
+        "name": "Rolling Hills Physics Addon (Project Viewpoint)",
+        "sizeBytes": 3022516
+      },
+      {
+        "id": "3822754688",
+        "name": "Immersive Physics \u0026 Weather (Project Viewpoint)",
+        "sizeBytes": 678886
+      },
+      {
+        "id": "3815801816",
+        "name": "车内顶灯 (Dome Light for viewpoint)",
+        "sizeBytes": 3487572
+      },
+      {
+        "id": "3815019204",
+        "name": "Project Viewpoint - KI5 Vehicle Parts Fix",
+        "sizeBytes": 179498
+      },
+      {
+        "id": "3817413313",
+        "name": "Project Viewpoint - Immersive Driving",
+        "sizeBytes": 120306
+      },
+      {
+        "id": "3822854313",
+        "name": "Viewpoint x A-LIFE",
+        "sizeBytes": 114099
+      },
+      {
+        "id": "3818260104",
+        "name": "Viewpoint - Vehicle Mirrors",
+        "sizeBytes": 951147
+      },
+      {
+        "id": "3817276586",
+        "name": "Project Viewpoint: Vehicle Top Speed",
+        "sizeBytes": 36141
+      },
+      {
+        "id": "3815245833",
+        "name": "Visible Corpses in Trailers [B42]",
+        "sizeBytes": 3911813
+      },
+      {
+        "id": "3812896812",
+        "name": "Helicopter Fix - Project Viewpoint",
+        "sizeBytes": 233652
+      },
+      {
+        "id": "3819322670",
+        "name": "Project Viewpoint - Visible Helicopter Events",
+        "sizeBytes": 935039
+      },
+      {
+        "id": "3818359767",
+        "name": "3D Helicopter Event (Project Viewpoint)",
+        "sizeBytes": 6564512
+      },
+      {
+        "id": "3822346365",
+        "name": "Stinger Anti-Air",
+        "sizeBytes": 53583110
+      },
+      {
+        "id": "3823702935",
+        "name": "M3 Half-track [B42]",
+        "sizeBytes": 184249273
+      },
+      {
+        "id": "3813726756",
+        "name": "Tactical Strike [SP/MP]",
+        "sizeBytes": 5073803
+      },
+      {
+        "id": "3813483790",
+        "name": "[B42/ViewPoint] Skyhammer Air Support - Apache, A-10, AC-130 \u0026 B-2",
+        "sizeBytes": 53799922
+      },
+      {
+        "id": "3815739336",
+        "name": "Viewpoint Vehicle Tuning Compatibility",
+        "sizeBytes": 5847
+      },
+      {
+        "id": "3822339643",
+        "name": "ProjectViewpoint-IrisEyot",
+        "sizeBytes": 118749703
+      }
+    ]
+  },
+  "requirements": {
+    "freeDiskGB": 14,
+    "ramGB": 8,
+    "recommendedRamGB": 16,
+    "vramGB": 8
+  },
+  "groups": [],
+  "warnings": [
+    "This package downloads 198 items from Steam Workshop and can take a long time.",
+    "This is a reference collection, not a tested modpack. It contains obsolete and conflicting alternatives.",
+    "Some Workshop items may be incompatible with each other. Start a new save for a stable test.",
+    "Back up your save manually before switching an existing world.",
+    "Workshop updates can change this pack at any time.",
+    "Every player on a co-op server must use the same collection and update state."
+  ],
+  "credits": [
+    "All mods belong to their respective authors.",
+    "This catalog entry links to a public Steam Workshop collection; it is not claimed as original work.",
+    "Not affiliated with The Indie Stone."
+  ],
+  "updatedAt": "2026-10-20"
+}
