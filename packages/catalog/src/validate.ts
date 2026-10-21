@@ -38,9 +38,23 @@ export async function validateCommittedCatalog(): Promise<void> {
     if (!committedPack) {
       throw new Error(`catalog/index.json is missing pack ${pack.id}; run pnpm catalog:generate`)
     }
-    if (committedPack.archive.sha256 !== pack.archive.sha256) {
+    if (pack.source === 'archive') {
+      if (
+        !committedPack.archive ||
+        !pack.archive ||
+        committedPack.archive.sha256 !== pack.archive.sha256
+      ) {
+        throw new Error(
+          `${pack.id}: committed archive hash does not match pack.json; run pnpm catalog:generate`,
+        )
+      }
+    } else if (
+      !committedPack.workshop ||
+      !pack.workshop ||
+      committedPack.workshop.collectionId !== pack.workshop.collectionId
+    ) {
       throw new Error(
-        `${pack.id}: committed archive hash does not match pack.json; run pnpm catalog:generate`,
+        `${pack.id}: committed workshop metadata does not match pack.json; run pnpm catalog:generate`,
       )
     }
     if (

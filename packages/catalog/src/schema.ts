@@ -47,6 +47,22 @@ export const requirementsSchema = z
   })
   .strict()
 
+export const workshopItemSchema = z
+  .object({
+    id: z.string().regex(/^\d+$/),
+    name: z.string().min(1),
+    sizeBytes: z.number().int().nonnegative().optional(),
+  })
+  .strict()
+
+export const workshopSchema = z
+  .object({
+    collectionId: z.string().regex(/^\d+$/),
+    downloadBytes: z.number().int().positive(),
+    items: z.array(workshopItemSchema).min(1),
+  })
+  .strict()
+
 export const packSchema = z
   .object({
     schemaVersion: z.literal(CATALOG_SCHEMA_VERSION),
@@ -71,9 +87,11 @@ export const packSchema = z
       .nullable()
       .default(null),
     order: z.number().int().default(0),
-    archive: archiveSchema,
+    source: z.enum(['archive', 'workshop']).default('archive'),
+    archive: archiveSchema.nullable().default(null),
+    workshop: workshopSchema.nullable().default(null),
     requirements: requirementsSchema,
-    groups: z.array(modGroupSchema).min(1),
+    groups: z.array(modGroupSchema).default([]),
     warnings: z.array(z.string()).default([]),
     credits: z.array(z.string()).default([]),
     updatedAt: z.string().min(1),
@@ -93,8 +111,9 @@ export const indexedArchiveSchema = archiveSchema
   .omit({ urls: true })
   .extend({ url: z.string().url() })
 
-export const indexedPackSchema = packSchema.omit({ archive: true }).extend({
-  archive: indexedArchiveSchema,
+export const indexedPackSchema = packSchema.omit({ archive: true, workshop: true }).extend({
+  archive: indexedArchiveSchema.nullable().default(null),
+  workshop: workshopSchema.nullable().default(null),
   stats: packStatsSchema,
 })
 
@@ -110,10 +129,19 @@ export const catalogSchema = z
 export type CatalogMode = z.infer<typeof catalogSchema.shape.mode>
 export type ModEntry = z.infer<typeof modSchema>
 export type ModGroup = z.infer<typeof modGroupSchema>
+export type WorkshopItem = z.infer<typeof workshopItemSchema>
 export type PackDefinition = z.infer<typeof packSchema>
 export type IndexedPack = z.infer<typeof indexedPackSchema>
 export type Catalog = z.infer<typeof catalogSchema>
 export type PackStats = z.infer<typeof packStatsSchema>
+
+export function isWorkshopPack(pack: { source: string; workshop: unknown }): boolean {
+  return pack.source === 'workshop' && pack.workshop !== null
+}
+
+export function getWorkshopItems(pack: IndexedPack): WorkshopItem[] {
+  return pack.workshop?.items ?? []
+}
 
 export interface EffectiveMod extends ModEntry {
   group: string

@@ -8,23 +8,30 @@ import { updateDefaultTxt } from './activation.js'
 import { applyHostIni, type HostApplyResult } from './host.js'
 import { applyGameConfig } from './gameConfig.js'
 import { isZombieBuddyInstalled } from './zombiebuddy.js'
-import { verifyPack, type PackHealth } from './verify.js'
+import { verifyMods, verifyPack, type PackHealth } from './verify.js'
 import type { EventSink } from './events.js'
 import { EasyPzError } from './errors.js'
 import { clearPackInstall, loadState, saveState, setActivePack, type AppState } from './state.js'
 import {
-  activationEntries,
+  activationEntriesForMods,
   assertPackAvailable,
-  deactivationEntries,
+  deactivationEntriesForMods,
   deletePackStorage,
   detectActivePackId,
   getAvailablePackIds,
+  getPackStorageMods,
   runMoveTransaction,
 } from './storage.js'
 
-function allPackClientIds(catalog: Catalog): string[] {
+function allPackClientIds(catalog: Catalog, state: AppState): string[] {
   const ids = new Set<string>()
   for (const pack of catalog.packs) {
+    if (pack.source === 'workshop') {
+      for (const mod of state.installs[pack.id]?.mods ?? []) {
+        if (!mod.serverOnly) ids.add(mod.id)
+      }
+      continue
+    }
     for (const id of getActiveModIds(catalog, pack.id, false)) ids.add(id)
   }
   return [...ids]
@@ -56,18 +63,22 @@ export async function setPackEnabled(options: {
 
   const state = await loadState(paths, { catalog, migrate: true })
   const previousPackId = state.activePackId
-  const allIds = allPackClientIds(catalog)
-  const targetIds = getActiveModIds(catalog, packId, false)
+  const allIds = allPackClientIds(catalog, state)
+  const targetMods = await getPackStorageMods(catalog, packId, paths, state)
+  const targetIds = targetMods.filter((mod) => !mod.serverOnly).map((mod) => mod.id)
   const duplicateRoot = path.join(paths.backupDir, 'easypz-duplicates')
 
   if (enabled) {
-    await assertPackAvailable(catalog, packId, paths)
+    await assertPackAvailable(catalog, packId, paths, state)
+
+    const previousMods =
+      previousPackId && previousPackId !== packId
+        ? await getPackStorageMods(catalog, previousPackId, paths, state)
+        : []
 
     const entries = [
-      ...(previousPackId && previousPackId !== packId
-        ? deactivationEntries(catalog, previousPackId, paths)
-        : []),
-      ...activationEntries(catalog, packId, paths),
+      ...deactivationEntriesForMods(previousMods, paths),
+      ...activationEntriesForMods(targetMods, paths),
     ]
 
     await runMoveTransaction(
@@ -109,7 +120,7 @@ export async function setPackEnabled(options: {
   }
 
   await runMoveTransaction(
-    deactivationEntries(catalog, packId, paths),
+    deactivationEntriesForMods(targetMods, paths),
     paths.journalFile,
     { signal, duplicateRoot },
     async () => {
@@ -177,13 +188,14 @@ export async function deletePack(options: {
     state = await loadState(paths, { catalog, migrate: true })
   }
 
-  const available = await getAvailablePackIds(catalog, paths)
+  const available = await getAvailablePackIds(catalog, paths, state)
   const otherAvailable = available.filter((id) => id !== packId)
   const result = await deletePackStorage({
     catalog,
     packId,
     paths,
     otherAvailablePackIds: otherAvailable,
+    state,
   })
 
   await saveState(paths, clearPackInstall(state, packId))
@@ -253,7 +265,9 @@ export async function applyHostForPack(options: {
     throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before updating the host.')
   }
 
-  const modIds = getActiveModIds(catalog, packId, true)
+  const state = await loadState(paths, { catalog, migrate: true })
+  const mods = await getPackStorageMods(catalog, packId, paths, state)
+  const modIds = mods.map((mod) => mod.id)
   const result = await applyHostIni({
     iniPath: hostIniPath(paths),
     modIds,
@@ -280,6 +294,22 @@ export async function getPackHealth(options: {
   const game = await getGameInfo(options.paths, {
     gamePathOverride: options.gamePathOverride,
   })
+  const state = await loadState(options.paths, { catalog: options.catalog, migrate: true })
+  const pack = getPack(options.catalog, options.packId)
+
+  if (pack.source === 'workshop') {
+    const mods = (state.installs[pack.id]?.mods ?? []).map((mod) => ({
+      ...mod,
+      group: 'Workshop',
+    }))
+    return verifyMods({
+      packId: pack.id,
+      mods,
+      paths: options.paths,
+      pzPath: game.pzPath,
+      hostIniPath: hostIniPath(options.paths),
+    })
+  }
 
   return verifyPack({
     catalog: options.catalog,
@@ -296,13 +326,16 @@ export async function reconcileActivePack(options: {
   onEvent?: EventSink
 }): Promise<AppState> {
   const { catalog, paths, onEvent } = options
-  const activePackId = await detectActivePackId(catalog, paths)
   const state = await loadState(paths, { catalog, migrate: true })
-  const addIds = activePackId ? getActiveModIds(catalog, activePackId, false) : []
+  const activePackId = await detectActivePackId(catalog, paths, state)
+  const activeMods = activePackId
+    ? await getPackStorageMods(catalog, activePackId, paths, state)
+    : []
+  const addIds = activeMods.filter((mod) => !mod.serverOnly).map((mod) => mod.id)
 
   await updateDefaultTxt({
     addIds,
-    removeIds: allPackClientIds(catalog),
+    removeIds: allPackClientIds(catalog, state),
     modsDir: modsDir(paths),
     backupDir: paths.backupDir,
   })

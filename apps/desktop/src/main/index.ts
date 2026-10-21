@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process'
+﻿import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -12,6 +12,7 @@ import {
   getGameInfo,
   getHostStatus,
   getPackHealth,
+  getPackStorageMods,
   hostIniPath,
   installPack,
   isEasyPzError,
@@ -26,7 +27,7 @@ import {
   type EngineEvent,
   type PackToggleResult,
 } from '@easypz/engine'
-import { getActiveModIds, getPack, type Catalog } from '@easypz/catalog'
+import { getPack, type Catalog } from '@easypz/catalog'
 import type { Bootstrap, OperationResult, PendingAction, Settings } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { getCatalogSource, loadCatalog, toCatalogView } from './catalog'
@@ -135,9 +136,9 @@ async function buildBootstrap(): Promise<Bootstrap> {
       log.warn('Could not reconcile the active pack after recovery', error)
     }
   }
-  const availablePackIds = await getAvailablePackIds(catalog, paths)
+  const availablePackIds = await getAvailablePackIds(catalog, paths, state)
   const hostExpectedIds = state.activePackId
-    ? getActiveModIds(catalog, state.activePackId, true)
+    ? (await getPackStorageMods(catalog, state.activePackId, paths, state)).map((mod) => mod.id)
     : null
   const host = await getHostStatus(hostIniPath(paths), hostExpectedIds)
   const legacyDetected =

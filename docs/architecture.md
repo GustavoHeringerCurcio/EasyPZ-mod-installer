@@ -94,6 +94,20 @@ Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warnin
 - Shared mods are stored once under their workshop/folder key.
 - Deleting a pack removes only store folders not referenced by another available pack.
 
+## Workshop collection packs
+
+Packs with `source: "workshop"` do not use an archive. The catalog pins the public collection ID and its current item list.
+
+1. Ensure SteamCMD exists at `%LOCALAPPDATA%\EasyPZ\steamcmd`.
+2. For each item, check the Steam client Workshop folder first.
+3. Download missing items with SteamCMD in small batches.
+4. Discover each item’s `mods/<folder>` content and parse `mod.info`.
+5. Copy mods into the EasyPZ store.
+6. Record the discovered mod IDs/folders in the install record.
+7. Activate normally using the recorded IDs.
+
+The collection’s install record is the source of truth for availability, activation, verification, and deletion. Partial item failures are reported but do not abort the entire collection.
+
 ## Legacy migration
 
 On first read, if state does not exist:

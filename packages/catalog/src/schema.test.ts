@@ -15,13 +15,25 @@ describe('catalog', () => {
     const catalog = await buildCatalog({ mode: 'alpha', write: false })
     catalogSchema.parse(catalog)
 
-    expect(catalog.packs.map((pack) => pack.id)).toEqual(['essentials', 'medium', 'advanced'])
+    expect(catalog.packs.map((pack) => pack.id)).toEqual([
+      'essentials',
+      'medium',
+      'advanced',
+      'viewpoint-collection',
+    ])
     expect(getPack(catalog, 'essentials').stats.clientMods).toBe(6)
     expect(getPack(catalog, 'medium').stats.clientMods).toBe(38)
     expect(getPack(catalog, 'advanced').stats.clientMods).toBe(45)
+    expect(getPack(catalog, 'viewpoint-collection').stats.clientMods).toBe(90)
     expect(getPack(catalog, 'essentials').extends).toBeNull()
     expect(getPack(catalog, 'advanced').extends).toBe('medium')
-    expect(getPack(catalog, 'essentials').archive.url).toContain('EasyPZ-assets')
+    expect(getPack(catalog, 'essentials').archive?.url).toContain('EasyPZ-assets')
+
+    const workshop = getPack(catalog, 'viewpoint-collection')
+    expect(workshop.source).toBe('workshop')
+    expect(workshop.archive).toBeNull()
+    expect(workshop.workshop?.collectionId).toBe('3820219222')
+    expect(workshop.workshop?.items).toHaveLength(90)
   })
 
   it('points alpha archives at the legacy mirror and public archives at this repo', async () => {
@@ -31,9 +43,9 @@ describe('catalog', () => {
     const alphaMedium = getPack(alpha, 'medium')
     const publicMedium = getPack(published, 'medium')
 
-    expect(alphaMedium.archive.url).toContain('pz-viewpoint-starter')
-    expect(publicMedium.archive.url).toContain('EasyPZ-mod-installer')
-    expect(alphaMedium.archive.sha256).toBe(publicMedium.archive.sha256)
+    expect(alphaMedium.archive?.url).toContain('pz-viewpoint-starter')
+    expect(publicMedium.archive?.url).toContain('EasyPZ-mod-installer')
+    expect(alphaMedium.archive?.sha256).toBe(publicMedium.archive?.sha256)
   })
 
   it('resolves inherited mods without duplicates', async () => {

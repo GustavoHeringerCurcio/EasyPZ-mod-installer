@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -7,7 +7,7 @@ import { buildDefaultTxt, parseDefaultModIds } from './activation.js'
 import { hasModInfo } from './archive.js'
 import { getAppPaths, activeModPath, defaultTxtPath, modsDir, storeModPath } from './paths.js'
 import { deletePack, setPackEnabled } from './operations.js'
-import { loadState } from './state.js'
+import { createEmptyState, loadState, saveState } from './state.js'
 import { getAvailablePackIds, recoverStorageJournal } from './storage.js'
 
 const temps: string[] = []
@@ -104,6 +104,21 @@ function makeCatalog(): Catalog {
         'medium',
         3,
       ),
+      {
+        ...makePack('viewpoint-collection', [], null, 2),
+        name: 'Project Viewpoint Collection',
+        source: 'workshop',
+        archive: null,
+        workshop: {
+          collectionId: '555',
+          downloadBytes: 2,
+          items: [
+            { id: '501', name: 'Workshop One', sizeBytes: 1 },
+            { id: '502', name: 'Workshop Two', sizeBytes: 1 },
+          ],
+        },
+        stats: { clientMods: 2, serverMods: 0, totalMods: 2, workshopCount: 2 },
+      },
     ],
   }
 }
@@ -219,6 +234,53 @@ describe('pack storage', () => {
     expect(await hasModInfo(storeModPath(paths, '222', 'ModC'))).toBe(false)
     expect(await hasModInfo(storeModPath(paths, '111', 'ModA'))).toBe(true)
     expect(await hasModInfo(storeModPath(paths, '999', 'ModShared'))).toBe(true)
+  })
+
+  it('activates a downloaded Workshop collection from its install record', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '501', 'ModW1'))
+    await writeModInfo(storeModPath(paths, '502', 'ModW2'))
+
+    const state = createEmptyState()
+    state.installs['viewpoint-collection'] = {
+      packId: 'viewpoint-collection',
+      source: 'workshop',
+      workshopCollectionId: '555',
+      archiveSha256: 'workshop:555',
+      catalogGeneratedAt: catalog.generatedAt,
+      installedAt: new Date().toISOString(),
+      managedFolders: ['ModW1', 'ModW2'],
+      mods: [
+        { id: 'ModW1', name: 'Mod W1', folder: 'ModW1', workshopId: '501', serverOnly: false },
+        { id: 'ModW2', name: 'Mod W2', folder: 'ModW2', workshopId: '502', serverOnly: false },
+      ],
+    }
+    await saveState(paths, state)
+
+    expect(await getAvailablePackIds(catalog, paths)).toContain('viewpoint-collection')
+
+    await setPackEnabled({
+      catalog,
+      packId: 'viewpoint-collection',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+
+    expect(await hasModInfo(activeModPath(paths, 'ModW1'))).toBe(true)
+    expect(await hasModInfo(activeModPath(paths, 'ModW2'))).toBe(true)
+    const ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toEqual(expect.arrayContaining(['UserMod', 'ModW1', 'ModW2']))
+
+    await setPackEnabled({
+      catalog,
+      packId: 'viewpoint-collection',
+      paths,
+      enabled: false,
+      skipGameCheck: true,
+    })
+    expect(await hasModInfo(activeModPath(paths, 'ModW1'))).toBe(false)
+    expect(await hasModInfo(storeModPath(paths, '501', 'ModW1'))).toBe(true)
   })
 
   it('recovers a previously interrupted move', async () => {

@@ -1,8 +1,9 @@
-import type { EngineEvent, InstallSummary } from '@easypz/engine'
+﻿import type { EngineEvent, InstallSummary } from '@easypz/engine'
 
 export type StageName =
   | 'preflight'
   | 'download'
+  | 'workshop'
   | 'verify'
   | 'extract'
   | 'apply'
@@ -15,6 +16,7 @@ export type StageName =
 export const STAGE_ORDER: StageName[] = [
   'preflight',
   'download',
+  'workshop',
   'verify',
   'extract',
   'apply',
@@ -49,7 +51,7 @@ export interface InstallUiState {
   running: boolean
   packId: string | null
   stages: Partial<Record<StageName, StageState>>
-  progress: Partial<Record<'download' | 'extract', InstallProgress>>
+  progress: Partial<Record<'download' | 'workshop' | 'extract', InstallProgress>>
   currentMod: { index: number; total: number; name: string; action: string } | null
   logs: InstallLogLine[]
   summary: InstallSummary | null

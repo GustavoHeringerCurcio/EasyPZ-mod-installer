@@ -20,11 +20,12 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 
 ## Packs
 
-| Pack           | Client mods | Download | Notes                                                      |
-| -------------- | ----------: | -------: | ---------------------------------------------------------- |
-| **Essentials** |           6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
-| **Medium**     |          38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
-| **Advanced**   |          45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
+| Pack                             |       Client mods | Download | Notes                                                      |
+| -------------------------------- | ----------------: | -------: | ---------------------------------------------------------- |
+| **Essentials**                   |                 6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
+| **Medium**                       |                38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
+| **Advanced**                     |                45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
+| **Project Viewpoint Collection** | 90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD      |
 
 Essentials is standalone. Medium and Advanced are additive to each other, but Essentials is a smaller independent starter pack.
 
@@ -38,6 +39,17 @@ Only one EasyPZ modpack can be ready to play at a time.
 - Disabling a pack moves it to the store and removes its IDs from `default.txt`.
 - Mods are moved, not re-downloaded, so switching is fast once a pack is installed.
 - The app preserves unrelated mod IDs the user added to `default.txt`.
+
+## Workshop collection packs
+
+The **Project Viewpoint Collection** is not a prebuilt archive. It uses the public Steam Workshop collection `3820219222` and downloads its 90 items through SteamCMD.
+
+- SteamCMD is downloaded automatically to `%LOCALAPPDATA%\EasyPZ\steamcmd`.
+- Items already present in the Steam client’s Workshop folder are reused.
+- The app discovers each item’s real mod ID and folder from `mod.info`.
+- Failed or removed items are reported and skipped; the rest of the collection continues.
+- The collection changes when Workshop items update. For a stable test, use a new save and keep a manual backup.
+- This is a large, uncurated collection. It appears under **More modpacks**, not the recommended section.
 
 ## Requirements
 
@@ -125,6 +137,7 @@ Read [docs/alpha.md](docs/alpha.md). In short:
 | `%LOCALAPPDATA%\EasyPZ\cache\archives`    | Verified pack archives                                  |
 | `%LOCALAPPDATA%\EasyPZ\cache\extracted`   | Extracted archives keyed by SHA256                      |
 | `%USERPROFILE%\Zomboid\EasyPZ\state.json` | Active pack and install records                         |
+| `%LOCALAPPDATA%\EasyPZ\steamcmd`          | SteamCMD used for Workshop collection downloads         |
 | `%USERPROFILE%\Zomboid\EasyPZ\store`      | Inactive downloaded pack mods                           |
 | `%USERPROFILE%\Zomboid\mods`              | Mods for the one active pack                            |
 | `%USERPROFILE%\Zomboid\backups`           | EasyPZ backups, `default.txt` backups, host INI backups |

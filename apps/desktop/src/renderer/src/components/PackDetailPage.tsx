@@ -57,8 +57,16 @@ export function PackDetailPage({
     () => getEffectiveMods(bootstrap.catalog, pack.id),
     [bootstrap.catalog, pack.id],
   )
+  const isWorkshop = pack.source === 'workshop'
+  const workshopItems = pack.workshop?.items ?? []
+  const modCount = isWorkshop ? workshopItems.length : mods.length
+  const downloadBytes = pack.archive?.sizeBytes ?? pack.workshop?.downloadBytes ?? 0
+  const requiredDiskGB = pack.archive?.requiredDiskGB ?? pack.requirements.freeDiskGB
 
   const normalized = modSearch.trim().toLowerCase()
+  const filteredWorkshopItems = workshopItems.filter(
+    (item) => !normalized || item.name.toLowerCase().includes(normalized),
+  )
   const filteredGroups = groups
     .map((group) => ({
       ...group,
@@ -125,7 +133,7 @@ export function PackDetailPage({
             {(
               [
                 ['overview', t('pack.overview')],
-                ['mods', `${t('pack.mods')} (${mods.length})`],
+                ['mods', `${t('pack.mods')} (${modCount})`],
                 ['requirements', t('pack.requirements')],
               ] as Array<[Tab, string]>
             ).map(([id, label]) => (
@@ -169,8 +177,8 @@ export function PackDetailPage({
                   value={pack.stats.workshopCount}
                   hint="Steam Workshop"
                 />
-                <Stat label={t('pack.download')} value={formatBytes(pack.archive.sizeBytes)} />
-                <Stat label={t('pack.disk')} value={`${pack.archive.requiredDiskGB} GB`} />
+                <Stat label={t('pack.download')} value={formatBytes(downloadBytes)} />
+                <Stat label={t('pack.disk')} value={`${requiredDiskGB} GB`} />
               </div>
 
               <section>
@@ -189,23 +197,45 @@ export function PackDetailPage({
               </section>
 
               <section>
-                <SectionTitle>{t('pack.groups')}</SectionTitle>
+                <SectionTitle>
+                  {isWorkshop ? t('pack.workshopItems') : t('pack.groups')}
+                </SectionTitle>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {groups.map((group) => (
-                    <div
-                      key={`${group.packId}-${group.name}`}
-                      className="flex items-center justify-between gap-2 rounded-xl border border-line bg-panel-2/60 px-4 py-3"
-                    >
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-bone">{group.name}</div>
-                        <div className="text-[11px] text-muted">
-                          {t('pack.modCount', { count: group.mods.length })}
-                          {group.packId !== pack.id ? ` · ${t('pack.inherited')}` : ''}
+                  {isWorkshop
+                    ? workshopItems.slice(0, 12).map((item) => (
+                        <a
+                          key={item.id}
+                          href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between gap-2 rounded-xl border border-line bg-panel-2/60 px-4 py-3 transition-colors hover:border-white/25"
+                        >
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-bone">
+                              {item.name}
+                            </div>
+                            <div className="font-mono text-[10px] text-muted">{item.id}</div>
+                          </div>
+                          <ExternalLink className="size-3.5 shrink-0 text-muted" />
+                        </a>
+                      ))
+                    : groups.map((group) => (
+                        <div
+                          key={`${group.packId}-${group.name}`}
+                          className="flex items-center justify-between gap-2 rounded-xl border border-line bg-panel-2/60 px-4 py-3"
+                        >
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-bone">
+                              {group.name}
+                            </div>
+                            <div className="text-[11px] text-muted">
+                              {t('pack.modCount', { count: group.mods.length })}
+                              {group.packId !== pack.id ? ` · ${t('pack.inherited')}` : ''}
+                            </div>
+                          </div>
+                          <Badge tone="muted">{group.mods.length}</Badge>
                         </div>
-                      </div>
-                      <Badge tone="muted">{group.mods.length}</Badge>
-                    </div>
-                  ))}
+                      ))}
                 </div>
               </section>
 
@@ -232,55 +262,82 @@ export function PackDetailPage({
                 />
               </div>
 
-              {filteredGroups.map((group) => (
-                <section key={`${group.packId}-${group.name}`}>
-                  <div className="mb-3 flex items-center gap-3">
-                    <h3 className="font-display text-sm font-semibold text-bone">{group.name}</h3>
-                    {group.packId !== pack.id ? (
-                      <Badge tone="muted">{t('pack.inherited')}</Badge>
-                    ) : null}
-                    <div className="h-px flex-1 bg-line" />
-                  </div>
-                  <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                    {group.mods.map((mod) => (
-                      <div
-                        key={`${mod.workshopId}-${mod.folder}`}
-                        className="flex items-center gap-4 bg-panel-2/35 px-4 py-3"
-                      >
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
-                          {mod.serverOnly ? (
-                            <Server className="size-3.5 text-muted" />
-                          ) : (
-                            <Sparkles className="size-3.5 text-bone/70" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-[13px] font-medium text-bone">
-                            {mod.name}
-                          </div>
-                          <div className="truncate font-mono text-[10px] text-muted">
-                            {mod.folder} · {mod.workshopId}
-                          </div>
-                        </div>
-                        {mod.serverOnly ? <Badge tone="muted">{t('pack.serverOnly')}</Badge> : null}
-                        {mod.workshopUrl ? (
-                          <a
-                            href={mod.workshopUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={t('pack.openWorkshop')}
-                            className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-bone"
-                          >
-                            <ExternalLink className="size-3.5" />
-                          </a>
-                        ) : null}
+              {isWorkshop ? (
+                <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                  {filteredWorkshopItems.map((item) => (
+                    <a
+                      key={item.id}
+                      href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
+                    >
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+                        <Sparkles className="size-3.5 text-bone/70" />
                       </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[13px] font-medium text-bone">
+                          {item.name}
+                        </div>
+                        <div className="truncate font-mono text-[10px] text-muted">{item.id}</div>
+                      </div>
+                      <ExternalLink className="size-3.5 shrink-0 text-muted" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                filteredGroups.map((group) => (
+                  <section key={`${group.packId}-${group.name}`}>
+                    <div className="mb-3 flex items-center gap-3">
+                      <h3 className="font-display text-sm font-semibold text-bone">{group.name}</h3>
+                      {group.packId !== pack.id ? (
+                        <Badge tone="muted">{t('pack.inherited')}</Badge>
+                      ) : null}
+                      <div className="h-px flex-1 bg-line" />
+                    </div>
+                    <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                      {group.mods.map((mod) => (
+                        <div
+                          key={`${mod.workshopId}-${mod.folder}`}
+                          className="flex items-center gap-4 bg-panel-2/35 px-4 py-3"
+                        >
+                          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+                            {mod.serverOnly ? (
+                              <Server className="size-3.5 text-muted" />
+                            ) : (
+                              <Sparkles className="size-3.5 text-bone/70" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-[13px] font-medium text-bone">
+                              {mod.name}
+                            </div>
+                            <div className="truncate font-mono text-[10px] text-muted">
+                              {mod.folder} · {mod.workshopId}
+                            </div>
+                          </div>
+                          {mod.serverOnly ? (
+                            <Badge tone="muted">{t('pack.serverOnly')}</Badge>
+                          ) : null}
+                          {mod.workshopUrl ? (
+                            <a
+                              href={mod.workshopUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={t('pack.openWorkshop')}
+                              className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-bone"
+                            >
+                              <ExternalLink className="size-3.5" />
+                            </a>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))
+              )}
 
-              {filteredGroups.length === 0 ? (
+              {(isWorkshop ? filteredWorkshopItems.length : filteredGroups.length) === 0 ? (
                 <Panel className="p-8 text-center text-sm text-muted">{t('pack.noMods')}</Panel>
               ) : null}
             </div>
@@ -315,7 +372,7 @@ export function PackDetailPage({
                 <RequirementRow
                   icon={Download}
                   label={t('pack.download')}
-                  value={formatBytes(pack.archive.sizeBytes)}
+                  value={formatBytes(downloadBytes)}
                 />
               </div>
 
@@ -350,8 +407,8 @@ export function PackDetailPage({
             </div>
 
             <div className="space-y-3 px-5 py-4 text-xs">
-              <Row label={t('pack.download')} value={formatBytes(pack.archive.sizeBytes)} />
-              <Row label={t('pack.disk')} value={`${pack.archive.requiredDiskGB} GB`} />
+              <Row label={t('pack.download')} value={formatBytes(downloadBytes)} />
+              <Row label={t('pack.disk')} value={`${requiredDiskGB} GB`} />
               <Row label={t('pack.build')} value={pack.gameBuild} />
               <Row label={t('pack.workshopItems')} value={String(pack.stats.workshopCount)} />
             </div>

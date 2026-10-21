@@ -33,22 +33,31 @@ export interface PackHealth {
   zombieBuddyInstalled: boolean
 }
 
-export async function verifyPack(options: {
-  catalog: Catalog
+export interface VerifyModEntry {
+  id: string
+  name: string
+  folder: string
+  workshopId: string
+  serverOnly: boolean
+  group?: string
+}
+
+export async function verifyMods(options: {
   packId: string
+  mods: VerifyModEntry[]
   paths: AppPaths
   pzPath: string | null
   hostIniPath: string
 }): Promise<PackHealth> {
-  const { catalog, packId, paths, pzPath, hostIniPath } = options
+  const { packId, mods, paths, pzPath, hostIniPath } = options
 
   const rows: VerifyRow[] = []
-  for (const mod of getEffectiveMods(catalog, packId)) {
+  for (const mod of mods) {
     const stored = await modIsStored(paths, mod.workshopId, mod.folder)
     const active = await modIsActive(paths, mod.folder)
     const installed = stored || active
     rows.push({
-      group: mod.group,
+      group: mod.group ?? 'Workshop',
       folder: mod.folder,
       name: mod.name,
       modId: mod.id,
@@ -75,6 +84,24 @@ export async function verifyPack(options: {
     hostModCount: hostMods ? hostMods.length : null,
     zombieBuddyInstalled: pzPath ? await isZombieBuddyInstalled(pzPath) : false,
   }
+}
+
+export async function verifyPack(options: {
+  catalog: Catalog
+  packId: string
+  paths: AppPaths
+  pzPath: string | null
+  hostIniPath: string
+}): Promise<PackHealth> {
+  const mods = getEffectiveMods(options.catalog, options.packId).map((mod) => ({
+    id: mod.id,
+    name: mod.name,
+    folder: mod.folder,
+    workshopId: mod.workshopId,
+    serverOnly: mod.serverOnly,
+    group: mod.group,
+  }))
+  return verifyMods({ ...options, mods })
 }
 
 export async function pathExists(target: string): Promise<boolean> {

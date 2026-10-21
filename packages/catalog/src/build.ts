@@ -21,6 +21,17 @@ function formatZodError(error: unknown): string {
 }
 
 function resolveStats(packs: Map<string, PackDefinition>, packId: string): PackStats {
+  const root = packs.get(packId)
+  if (root?.source === 'workshop') {
+    const count = root.workshop?.items.length ?? 0
+    return {
+      clientMods: count,
+      serverMods: 0,
+      totalMods: count,
+      workshopCount: count,
+    }
+  }
+
   const seen = new Set<string>()
   const chainSeen = new Set<string>()
   const mods: PackDefinition['groups'][number]['mods'] = []
@@ -54,6 +65,7 @@ function resolveStats(packs: Map<string, PackDefinition>, packId: string): PackS
 }
 
 function validateArchiveUrl(mode: CatalogMode, pack: PackDefinition): string {
+  if (!pack.archive) throw new Error(`${pack.id}: archive pack is missing archive metadata`)
   const url = pack.archive.urls[mode]
   let parsed: URL
   try {
@@ -139,6 +151,17 @@ export async function buildCatalog(options: BuildOptions): Promise<Catalog> {
     if (pack.extends && !byId.has(pack.extends)) {
       throw new Error(`${pack.id}: extends unknown pack "${pack.extends}"`)
     }
+    if (pack.source === 'archive') {
+      if (!pack.archive) throw new Error(`${pack.id}: archive pack is missing archive metadata`)
+      if (pack.groups.length === 0) throw new Error(`${pack.id}: archive pack has no mods`)
+      if (pack.workshop)
+        throw new Error(`${pack.id}: archive pack must not define workshop metadata`)
+    } else {
+      if (!pack.workshop) throw new Error(`${pack.id}: workshop pack is missing workshop metadata`)
+      if (pack.archive)
+        throw new Error(`${pack.id}: workshop pack must not define archive metadata`)
+      if (pack.extends) throw new Error(`${pack.id}: workshop packs cannot extend another pack`)
+    }
   }
 
   const ids = new Set<string>()
@@ -152,6 +175,15 @@ export async function buildCatalog(options: BuildOptions): Promise<Catalog> {
   const packs: IndexedPack[] = definitions
     .sort((left, right) => left.order - right.order || left.name.localeCompare(right.name))
     .map((pack) => {
+      if (pack.source === 'workshop') {
+        return {
+          ...pack,
+          archive: null,
+          stats: resolveStats(byId, pack.id),
+        }
+      }
+
+      if (!pack.archive) throw new Error(`${pack.id}: archive pack is missing archive metadata`)
       const { urls, ...archive } = pack.archive
       return {
         ...pack,
@@ -159,6 +191,7 @@ export async function buildCatalog(options: BuildOptions): Promise<Catalog> {
           ...archive,
           url: validateArchiveUrl(options.mode, pack),
         },
+        workshop: null,
         stats: resolveStats(byId, pack.id),
       }
     })

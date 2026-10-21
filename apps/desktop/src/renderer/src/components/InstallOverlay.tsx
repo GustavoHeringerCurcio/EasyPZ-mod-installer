@@ -46,6 +46,7 @@ export function InstallOverlay({
     return status === 'done' || status === 'skip'
   }).length
   const download = state.progress.download
+  const workshop = state.progress.workshop
   const extract = state.progress.extract
   const activeStage = STAGE_ORDER.find((stage) => state.stages[stage]?.status === 'start')
 
@@ -184,6 +185,22 @@ export function InstallOverlay({
                     {t('install.downloadSpeed', {
                       speed: formatSpeed(download.bytesPerSecond),
                       eta: formatEta(download.etaSeconds),
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              {workshop && state.stages.workshop?.status === 'start' ? (
+                <div className="space-y-2 rounded-xl border border-line bg-panel-2/60 p-4">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-bone">{t('install.stages.workshop')}</span>
+                    <span className="font-mono text-muted">{workshop.percent.toFixed(0)}%</span>
+                  </div>
+                  <Progress value={workshop.percent} />
+                  <div className="text-[11px] text-muted">
+                    {t('install.workshopItems', {
+                      done: workshop.transferred ?? 0,
+                      total: workshop.total ?? 0,
                     })}
                   </div>
                 </div>

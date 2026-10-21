@@ -96,6 +96,7 @@ const ptBR = {
     currentMod: 'Agora: {{name}}',
     extracting: 'Extraindo arquivos…',
     files: '{{count}} arquivos',
+    workshopItems: '{{done}} / {{total}} itens da Workshop',
     completeLog: 'Instalação concluída.',
     log: 'Log ao vivo',
     downloadSpeed: '{{speed}} · faltam {{eta}}',
@@ -103,6 +104,7 @@ const ptBR = {
     stages: {
       preflight: 'Verificando jogo e disco',
       download: 'Baixando pack',
+      workshop: 'Baixando da Steam Workshop',
       verify: 'Verificando SHA256',
       extract: 'Extraindo arquivo',
       apply: 'Guardando mods',

@@ -1,6 +1,7 @@
 export type InstallStage =
   | 'preflight'
   | 'download'
+  | 'workshop'
   | 'verify'
   | 'extract'
   | 'apply'
@@ -16,7 +17,7 @@ export type EngineEvent =
   | { type: 'stage'; stage: InstallStage; status: StageStatus; detail?: string }
   | {
       type: 'progress'
-      stage: 'download' | 'extract'
+      stage: 'download' | 'workshop' | 'extract'
       percent: number
       transferred?: number
       total?: number

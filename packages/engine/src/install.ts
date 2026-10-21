@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
 import { getPack } from '@easypz/catalog'
@@ -14,6 +14,7 @@ import { EasyPzError, cancelledError, isEasyPzError, toError } from './errors.js
 import { loadState, recordInstall, saveState } from './state.js'
 import { storePackMods } from './storage.js'
 import { setPackEnabled } from './operations.js'
+import { downloadWorkshopPack } from './workshop.js'
 
 export interface InstallOptions {
   catalog: Catalog
@@ -117,10 +118,11 @@ async function preflight(options: InstallOptions): Promise<{
 
   const pack = getPack(options.catalog, options.packId)
 
-  if (game.freeDiskGB !== null && game.freeDiskGB < pack.archive.requiredDiskGB) {
+  const requiredDiskGB = pack.archive?.requiredDiskGB ?? pack.requirements.freeDiskGB
+  if (game.freeDiskGB !== null && game.freeDiskGB < requiredDiskGB) {
     throw new EasyPzError(
       'DISK_SPACE',
-      `Not enough free space. ${pack.archive.requiredDiskGB} GB required, ${game.freeDiskGB.toFixed(1)} GB available.`,
+      `Not enough free space. ${requiredDiskGB} GB required, ${game.freeDiskGB.toFixed(1)} GB available.`,
     )
   }
 
@@ -131,6 +133,122 @@ async function preflight(options: InstallOptions): Promise<{
 
   stageEvent(options.onEvent, 'preflight', 'done')
   return { game, pack }
+}
+
+async function installWorkshopPack(args: {
+  options: InstallOptions
+  game: GameInfo
+  pack: ReturnType<typeof getPack>
+  pzPath: string
+}): Promise<InstallSummary> {
+  const { options, game, pack, pzPath } = args
+  const { catalog, packId, paths, signal, onEvent } = options
+
+  if (!pack.workshop) {
+    throw new EasyPzError('IO', 'Workshop pack is missing collection metadata.')
+  }
+  if (!game.workshopRoot) {
+    throw new EasyPzError('GAME_NOT_FOUND', 'The Steam Workshop folder could not be found.')
+  }
+
+  stageEvent(onEvent, 'download', 'skip', 'Steam Workshop collection')
+  stageEvent(onEvent, 'verify', 'skip', 'Steam Workshop collection')
+  stageEvent(onEvent, 'extract', 'skip', 'Steam Workshop collection')
+  stageEvent(onEvent, 'workshop', 'start')
+
+  const downloaded = await downloadWorkshopPack({
+    catalog,
+    packId,
+    paths,
+    workshopRoot: game.workshopRoot,
+    signal,
+    onEvent,
+  })
+
+  stageEvent(onEvent, 'workshop', 'done', `${downloaded.mods.length} mods`)
+
+  if (downloaded.failedItems.length > 0) {
+    emit(onEvent, {
+      type: 'warning',
+      message: `${downloaded.failedItems.length} Workshop item(s) could not be downloaded and were skipped.`,
+    })
+  }
+
+  ensureNotCancelled(signal)
+
+  let zombieBuddy: ZombieBuddyStatus = 'skipped'
+  stageEvent(onEvent, 'zombiebuddy', 'start')
+  try {
+    zombieBuddy = await ensureZombieBuddy({
+      pzPath,
+      extractRoot: '',
+      paths,
+      skip: Boolean(options.skipZombieBuddy),
+    })
+    stageEvent(onEvent, 'zombiebuddy', zombieBuddy === 'skipped' ? 'skip' : 'done', zombieBuddy)
+  } catch (error) {
+    emit(onEvent, {
+      type: 'warning',
+      message: `ZombieBuddy setup failed: ${toError(error).message}`,
+    })
+    stageEvent(onEvent, 'zombiebuddy', 'skip', 'Failed')
+  }
+
+  ensureNotCancelled(signal)
+
+  stageEvent(onEvent, 'configure', 'start')
+  await applyGameConfig({
+    pzPath,
+    zomboidDir: paths.zomboidDir,
+    heapMB: game.recommendedHeapMB,
+    zombieBuddyInstalled: await isZombieBuddyInstalled(pzPath),
+  })
+  stageEvent(onEvent, 'configure', 'done', `Heap ${game.recommendedHeapMB} MB`)
+
+  ensureNotCancelled(signal)
+
+  stageEvent(onEvent, 'apply', 'start')
+  const state = await loadState(paths, { catalog, migrate: true })
+  const installedState = recordInstall(state, catalog, packId, { mods: downloaded.mods })
+  await saveState(paths, { ...installedState, activePackId: state.activePackId })
+  stageEvent(onEvent, 'apply', 'done', `${downloaded.mods.length} mods`)
+
+  stageEvent(onEvent, 'activate', 'start')
+  if (options.skipActivate) {
+    stageEvent(onEvent, 'activate', 'skip')
+  } else {
+    const toggle = await setPackEnabled({
+      catalog,
+      packId,
+      paths,
+      enabled: true,
+      signal,
+      onEvent,
+      skipGameCheck: true,
+    })
+    stageEvent(onEvent, 'activate', 'done', `${toggle.modCount} client mods`)
+  }
+
+  stageEvent(onEvent, 'host', 'skip')
+  stageEvent(onEvent, 'state', 'start')
+  const finalState = await loadState(paths, { catalog, migrate: true })
+  const nextState = recordInstall(finalState, catalog, packId, { mods: downloaded.mods })
+  await saveState(paths, nextState)
+  stageEvent(onEvent, 'state', 'done')
+
+  const summary: InstallSummary = {
+    packId,
+    clientMods: downloaded.mods.filter((mod) => !mod.serverOnly).length,
+    serverMods: downloaded.mods.filter((mod) => mod.serverOnly).length,
+    workshopItems: downloaded.downloadedItems,
+    downloadedBytes: pack.workshop.downloadBytes,
+    installedAt: nextState.installs[packId]?.installedAt ?? new Date().toISOString(),
+    zombieBuddy,
+    hostUpdated: false,
+  }
+
+  emit(onEvent, { type: 'done', summary })
+  return summary
 }
 
 export async function installPack(options: InstallOptions): Promise<InstallSummary> {
@@ -145,18 +263,33 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
     }
     ensureNotCancelled(signal)
 
-    const extractRootForPack = path.join(paths.extractRoot, pack.archive.sha256)
+    if (pack.source === 'workshop') {
+      return await installWorkshopPack({
+        options,
+        game,
+        pack,
+        pzPath,
+      })
+    }
+
+    const archive = pack.archive
+    if (!archive) {
+      throw new EasyPzError('IO', 'Archive pack is missing archive metadata.')
+    }
+
+    stageEvent(onEvent, 'workshop', 'skip', 'Archive pack')
+
+    const extractRootForPack = path.join(paths.extractRoot, archive.sha256)
     const cachedExtract = await extractCacheComplete(catalog, packId, extractRootForPack)
     const reusableArchive = await resolveArchive({
       paths,
-      fileName: pack.archive.fileName,
-      sha256: pack.archive.sha256,
+      fileName: archive.fileName,
+      sha256: archive.sha256,
       force: Boolean(options.forceRedownload),
       onEvent,
     })
 
-    let archivePath =
-      reusableArchive?.archivePath ?? path.join(paths.archiveDir, pack.archive.fileName)
+    let archivePath = reusableArchive?.archivePath ?? path.join(paths.archiveDir, archive.fileName)
     let downloadedBytes = 0
 
     stageEvent(onEvent, 'download', 'start')
@@ -165,20 +298,20 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       emit(onEvent, {
         type: 'log',
         level: 'info',
-        message: `Using ${label} for ${pack.archive.fileName}.`,
+        message: `Using ${label} for ${archive.fileName}.`,
       })
       stageEvent(onEvent, 'download', 'skip', `Already cached in the ${label}`)
     } else {
       emit(onEvent, {
         type: 'log',
         level: 'info',
-        message: `Downloading ${pack.archive.fileName} (${(pack.archive.sizeBytes / 1024 ** 3).toFixed(1)} GB).`,
+        message: `Downloading ${archive.fileName} (${(archive.sizeBytes / 1024 ** 3).toFixed(1)} GB).`,
       })
       const result = await downloadFile({
-        url: pack.archive.url,
+        url: archive.url,
         destination: archivePath,
-        expectedSha256: pack.archive.sha256,
-        expectedSize: pack.archive.sizeBytes,
+        expectedSha256: archive.sha256,
+        expectedSize: archive.sizeBytes,
         signal,
         onProgress: (progress) => {
           emit(onEvent, {
@@ -209,10 +342,10 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
 
     stageEvent(onEvent, 'verify', 'start')
     const actual = await hashFile(archivePath)
-    if (actual !== pack.archive.sha256) {
+    if (actual !== archive.sha256) {
       throw new EasyPzError(
         'ARCHIVE_HASH_MISMATCH',
-        `Archive hash mismatch. Expected ${pack.archive.sha256}, got ${actual}.`,
+        `Archive hash mismatch. Expected ${archive.sha256}, got ${actual}.`,
       )
     }
     stageEvent(onEvent, 'verify', 'done')

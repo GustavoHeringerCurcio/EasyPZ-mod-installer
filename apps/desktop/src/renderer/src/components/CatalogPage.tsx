@@ -96,7 +96,7 @@ function PackCard({
             </span>
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-bone/80">
               <Download className="size-4" />
-              {formatBytes(pack.archive.sizeBytes)}
+              {formatBytes(pack.archive?.sizeBytes ?? pack.workshop?.downloadBytes ?? 0)}
             </span>
           </div>
 
@@ -178,6 +178,9 @@ export function CatalogPage({
       pack.description.toLowerCase().includes(normalized) ||
       pack.tags.some((tag) => tag.toLowerCase().includes(normalized))
     ) {
+      return true
+    }
+    if (pack.workshop?.items.some((item) => item.name.toLowerCase().includes(normalized))) {
       return true
     }
     return getEffectiveMods(bootstrap.catalog, pack.id).some(

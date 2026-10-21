@@ -96,6 +96,7 @@ const en = {
     currentMod: 'Now: {{name}}',
     extracting: 'Extracting files…',
     files: '{{count}} files',
+    workshopItems: '{{done}} / {{total}} Workshop items',
     completeLog: 'Install complete.',
     log: 'Live log',
     downloadSpeed: '{{speed}} · {{eta}} left',
@@ -103,6 +104,7 @@ const en = {
     stages: {
       preflight: 'Checking game and disk',
       download: 'Downloading pack',
+      workshop: 'Downloading from Steam Workshop',
       verify: 'Verifying SHA256',
       extract: 'Extracting archive',
       apply: 'Installing mods',

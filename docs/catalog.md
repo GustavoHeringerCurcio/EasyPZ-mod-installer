@@ -104,6 +104,27 @@ Do not create cycles. Validation rejects unknown parents.
 - The current covers are branded placeholders with `"placeholderArt": true`.
 - Do not use Project Zomboid trademarks or unlicensed screenshots in the app identity.
 
+## Workshop collection packs
+
+A pack can use Steam Workshop instead of a prebuilt archive:
+
+```json
+{
+  "id": "viewpoint-collection",
+  "source": "workshop",
+  "featured": false,
+  "archive": null,
+  "groups": [],
+  "workshop": {
+    "collectionId": "3820219222",
+    "downloadBytes": 2364814611,
+    "items": [{ "id": "3815544725", "name": "Viewpoint Immersive Map", "sizeBytes": 700000 }]
+  }
+}
+```
+
+Workshop packs require `workshop`, must not define `archive`, cannot extend another pack, and have empty `groups`. The engine downloads items with SteamCMD and discovers the actual mod IDs and folders from each item’s `mod.info`.
+
 ## Modes
 
 `catalog/index.json` records `"mode": "alpha" | "public"`.

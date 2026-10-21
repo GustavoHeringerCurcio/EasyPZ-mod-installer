@@ -164,7 +164,11 @@ export function LibraryPage({
                         })}
                       </span>
                     ) : null}
-                    <span className="font-mono">{pack.archive.sha256.slice(0, 10)}...</span>
+                    <span className="font-mono">
+                      {pack.workshop
+                        ? `workshop:${pack.workshop.collectionId}`
+                        : `${pack.archive?.sha256.slice(0, 10) ?? ''}...`}
+                    </span>
                   </div>
 
                   {healthForPack ? (

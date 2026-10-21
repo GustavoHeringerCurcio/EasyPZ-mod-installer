@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "id": "viewpoint-collection",
+  "name": "Project Viewpoint Collection",
+  "tagline": "The full Project Viewpoint Workshop collection.",
+  "description": "All 90 items from the PROJECT VIEWPOINT Steam Workshop collection: Viewpoint add-ons, fixes, maps, vehicles, UI, and gameplay mods. This is a large collection and can change when Workshop items update.",
+  "cover": "packs/viewpoint-collection/cover.jpg",
+  "gallery": [],
+  "accent": "#a855f7",
+  "featured": false,
+  "placeholderArt": false,
+  "gameBuild": "42.21",
+  "tags": ["collection", "workshop", "viewpoint", "multiplayer", "large"],
+  "extends": null,
+  "order": 30,
+  "source": "workshop",
+  "archive": null,
+  "workshop": {
+    "collectionId": "3820219222",
+    "downloadBytes": 2364814611,
+    "items": [
+      {
+        "id": "3815544725",
+        "name": "Viewpoint Immersive Map",
+        "sizeBytes": 702665
+      },
+      {
+        "id": "3815033191",
+        "name": "Barricade Fix - Project Viewpoint",
+        "sizeBytes": 284968
+      },
+      {
+        "id": "3818432217",
+        "name": "Immersive Camera Motion : Project Viewpoint Add-on",
+        "sizeBytes": 285234
+      },
+      {
+        "id": "3816819422",
+        "name": "Viewpoint DayZ",
+        "sizeBytes": 51650821
+      },
+      {
+        "id": "3812151347",
+        "name": "Door Fix - Project Viewpoint",
+        "sizeBytes": 250578
+      },
+      {
+        "id": "3814787969",
+        "name": "Workshop item 3814787969",
+        "sizeBytes": 0
+      },
+      {
+        "id": "3814398576",
+        "name": "Surface Fix - Project Viewpoint",
+        "sizeBytes": 548863
+      },
+      {
+        "id": "3816588758",
+        "name": "Death Cam Mod for Project Viewpoint",
+        "sizeBytes": 247908
+      },
+      {
+        "id": "3813172420",
+        "name": "Project Viewpoint: KK\u0027s TREE in 3D （Animated \u0026 Seasonal）",
+        "sizeBytes": 110883666
+      },
+      {
+        "id": "3814994364",
+        "name": "Viewpoint Foraging",
+        "sizeBytes": 1753896
+      },
+      {
+        "id": "3815931973",
+        "name": "Project Viewpoint: KK\u0027s Shelves in 3D",
+        "sizeBytes": 184844234
+      },
+      {
+        "id": "3817294484",
+        "name": "Viewpoint - Roofs (WIP)",
+        "sizeBytes": 81606554
+      },
+      {
+        "id": "3814486926",
+        "name": "Viewpoint - 3D Fences",
+        "sizeBytes": 2991662
+      },
+      {
+        "id": "3816442251",
+        "name": "Viewpoint: Living Props",
+        "sizeBytes": 81759686
+      },
+      {
+        "id": "3813194971",
+        "name": "Viewpoint - Advanced Throwables",
+        "sizeBytes": 1302734
+      },
+      {
+        "id": "3812864848",
+        "name": "Viewpoint True Ballistics",
+        "sizeBytes": 772927
+      },
+      {
+        "id": "3812612054",
+        "name": "Project Viewpoint: Recoil \u0026 ADS",
+        "sizeBytes": 1391740
+      },
+      {
+        "id": "3810302175",
+        "name": "6244 3D models for Viewpoint [sour_kisel]",
+        "sizeBytes": 450786523
+      },
+      {
+        "id": "3809306528",
+        "name": "Project Viewpoint",
+        "sizeBytes": 34153469
+      },
+      {
+        "id": "3619862853",
+        "name": "ZombieBuddy",
+        "sizeBytes": 14466055
+      },
+      {
+        "id": "3420478458",
+        "name": "[B42.20] Better Flashlights",
+        "sizeBytes": 2103998
+      },
+      {
+        "id": "3171167894",
+        "name": "that DAMN Library",
+        "sizeBytes": 42407848
+      },
+      {
+        "id": "3759256921",
+        "name": "Workshop item 3759256921",
+        "sizeBytes": 0
+      },
+      {
+        "id": "3671176591",
+        "name": "dustinguished bolt cutters",
+        "sizeBytes": 423181
+      },
+      {
+        "id": "3409723807",
+        "name": "[B42] UH-1B Helicopter (Beta)",
+        "sizeBytes": 14383910
+      },
+      {
+        "id": "3680633169",
+        "name": "Tactical Pistol Hold",
+        "sizeBytes": 3482508
+      },
+      {
+        "id": "3677017550",
+        "name": "Tactical Hold",
+        "sizeBytes": 2337848
+      },
+      {
+        "id": "3579640010",
+        "name": "ST Additions - Pry Open (A Crowbar Mod)",
+        "sizeBytes": 748124
+      },
+      {
+        "id": "3772052709",
+        "name": "Spawn Selector [B42 Stable]",
+        "sizeBytes": 574320
+      },
+      {
+        "id": "3391145494",
+        "name": "[B42] OSRS Exp Drops",
+        "sizeBytes": 1466565
+      },
+      {
+        "id": "3815468401",
+        "name": "Too Many Emotes",
+        "sizeBytes": 57773106
+      },
+      {
+        "id": "3508537032",
+        "name": "NeatUI Framework [B42]",
+        "sizeBytes": 2308100
+      },
+      {
+        "id": "3502080466",
+        "name": "Neat Crafting [B42]",
+        "sizeBytes": 4152045
+      },
+      {
+        "id": "3536052310",
+        "name": "Neat Building [B42]",
+        "sizeBytes": 42523446
+      },
+      {
+        "id": "3642084851",
+        "name": "[B41/42] Minimal Sidebar (Auto Hide)",
+        "sizeBytes": 60901
+      },
+      {
+        "id": "3779561845",
+        "name": "LG Extended Plumbing",
+        "sizeBytes": 1466549
+      },
+      {
+        "id": "3661336777",
+        "name": "Horse Mod [B42.20+/MP]",
+        "sizeBytes": 58507343
+      },
+      {
+        "id": "2256623447",
+        "name": "Firearms",
+        "sizeBytes": 167827553
+      },
+      {
+        "id": "2584112711",
+        "name": "[B41/B42] Faster Hood Opening",
+        "sizeBytes": 50826
+      },
+      {
+        "id": "3774776279",
+        "name": "Climb Ladders [B42SP \u0026 MP]",
+        "sizeBytes": 59468
+      },
+      {
+        "id": "3783444342",
+        "name": "[B42]Aviation Core (Beta)",
+        "sizeBytes": 6270078
+      },
+      {
+        "id": "3775549570",
+        "name": "Alice\u0027s Weapon Sling",
+        "sizeBytes": 1399513
+      },
+      {
+        "id": "3778868211",
+        "name": "Nick\u0027s Turn Off Fridges",
+        "sizeBytes": 150384
+      },
+      {
+        "id": "3781579266",
+        "name": "[B42] Silly\u0027s Roleplay Actions",
+        "sizeBytes": 39851675
+      },
+      {
+        "id": "3818359767",
+        "name": "3D Helicopter Event (Project Viewpoint)",
+        "sizeBytes": 6564512
+      },
+      {
+        "id": "3005903549",
+        "name": "\u002763 Volkswagen 1300 Beetle",
+        "sizeBytes": 21937974
+      },
+      {
+        "id": "3631989559",
+        "name": "\u002769 Dodge Charger",
+        "sizeBytes": 21182272
+      },
+      {
+        "id": "3161951724",
+        "name": "\u002776 Chevrolet K Series",
+        "sizeBytes": 52496468
+      },
+      {
+        "id": "2618213077",
+        "name": "\u002782 Oshkosh M911 + Military Semi-Trailers",
+        "sizeBytes": 31212549
+      },
+      {
+        "id": "2886832936",
+        "name": "\u002788 Chevrolet S10",
+        "sizeBytes": 9947196
+      },
+      {
+        "id": "2900580391",
+        "name": "\u002749 Dodge Power Wagon Crew Cab",
+        "sizeBytes": 13782095
+      },
+      {
+        "id": "3041122351",
+        "name": "\u002763 Volkswagen Type 2 Van",
+        "sizeBytes": 26792604
+      },
+      {
+        "id": "3026723485",
+        "name": "\u002767 Shelby GT500 + Eleanor",
+        "sizeBytes": 18168337
+      },
+      {
+        "id": "2991201484",
+        "name": "\u002769 Chevrolet Camaro",
+        "sizeBytes": 19382006
+      },
+      {
+        "id": "2873290424",
+        "name": "\u002770 Dodge Challenger",
+        "sizeBytes": 19081050
+      },
+      {
+        "id": "3670063857",
+        "name": "\u002770 Ford Escort",
+        "sizeBytes": 25148749
+      },
+      {
+        "id": "2886832257",
+        "name": "\u002782 Jeep J10",
+        "sizeBytes": 13438292
+      },
+      {
+        "id": "2805630347",
+        "name": "\u002784 Mercedes Benz W460",
+        "sizeBytes": 28081455
+      },
+      {
+        "id": "3614034284",
+        "name": "\u002785 Chevrolet Step-Van",
+        "sizeBytes": 28373857
+      },
+      {
+        "id": "3413706334",
+        "name": "\u002785 Pontiac Parisienne",
+        "sizeBytes": 15175202
+      },
+      {
+        "id": "2870394916",
+        "name": "\u002786 Ford Econoline E-150 + Pop Culture vans",
+        "sizeBytes": 56479405
+      },
+      {
+        "id": "2566953935",
+        "name": "\u002786 Oshkosh P19A + Military Trailers",
+        "sizeBytes": 22501937
+      },
+      {
+        "id": "3196180339",
+        "name": "\u002787 Chevrolet Suburban",
+        "sizeBytes": 15122561
+      },
+      {
+        "id": "3110911330",
+        "name": "\u002787 Ford B700/F700 Trucks",
+        "sizeBytes": 31435172
+      },
+      {
+        "id": "3435796523",
+        "name": "\u002788 Toyota Hilux",
+        "sizeBytes": 11811514
+      },
+      {
+        "id": "2886833398",
+        "name": "\u002789 Ford Bronco",
+        "sizeBytes": 11390790
+      },
+      {
+        "id": "2932549988",
+        "name": "\u002789 Isuzu Trooper",
+        "sizeBytes": 17266144
+      },
+      {
+        "id": "3570973322",
+        "name": "\u002789 LAND ROVER Defender",
+        "sizeBytes": 29075908
+      },
+      {
+        "id": "3110913021",
+        "name": "\u002790 BMW 3 Series (E30)",
+        "sizeBytes": 37589795
+      },
+      {
+        "id": "2952802178",
+        "name": "\u002790 Ford F350 Ambulance",
+        "sizeBytes": 10079679
+      },
+      {
+        "id": "2942793445",
+        "name": "\u002790 Pierce Arrow Pumper and Ladder Trucks",
+        "sizeBytes": 14320704
+      },
+      {
+        "id": "3539691958",
+        "name": "\u002791 Ford Ranger",
+        "sizeBytes": 14413373
+      },
+      {
+        "id": "2642541073",
+        "name": "\u002792 AM General M998 + M101A3 Cargo trailer",
+        "sizeBytes": 23775418
+      },
+      {
+        "id": "2962175696",
+        "name": "\u002792 Ford Crown Victoria",
+        "sizeBytes": 20320227
+      },
+      {
+        "id": "2846036306",
+        "name": "\u002792 NISSAN Skyline GT-R (R32)",
+        "sizeBytes": 18649998
+      },
+      {
+        "id": "3287727378",
+        "name": "\u002792 Jeep YJ Wrangler",
+        "sizeBytes": 21126362
+      },
+      {
+        "id": "3073430075",
+        "name": "\u002793 Ford F-Series",
+        "sizeBytes": 26806440
+      },
+      {
+        "id": "3647735736",
+        "name": "\u002795 Subaru Impreza WRX STI",
+        "sizeBytes": 10569960
+      },
+      {
+        "id": "3647736504",
+        "name": "\u002796 Mitsubishi Lancer EVO IV",
+        "sizeBytes": 11342232
+      },
+      {
+        "id": "2897390033",
+        "name": "\u002797 ADI Bushmaster",
+        "sizeBytes": 11790996
+      },
+      {
+        "id": "3315443103",
+        "name": "\u002798 Nissan Stagea 260RS Autech",
+        "sizeBytes": 13454787
+      },
+      {
+        "id": "2971246021",
+        "name": "\u002799 Ford Crown Victoria Police Interceptor",
+        "sizeBytes": 9881697
+      },
+      {
+        "id": "3670064951",
+        "name": "Campers!",
+        "sizeBytes": 28114112
+      },
+      {
+        "id": "3817413313",
+        "name": "Project Viewpoint - Immersive Driving",
+        "sizeBytes": 120306
+      },
+      {
+        "id": "3819166046",
+        "name": "Project Viewpoint - Isometric No More",
+        "sizeBytes": 780744
+      },
+      {
+        "id": "3820421584",
+        "name": "Project Viewpoint - Solid Horses",
+        "sizeBytes": 118763
+      },
+      {
+        "id": "3330403100",
+        "name": "Trailers!",
+        "sizeBytes": 11786296
+      },
+      {
+        "id": "3816856700",
+        "name": "Yeah it\u0027s water bitch-(fix-update)",
+        "sizeBytes": 6151240
+      },
+      {
+        "id": "3820158257",
+        "name": "[B41/B42] Minimal Car Dashboard (Auto-Hide)",
+        "sizeBytes": 4434813
+      },
+      {
+        "id": "3803984183",
+        "name": "Project A-Life [ALIFE NPCS]",
+        "sizeBytes": 52325148
+      }
+    ]
+  },
+  "requirements": {
+    "freeDiskGB": 8,
+    "ramGB": 8,
+    "recommendedRamGB": 16,
+    "vramGB": 8
+  },
+  "groups": [],
+  "warnings": [
+    "This package downloads 90 items from Steam Workshop and can take a long time.",
+    "Back up your save manually before switching an existing world.",
+    "Workshop updates can change this pack at any time.",
+    "Some Workshop items may be incompatible with each other. Start a new save for a stable test.",
+    "Every player on a co-op server must use the same collection and update state.",
+    "ZombieBuddy may ask you to approve its JAR on first launch."
+  ],
+  "credits": [
+    "All mods belong to their respective authors.",
+    "This catalog entry links to a public Steam Workshop collection; it is not claimed as original work.",
+    "Not affiliated with The Indie Stone."
+  ],
+  "updatedAt": "2026-10-20"
+}
