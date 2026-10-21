@@ -39,697 +39,836 @@
       {
         "id": "3619862853",
         "name": "ZombieBuddy",
-        "sizeBytes": 14466055
+        "sizeBytes": 14466055,
+        "group": "Core"
       },
       {
         "id": "3809306528",
         "name": "Project Viewpoint",
-        "sizeBytes": 34153469
+        "sizeBytes": 34153469,
+        "group": "Core"
       },
       {
         "id": "3810302175",
         "name": "6244 3D models for Viewpoint [sour_kisel]",
-        "sizeBytes": 450786523
+        "sizeBytes": 450786523,
+        "group": "Core"
       },
       {
         "id": "3812616893",
         "name": "Viewpoint - Interface",
-        "sizeBytes": 2147565
+        "sizeBytes": 2147565,
+        "group": "Core"
       },
       {
         "id": "3812702301",
         "name": "Viewpoint Advanced Movement",
-        "sizeBytes": 56134761
+        "sizeBytes": 56134761,
+        "group": "Core"
       },
       {
         "id": "3813230118",
         "name": "Viewpoint - Equipment Overlays",
-        "sizeBytes": 5717707
+        "sizeBytes": 5717707,
+        "group": "Core"
       },
       {
         "id": "3813194971",
         "name": "Viewpoint - Advanced Throwables",
-        "sizeBytes": 1302734
+        "sizeBytes": 1302734,
+        "group": "Core"
       },
       {
         "id": "3812864848",
         "name": "Viewpoint True Ballistics",
-        "sizeBytes": 772927
+        "sizeBytes": 772927,
+        "group": "Core"
       },
       {
         "id": "3812612054",
         "name": "Project Viewpoint: Recoil \u0026 ADS",
-        "sizeBytes": 1391740
+        "sizeBytes": 1391740,
+        "group": "Core"
       },
       {
         "id": "3813908957",
         "name": "Project Viewpoint: True Weathers \u0026 Lighting",
-        "sizeBytes": 1815182
+        "sizeBytes": 1815182,
+        "group": "Core"
       },
       {
         "id": "3810179295",
         "name": "Project Viewpoint Minimap (PZ3D Minimap) [B42.21.0] [SP/MP]",
-        "sizeBytes": 6331190
+        "sizeBytes": 6331190,
+        "group": "Core"
       },
       {
         "id": "2956146279",
         "name": "Rain Cleans Blood [B42.20 + MP]",
-        "sizeBytes": 2315561
+        "sizeBytes": 2315561,
+        "group": "Core"
       },
       {
         "id": "3607686447",
         "name": "Immersive Blackouts [B42MP]",
-        "sizeBytes": 149568
+        "sizeBytes": 149568,
+        "group": "Core"
       },
       {
         "id": "3504753006",
         "name": "Thump with Friends [B42]",
-        "sizeBytes": 480554
+        "sizeBytes": 480554,
+        "group": "Core"
       },
       {
         "id": "3778511497",
         "name": "Skully\u0027s Zombie Collision [B42.20+]",
-        "sizeBytes": 281781
+        "sizeBytes": 281781,
+        "group": "Core"
       },
       {
         "id": "3780683663",
         "name": "Cye\u0027s Push Doors! [SP/MP]",
-        "sizeBytes": 1244927
+        "sizeBytes": 1244927,
+        "group": "Core"
       },
       {
         "id": "3577903007",
         "name": "Vanilla Foods Expanded",
-        "sizeBytes": 114166963
+        "sizeBytes": 114166963,
+        "group": "Survival and QoL"
       },
       {
         "id": "3592172476",
         "name": "[B42:SP/MP] Take A Bath And Shower",
-        "sizeBytes": 40044551
+        "sizeBytes": 40044551,
+        "group": "Survival and QoL"
       },
       {
         "id": "2142622992",
         "name": "Repair Any Clothes",
-        "sizeBytes": 57680
+        "sizeBytes": 57680,
+        "group": "Survival and QoL"
       },
       {
         "id": "3615135168",
         "name": "Zombie Virus Vaccine [B42.14 to B42.20 - SP/MP]",
-        "sizeBytes": 83594074
+        "sizeBytes": 83594074,
+        "group": "Survival and QoL"
       },
       {
         "id": "3779561845",
         "name": "LG Extended Plumbing",
-        "sizeBytes": 1466549
+        "sizeBytes": 1466549,
+        "group": "Survival and QoL"
       },
       {
         "id": "3171167894",
         "name": "that DAMN Library",
-        "sizeBytes": 42407848
+        "sizeBytes": 42407848,
+        "group": "Survival and QoL"
       },
       {
         "id": "2625625421",
         "name": "Containers!",
-        "sizeBytes": 10907100
+        "sizeBytes": 10907100,
+        "group": "Survival and QoL"
       },
       {
         "id": "3775549570",
         "name": "Alice\u0027s Weapon Sling",
-        "sizeBytes": 1399513
+        "sizeBytes": 1399513,
+        "group": "Survival and QoL"
       },
       {
         "id": "2804531012",
         "name": "Draw On The Map - Free Hand Drawing [DISCONTINUED]",
-        "sizeBytes": 5429892
+        "sizeBytes": 5429892,
+        "group": "Survival and QoL"
       },
       {
         "id": "2503622437",
         "name": "Skill Recovery Journal",
-        "sizeBytes": 4460232
+        "sizeBytes": 4460232,
+        "group": "Survival and QoL"
       },
       {
         "id": "2896041179",
         "name": "errorMagnifier",
-        "sizeBytes": 394032
+        "sizeBytes": 394032,
+        "group": "Survival and QoL"
       },
       {
         "id": "3077900375",
         "name": "Mod Update and Alert System",
-        "sizeBytes": 674130
+        "sizeBytes": 674130,
+        "group": "Survival and QoL"
       },
       {
         "id": "3772052709",
         "name": "Spawn Selector [B42 Stable]",
-        "sizeBytes": 574320
+        "sizeBytes": 574320,
+        "group": "Survival and QoL"
       },
       {
         "id": "3817413313",
         "name": "Project Viewpoint - Immersive Driving",
-        "sizeBytes": 120306
+        "sizeBytes": 120306,
+        "group": "Survival and QoL"
       },
       {
         "id": "3820965001",
         "name": "Viewpoint - Visceral",
-        "sizeBytes": 809551
+        "sizeBytes": 809551,
+        "group": "Survival and QoL"
       },
       {
         "id": "3758880254",
         "name": "PZ Simple Crossbows [B42.21 MP]",
-        "sizeBytes": 5284802
+        "sizeBytes": 5284802,
+        "group": "Survival and QoL"
       },
       {
         "id": "3812984535",
         "name": "Viewpoint - Immersive Effects",
-        "sizeBytes": 403128
+        "sizeBytes": 403128,
+        "group": "Survival and QoL"
       },
       {
         "id": "3818432217",
         "name": "Immersive Camera Motion : Project Viewpoint Add-on",
-        "sizeBytes": 285234
+        "sizeBytes": 285234,
+        "group": "Survival and QoL"
       },
       {
         "id": "3818189653",
         "name": "Viewpoint - Visible Loot",
-        "sizeBytes": 188736546
+        "sizeBytes": 188736546,
+        "group": "Survival and QoL"
       },
       {
         "id": "3811256204",
         "name": "Project Viewpoint QOL",
-        "sizeBytes": 1189002
+        "sizeBytes": 1189002,
+        "group": "Survival and QoL"
       },
       {
         "id": "3819018807",
         "name": "Viewpoint - Right Click Fix",
-        "sizeBytes": 355470
+        "sizeBytes": 355470,
+        "group": "Survival and QoL"
       },
       {
         "id": "3815544725",
         "name": "Viewpoint Immersive Map",
-        "sizeBytes": 702665
+        "sizeBytes": 702665,
+        "group": "Survival and QoL"
       },
       {
         "id": "3814994364",
         "name": "Viewpoint Foraging",
-        "sizeBytes": 1753896
+        "sizeBytes": 1753896,
+        "group": "Survival and QoL"
       },
       {
         "id": "3814560827",
         "name": "Viewpoint Fishing",
-        "sizeBytes": 310761
+        "sizeBytes": 310761,
+        "group": "Survival and QoL"
       },
       {
         "id": "3802372726",
         "name": "True Swimming",
-        "sizeBytes": 2652103
+        "sizeBytes": 2652103,
+        "group": "Survival and QoL"
       },
       {
         "id": "3814178814",
         "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
-        "sizeBytes": 229203342
+        "sizeBytes": 229203342,
+        "group": "Maps"
       },
       {
         "id": "3816175183",
         "name": "Big Bear Lake [ALPHA] [B42]",
-        "sizeBytes": 88770434
+        "sizeBytes": 88770434,
+        "group": "Maps"
       },
       {
         "id": "3480990544",
         "name": "Constown (B42)",
-        "sizeBytes": 38204329
+        "sizeBytes": 38204329,
+        "group": "Maps"
       },
       {
         "id": "3484263516",
         "name": "Raven Creek B42",
-        "sizeBytes": 120169463
+        "sizeBytes": 120169463,
+        "group": "Maps"
       },
       {
         "id": "3747595202",
         "name": "Greenport, KY (B42)",
-        "sizeBytes": 37359556
+        "sizeBytes": 37359556,
+        "group": "Maps"
       },
       {
         "id": "3810223506",
         "name": "Greenport, KY (B42) - Ground Item Fix",
-        "sizeBytes": 9241
+        "sizeBytes": 9241,
+        "group": "Maps"
       },
       {
         "id": "2815966702",
         "name": "Rabbit Hash, KY [B42+ Update]",
-        "sizeBytes": 8009049
+        "sizeBytes": 8009049,
+        "group": "Maps"
       },
       {
         "id": "3661336777",
         "name": "Horse Mod [B42.20+/MP]",
-        "sizeBytes": 58507343
+        "sizeBytes": 58507343,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3784003967",
         "name": "Horse Utility Add-on",
-        "sizeBytes": 434280
+        "sizeBytes": 434280,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3813760573",
         "name": "HorseMod + Viewpoint Controls Patch",
-        "sizeBytes": 270690
+        "sizeBytes": 270690,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3820421584",
         "name": "Project Viewpoint - Solid Horses",
-        "sizeBytes": 118763
+        "sizeBytes": 118763,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "2584112711",
         "name": "[B41/B42] Faster Hood Opening",
-        "sizeBytes": 50826
+        "sizeBytes": 50826,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3816588758",
         "name": "Death Cam Mod for Project Viewpoint",
-        "sizeBytes": 247908
+        "sizeBytes": 247908,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3774776279",
         "name": "Climb Ladders [B42SP \u0026 MP]",
-        "sizeBytes": 59468
+        "sizeBytes": 59468,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3330403100",
         "name": "Trailers!",
-        "sizeBytes": 11786296
+        "sizeBytes": 11786296,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3816856700",
         "name": "Yeah it\u0027s water bitch-(fix-update)",
-        "sizeBytes": 6151240
+        "sizeBytes": 6151240,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3815245833",
         "name": "Visible Corpses in Trailers [B42]",
-        "sizeBytes": 3911813
+        "sizeBytes": 3911813,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3815223174",
         "name": "Viewpoint Better Terrain",
-        "sizeBytes": 6312501
+        "sizeBytes": 6312501,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3815630947",
         "name": "Viewpoint Rolling Hills",
-        "sizeBytes": 304280
+        "sizeBytes": 304280,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3817555882",
         "name": "Rolling Hills Physics Addon (Project Viewpoint)",
-        "sizeBytes": 3022516
+        "sizeBytes": 3022516,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3820772682",
         "name": "Viewpoint Terrain Lights Fix [B42]",
-        "sizeBytes": 434852
+        "sizeBytes": 434852,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3822754688",
         "name": "Immersive Physics \u0026 Weather (Project Viewpoint)",
-        "sizeBytes": 678886
+        "sizeBytes": 678886,
+        "group": "Horses, weather, and utility"
       },
       {
         "id": "3817137006",
         "name": "Viewpoint - World Actions Fix",
-        "sizeBytes": 1164625
+        "sizeBytes": 1164625,
+        "group": "Fixes"
       },
       {
         "id": "3816521966",
         "name": "Viewpoint Placement Fix",
-        "sizeBytes": 267899
+        "sizeBytes": 267899,
+        "group": "Fixes"
       },
       {
         "id": "3817129409",
         "name": "Viewpoint Stability Fix",
-        "sizeBytes": 48607
+        "sizeBytes": 48607,
+        "group": "Fixes"
       },
       {
         "id": "3817501459",
         "name": "Viewpoint Texture Fix",
-        "sizeBytes": 64337
+        "sizeBytes": 64337,
+        "group": "Fixes"
       },
       {
         "id": "3821308495",
         "name": "Viewpoint Visual Fixes",
-        "sizeBytes": 50570
+        "sizeBytes": 50570,
+        "group": "Fixes"
       },
       {
         "id": "3814208706",
         "name": "Viewpoint Aim Smoothing",
-        "sizeBytes": 81059
+        "sizeBytes": 81059,
+        "group": "Fixes"
       },
       {
         "id": "3822667831",
         "name": "Viewpoint Audio Fix",
-        "sizeBytes": 429978
+        "sizeBytes": 429978,
+        "group": "Fixes"
       },
       {
         "id": "3812510377",
         "name": "Project Viewpoint - Fixes",
-        "sizeBytes": 387480
+        "sizeBytes": 387480,
+        "group": "Fixes"
       },
       {
         "id": "3811344119",
         "name": "Light Fix - Project Viewpoint",
-        "sizeBytes": 160248
+        "sizeBytes": 160248,
+        "group": "Fixes"
       },
       {
         "id": "3814398576",
         "name": "Surface Fix - Project Viewpoint",
-        "sizeBytes": 548863
+        "sizeBytes": 548863,
+        "group": "Fixes"
       },
       {
         "id": "3818859807",
         "name": "Project Viewpoint - 3D Doors, Gates \u0026 Garages",
-        "sizeBytes": 36621221
+        "sizeBytes": 36621221,
+        "group": "3D world"
       },
       {
         "id": "3820833348",
         "name": "3D All Windows for Viewpoint [B42] byDGV",
-        "sizeBytes": 112303748
+        "sizeBytes": 112303748,
+        "group": "3D world"
       },
       {
         "id": "3818873810",
         "name": "[V2] 3D Curtains \u0026 Blinds - Project Viewpoint [B42]",
-        "sizeBytes": 24054024
+        "sizeBytes": 24054024,
+        "group": "3D world"
       },
       {
         "id": "3814486926",
         "name": "Viewpoint - 3D Fences",
-        "sizeBytes": 2991662
+        "sizeBytes": 2991662,
+        "group": "3D world"
       },
       {
         "id": "3818605173",
         "name": "Any Wall Posters 3D - Project Viewpoint [B42]",
-        "sizeBytes": 35307331
+        "sizeBytes": 35307331,
+        "group": "3D world"
       },
       {
         "id": "3818605688",
         "name": "Any Wall Flags 3D - Project Viewpoint [B42]",
-        "sizeBytes": 26769811
+        "sizeBytes": 26769811,
+        "group": "3D world"
       },
       {
         "id": "3815931973",
         "name": "Project Viewpoint: KK\u0027s Shelves in 3D",
-        "sizeBytes": 184844234
+        "sizeBytes": 184844234,
+        "group": "3D world"
       },
       {
         "id": "3822411039",
         "name": "Viewpoint - Forage 3D",
-        "sizeBytes": 239589
+        "sizeBytes": 239589,
+        "group": "3D world"
       },
       {
         "id": "3820279516",
         "name": "Viewpoint Directional Melee",
-        "sizeBytes": 136228
+        "sizeBytes": 136228,
+        "group": "Gameplay"
       },
       {
         "id": "3820063546",
         "name": "Viewpoint: Free Aim",
-        "sizeBytes": 161847
+        "sizeBytes": 161847,
+        "group": "Gameplay"
       },
       {
         "id": "3821892101",
         "name": "Viewpoint Tension",
-        "sizeBytes": 2874512
+        "sizeBytes": 2874512,
+        "group": "Gameplay"
       },
       {
         "id": "3812396995",
         "name": "Viewpoint Threat Detector",
-        "sizeBytes": 4001291
+        "sizeBytes": 4001291,
+        "group": "Gameplay"
       },
       {
         "id": "3816823515",
         "name": "Project Viewpoint Free Look",
-        "sizeBytes": 11606
+        "sizeBytes": 11606,
+        "group": "Gameplay"
       },
       {
         "id": "3811645644",
         "name": "Project Viewpoint Parkour",
-        "sizeBytes": 9402245
+        "sizeBytes": 9402245,
+        "group": "Gameplay"
       },
       {
         "id": "3818585720",
         "name": "Viewpoint Binoculars",
-        "sizeBytes": 486347
+        "sizeBytes": 486347,
+        "group": "Gameplay"
       },
       {
         "id": "3815538848",
         "name": "Drag Bodies - Project Viewpoint (First \u0026 Third Person)",
-        "sizeBytes": 13867
+        "sizeBytes": 13867,
+        "group": "Gameplay"
       },
       {
         "id": "3812518796",
         "name": "Project Viewpoint - Place Items (SUB-MOD)",
-        "sizeBytes": 50863
+        "sizeBytes": 50863,
+        "group": "Gameplay"
       },
       {
         "id": "3812198995",
         "name": "Project Viewpoint - Shovel Graves(SUBMOD)",
-        "sizeBytes": 224806
+        "sizeBytes": 224806,
+        "group": "Gameplay"
       },
       {
         "id": "3026723485",
         "name": "\u002767 Shelby GT500 + Eleanor",
-        "sizeBytes": 18168337
+        "sizeBytes": 18168337,
+        "group": "Vehicles"
       },
       {
         "id": "2991201484",
         "name": "\u002769 Chevrolet Camaro",
-        "sizeBytes": 19382006
+        "sizeBytes": 19382006,
+        "group": "Vehicles"
       },
       {
         "id": "2873290424",
         "name": "\u002770 Dodge Challenger",
-        "sizeBytes": 19081050
+        "sizeBytes": 19081050,
+        "group": "Vehicles"
       },
       {
         "id": "3379334330",
         "name": "\u002782 Porsche 911",
-        "sizeBytes": 26748311
+        "sizeBytes": 26748311,
+        "group": "Vehicles"
       },
       {
         "id": "3631989559",
         "name": "\u002769 Dodge Charger",
-        "sizeBytes": 21182272
+        "sizeBytes": 21182272,
+        "group": "Vehicles"
       },
       {
         "id": "3253385114",
         "name": "\u002781 DeLorean DMC-12",
-        "sizeBytes": 11324850
+        "sizeBytes": 11324850,
+        "group": "Vehicles"
       },
       {
         "id": "3110913021",
         "name": "\u002790 BMW 3 Series (E30)",
-        "sizeBytes": 37589795
+        "sizeBytes": 37589795,
+        "group": "Vehicles"
       },
       {
         "id": "2846036306",
         "name": "\u002792 NISSAN Skyline GT-R (R32)",
-        "sizeBytes": 18649998
+        "sizeBytes": 18649998,
+        "group": "Vehicles"
       },
       {
         "id": "3647735736",
         "name": "\u002795 Subaru Impreza WRX STI",
-        "sizeBytes": 10569960
+        "sizeBytes": 10569960,
+        "group": "Vehicles"
       },
       {
         "id": "3647736504",
         "name": "\u002796 Mitsubishi Lancer EVO IV",
-        "sizeBytes": 11342232
+        "sizeBytes": 11342232,
+        "group": "Vehicles"
       },
       {
         "id": "2962175696",
         "name": "\u002792 Ford Crown Victoria",
-        "sizeBytes": 20320227
+        "sizeBytes": 20320227,
+        "group": "Vehicles"
       },
       {
         "id": "2971246021",
         "name": "\u002799 Ford Crown Victoria Police Interceptor",
-        "sizeBytes": 9881697
+        "sizeBytes": 9881697,
+        "group": "Vehicles"
       },
       {
         "id": "2942793445",
         "name": "\u002790 Pierce Arrow Pumper and Ladder Trucks",
-        "sizeBytes": 14320704
+        "sizeBytes": 14320704,
+        "group": "Vehicles"
       },
       {
         "id": "2952802178",
         "name": "\u002790 Ford F350 Ambulance",
-        "sizeBytes": 10079679
+        "sizeBytes": 10079679,
+        "group": "Vehicles"
       },
       {
         "id": "3041122351",
         "name": "\u002763 Volkswagen Type 2 Van",
-        "sizeBytes": 26792604
+        "sizeBytes": 26792604,
+        "group": "Vehicles"
       },
       {
         "id": "2870394916",
         "name": "\u002786 Ford Econoline E-150 + Pop Culture vans",
-        "sizeBytes": 56479405
+        "sizeBytes": 56479405,
+        "group": "Vehicles"
       },
       {
         "id": "3614034284",
         "name": "\u002785 Chevrolet Step-Van",
-        "sizeBytes": 28373857
+        "sizeBytes": 28373857,
+        "group": "Vehicles"
       },
       {
         "id": "3812312558",
         "name": "Construction 1P Viewpoint",
-        "sizeBytes": 745568
+        "sizeBytes": 745568,
+        "group": "Vehicles"
       },
       {
         "id": "3821174725",
         "name": "Viewpoint - 3D RV Van",
-        "sizeBytes": 57157437
+        "sizeBytes": 57157437,
+        "group": "Vehicles"
       },
       {
         "id": "3817030886",
         "name": "RV Viewpoint Patch",
-        "sizeBytes": 4083
+        "sizeBytes": 4083,
+        "group": "Vehicles"
       },
       {
         "id": "3814635273",
         "name": "RVV+Viewpoint",
-        "sizeBytes": 798498
+        "sizeBytes": 798498,
+        "group": "Vehicles"
       },
       {
         "id": "3670064951",
         "name": "Campers!",
-        "sizeBytes": 28114112
+        "sizeBytes": 28114112,
+        "group": "Vehicles"
       },
       {
         "id": "3570973322",
         "name": "\u002789 LAND ROVER Defender",
-        "sizeBytes": 29075908
+        "sizeBytes": 29075908,
+        "group": "Vehicles"
       },
       {
         "id": "3435796523",
         "name": "\u002788 Toyota Hilux",
-        "sizeBytes": 11811514
+        "sizeBytes": 11811514,
+        "group": "Vehicles"
       },
       {
         "id": "2705406713",
         "name": "Military Tool Kit",
-        "sizeBytes": 31547512
+        "sizeBytes": 31547512,
+        "group": "Vehicles"
       },
       {
         "id": "3823702935",
         "name": "M3 Half-track [B42]",
-        "sizeBytes": 184249273
+        "sizeBytes": 184249273,
+        "group": "Vehicles"
       },
       {
         "id": "3818039291",
         "name": "Steel Sights: Tank Gunner Overhaul + M1 Abrams [B42]",
-        "sizeBytes": 26221527
+        "sizeBytes": 26221527,
+        "group": "Vehicles"
       },
       {
         "id": "3783444342",
         "name": "[B42]Aviation Core (Beta)",
-        "sizeBytes": 6270078
+        "sizeBytes": 6270078,
+        "group": "Vehicles"
       },
       {
         "id": "3409723807",
         "name": "[B42] UH-1B Helicopter (Beta)",
-        "sizeBytes": 14383910
+        "sizeBytes": 14383910,
+        "group": "Vehicles"
       },
       {
         "id": "3818359767",
         "name": "3D Helicopter Event (Project Viewpoint)",
-        "sizeBytes": 6564512
+        "sizeBytes": 6564512,
+        "group": "Vehicles"
       },
       {
         "id": "3812896812",
         "name": "Helicopter Fix - Project Viewpoint",
-        "sizeBytes": 233652
+        "sizeBytes": 233652,
+        "group": "Vehicles"
       },
       {
         "id": "3819322670",
         "name": "Project Viewpoint - Visible Helicopter Events",
-        "sizeBytes": 935039
+        "sizeBytes": 935039,
+        "group": "Vehicles"
       },
       {
         "id": "3815019204",
         "name": "Project Viewpoint - KI5 Vehicle Parts Fix",
-        "sizeBytes": 179498
+        "sizeBytes": 179498,
+        "group": "Vehicles"
       },
       {
         "id": "3818260104",
         "name": "Viewpoint - Vehicle Mirrors",
-        "sizeBytes": 951147
+        "sizeBytes": 951147,
+        "group": "Vehicles"
       },
       {
         "id": "3812659488",
         "name": "Viewpoint - Papa_Chad Vehicle Compatibility [B42.21]",
-        "sizeBytes": 45070
+        "sizeBytes": 45070,
+        "group": "Vehicles"
       },
       {
         "id": "3815739336",
         "name": "Viewpoint Vehicle Tuning Compatibility",
-        "sizeBytes": 5847
+        "sizeBytes": 5847,
+        "group": "Vehicles"
       },
       {
         "id": "3821554678",
         "name": "Brief Sprinters",
-        "sizeBytes": 52546
+        "sizeBytes": 52546,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3818733381",
         "name": "The Only Cure+ (Field Surgery)",
-        "sizeBytes": 419038899
+        "sizeBytes": 419038899,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3386906181",
         "name": "[B42+] Sandbox Options",
-        "sizeBytes": 9300440
+        "sizeBytes": 9300440,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "2987772693",
         "name": "Wolf Extraction Quest",
-        "sizeBytes": 10323528
+        "sizeBytes": 10323528,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3716405632",
         "name": "Dynamic Horde Events B42",
-        "sizeBytes": 3158279
+        "sizeBytes": 3158279,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3738819163",
         "name": "Airdrop B42.21",
-        "sizeBytes": 6136318
+        "sizeBytes": 6136318,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3461415167",
         "name": "[B42.20+/MP] Bicycle!",
-        "sizeBytes": 52932500
+        "sizeBytes": 52932500,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3456675747",
         "name": "[B42.20+ MP] Skateboard!",
-        "sizeBytes": 21350874
+        "sizeBytes": 21350874,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3816324722",
         "name": "Attachments UI [B42]",
-        "sizeBytes": 980910
+        "sizeBytes": 980910,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3812559973",
         "name": "Viewpoint Turbo - Light Performance Improvement [B42]",
-        "sizeBytes": 3012397
+        "sizeBytes": 3012397,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3816442251",
         "name": "Viewpoint: Living Props",
-        "sizeBytes": 81759686
+        "sizeBytes": 81759686,
+        "group": "Missions, events, transport, UI"
       },
       {
         "id": "3713362869",
         "name": "[B42] Faster Reading",
-        "sizeBytes": 88319
+        "sizeBytes": 88319,
+        "group": "Missions, events, transport, UI"
       }
     ]
   },

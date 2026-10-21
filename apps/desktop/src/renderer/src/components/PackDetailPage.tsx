@@ -64,9 +64,21 @@ export function PackDetailPage({
   const requiredDiskGB = pack.archive?.requiredDiskGB ?? pack.requirements.freeDiskGB
 
   const normalized = modSearch.trim().toLowerCase()
-  const filteredWorkshopItems = workshopItems.filter(
-    (item) => !normalized || item.name.toLowerCase().includes(normalized),
+  const filteredWorkshopItems = useMemo(
+    () =>
+      workshopItems.filter((item) => !normalized || item.name.toLowerCase().includes(normalized)),
+    [normalized, workshopItems],
   )
+  const filteredWorkshopGroups = useMemo(() => {
+    const grouped = new Map<string, typeof workshopItems>()
+    for (const item of filteredWorkshopItems) {
+      const name = item.group ?? t('pack.workshopItems')
+      const current = grouped.get(name) ?? []
+      current.push(item)
+      grouped.set(name, current)
+    }
+    return Array.from(grouped, ([name, items]) => ({ name, items }))
+  }, [filteredWorkshopItems, t])
   const filteredGroups = groups
     .map((group) => ({
       ...group,
@@ -263,26 +275,41 @@ export function PackDetailPage({
               </div>
 
               {isWorkshop ? (
-                <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                  {filteredWorkshopItems.map((item) => (
-                    <a
-                      key={item.id}
-                      href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
-                    >
-                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
-                        <Sparkles className="size-3.5 text-bone/70" />
+                <div className="space-y-6">
+                  {filteredWorkshopGroups.map((group) => (
+                    <section key={group.name}>
+                      <div className="mb-3 flex items-center gap-3">
+                        <h3 className="font-display text-sm font-semibold text-bone">
+                          {group.name}
+                        </h3>
+                        <Badge tone="muted">{group.items.length}</Badge>
+                        <div className="h-px flex-1 bg-line" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-[13px] font-medium text-bone">
-                          {item.name}
-                        </div>
-                        <div className="truncate font-mono text-[10px] text-muted">{item.id}</div>
+                      <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                        {group.items.map((item) => (
+                          <a
+                            key={item.id}
+                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
+                          >
+                            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+                              <Sparkles className="size-3.5 text-bone/70" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-[13px] font-medium text-bone">
+                                {item.name}
+                              </div>
+                              <div className="truncate font-mono text-[10px] text-muted">
+                                {item.id}
+                              </div>
+                            </div>
+                            <ExternalLink className="size-3.5 shrink-0 text-muted" />
+                          </a>
+                        ))}
                       </div>
-                      <ExternalLink className="size-3.5 shrink-0 text-muted" />
-                    </a>
+                    </section>
                   ))}
                 </div>
               ) : (

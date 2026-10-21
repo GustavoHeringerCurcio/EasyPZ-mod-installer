@@ -52,6 +52,7 @@ export const workshopItemSchema = z
     id: z.string().regex(/^\d+$/),
     name: z.string().min(1),
     sizeBytes: z.number().int().nonnegative().optional(),
+    group: z.string().min(1).optional(),
   })
   .strict()
 

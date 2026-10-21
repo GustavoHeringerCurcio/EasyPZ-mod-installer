@@ -46,6 +46,9 @@ describe('catalog', () => {
     expect(ultra.workshop?.items).toHaveLength(139)
     expect(ultra.workshop?.items.map((item) => item.id)).toContain('3822754688')
     expect(ultra.workshop?.items.map((item) => item.id)).not.toContain('3810071828')
+    expect(new Set(ultra.workshop?.items.map((item) => item.group)).size).toBe(9)
+    expect(ultra.workshop?.items.at(0)?.group).toBe('Core')
+    expect(ultra.workshop?.items.at(-1)?.group).toBe('Missions, events, transport, UI')
     expect(ultra.workshop?.items.at(-1)?.id).toBe('3713362869')
   })
 
