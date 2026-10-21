@@ -15,8 +15,7 @@ const en = {
   },
   catalog: {
     title: 'Pick your pack.',
-    subtitle:
-      'One click installs the full Project Zomboid modpack: mods, ZombieBuddy, launcher settings, and activation.',
+    subtitle: 'One click installs the full Project Zomboid modpack',
     search: 'Search packs and mods',
     install: 'Install',
     enable: 'Enable',
@@ -28,6 +27,7 @@ const en = {
     alphaNote:
       'Private alpha catalog. Artwork is placeholder and will be replaced before the public launch.',
     mods: '{{count}} client mods',
+    modsShort: '{{count}} mods',
     packCount_one: '{{count}} pack',
     packCount_other: '{{count}} packs',
     buildLine: 'Project Zomboid · Build {{build}}',
@@ -35,6 +35,9 @@ const en = {
     active: 'Active',
     updated: 'Updated {{date}}',
     viewPack: 'View pack',
+    recommended: 'Recommended base modpack',
+    morePacks: 'More modpacks',
+    morePacksEmpty: 'No additional modpacks yet.',
   },
   pack: {
     back: 'Back to catalog',
@@ -183,6 +186,7 @@ const en = {
     maintenance: 'Maintenance',
     openLogs: 'Open logs',
     openCache: 'Open download cache',
+    clearCache: 'Clear download cache',
     openStore: 'Open pack storage',
     openMods: 'Open mods folder',
     openBackups: 'Open backups',
@@ -232,6 +236,10 @@ const en = {
     hostBody:
       'This updates servertest.ini to match the active pack and creates a backup of the current file.',
     hostAction: 'Sync host',
+    clearCacheTitle: 'Clear download cache?',
+    clearCacheBody:
+      'This deletes downloaded pack archives and extracted files. Installed packs, mods, saves, and settings are not touched.',
+    clearCacheAction: 'Clear cache',
   },
   elevation: {
     title: 'Administrator access required',
@@ -247,6 +255,8 @@ const en = {
     ELEVATION_REQUIRED: 'Administrator access is required.',
     DISK_SPACE: 'Not enough free disk space.',
     ARCHIVE_HASH_MISMATCH: 'The downloaded pack did not match its checksum.',
+    ARCHIVE_CORRUPT:
+      'The pack archive is incomplete or corrupt. Try another pack or update the catalog.',
     ARCHIVE_MISSING_MODS: 'The pack archive is incomplete.',
     MISSING_MODS: 'Some mods are missing from the mods folder.',
     HOST_NOT_FOUND: 'The host configuration was not found.',
@@ -271,6 +281,7 @@ const en = {
     hostUpdated: 'Host configuration updated.',
     hostMissing: 'servertest.ini was not found.',
     gameUpdated: 'Game folder updated.',
+    cacheCleared: 'Download cache cleared.',
     copied: 'Copied to clipboard.',
   },
   common: {

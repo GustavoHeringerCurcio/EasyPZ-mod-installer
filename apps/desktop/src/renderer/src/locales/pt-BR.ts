@@ -15,8 +15,7 @@ const ptBR = {
   },
   catalog: {
     title: 'Escolha seu pack.',
-    subtitle:
-      'Um clique instala o modpack completo de Project Zomboid: mods, ZombieBuddy, configurações do launcher e ativação.',
+    subtitle: 'Um clique instala o modpack completo de Project Zomboid',
     search: 'Pesquisar packs e mods',
     install: 'Instalar',
     enable: 'Ativar',
@@ -28,6 +27,7 @@ const ptBR = {
     alphaNote:
       'Catálogo alpha privado. As artes são provisórias e serão substituídas antes do lançamento público.',
     mods: '{{count}} mods no cliente',
+    modsShort: '{{count}} mods',
     packCount_one: '{{count}} pack',
     packCount_other: '{{count}} packs',
     buildLine: 'Project Zomboid · Build {{build}}',
@@ -35,6 +35,9 @@ const ptBR = {
     active: 'Ativo',
     updated: 'Atualizado em {{date}}',
     viewPack: 'Ver pack',
+    recommended: 'Modpack base recomendado',
+    morePacks: 'Mais modpacks',
+    morePacksEmpty: 'Nenhum modpack adicional ainda.',
   },
   pack: {
     back: 'Voltar ao catálogo',
@@ -184,6 +187,7 @@ const ptBR = {
     maintenance: 'Manutenção',
     openLogs: 'Abrir logs',
     openCache: 'Abrir cache de download',
+    clearCache: 'Limpar cache de download',
     openStore: 'Abrir armazenamento de packs',
     openMods: 'Abrir pasta de mods',
     openBackups: 'Abrir backups',
@@ -247,6 +251,8 @@ const ptBR = {
     ELEVATION_REQUIRED: 'É necessário acesso de administrador.',
     DISK_SPACE: 'Não há espaço livre suficiente em disco.',
     ARCHIVE_HASH_MISMATCH: 'O pack baixado não corresponde ao checksum.',
+    ARCHIVE_CORRUPT:
+      'O arquivo do pack está incompleto ou corrompido. Tente outro pack ou atualize o catálogo.',
     ARCHIVE_MISSING_MODS: 'O arquivo do pack está incompleto.',
     MISSING_MODS: 'Faltam mods na pasta de mods.',
     HOST_NOT_FOUND: 'A configuração do host não foi encontrada.',
@@ -271,6 +277,7 @@ const ptBR = {
     hostUpdated: 'Configuração do host atualizada.',
     hostMissing: 'servertest.ini não foi encontrado.',
     gameUpdated: 'Pasta do jogo atualizada.',
+    cacheCleared: 'Cache de download limpo.',
     copied: 'Copiado para a área de transferência.',
   },
   common: {

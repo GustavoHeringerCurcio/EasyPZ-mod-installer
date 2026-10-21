@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 import {
   ArrowLeft,
   Boxes,
@@ -20,6 +21,7 @@ import { getEffectiveGroups, getEffectiveMods } from '@easypz/catalog'
 import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, SectionTitle, Stat } from './ui'
 import { cn, formatBytes, formatDate } from '../lib/format'
+import { packAccent } from '../lib/packTheme'
 
 type Tab = 'overview' | 'mods' | 'requirements'
 
@@ -46,6 +48,7 @@ export function PackDetailPage({
 
   const available = bootstrap.availablePackIds.includes(pack.id)
   const active = bootstrap.state.activePackId === pack.id && available
+  const accent = packAccent(pack)
   const groups = useMemo(
     () => getEffectiveGroups(bootstrap.catalog, pack.id),
     [bootstrap.catalog, pack.id],
@@ -76,7 +79,10 @@ export function PackDetailPage({
   const ActionIcon = available ? Power : Download
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-8 py-7">
+    <div
+      style={{ '--pack-accent': accent } as CSSProperties}
+      className="mx-auto w-full max-w-6xl px-8 py-7"
+    >
       <button
         onClick={onBack}
         className="mb-4 inline-flex items-center gap-2 text-xs font-medium text-muted transition-colors hover:text-bone"
@@ -85,8 +91,8 @@ export function PackDetailPage({
         {t('pack.back')}
       </button>
 
-      <div className="overflow-hidden rounded-3xl border border-line bg-panel">
-        <div className="aspect-[16/5.2] w-full overflow-hidden bg-panel-2">
+      <div className="relative overflow-hidden rounded-3xl border border-line bg-panel">
+        <div className="relative aspect-[16/5.2] w-full overflow-hidden bg-panel-2">
           {pack.coverDataUrl ? (
             <img src={pack.coverDataUrl} alt="" className="h-full w-full object-cover" />
           ) : (
@@ -94,20 +100,22 @@ export function PackDetailPage({
               <Boxes className="size-16 text-muted/30" />
             </div>
           )}
-        </div>
-        <div className="border-t border-line p-7">
-          <div className="flex flex-wrap items-center gap-2">
-            {active ? <Badge tone="brand">{t('pack.active')}</Badge> : null}
-            {!active && available ? <Badge>{t('pack.installed')}</Badge> : null}
-            <Badge tone="muted">
-              {t('pack.build')} {pack.gameBuild}
-            </Badge>
-            {pack.placeholderArt ? <Badge tone="muted">{t('pack.placeholder')}</Badge> : null}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10" />
+          <div className="absolute inset-x-0 top-0 h-0.5 pack-accent-fill" />
+          <div className="absolute inset-x-0 bottom-0 p-7">
+            <div className="flex flex-wrap items-center gap-2">
+              {active ? <Badge tone="success">{t('pack.active')}</Badge> : null}
+              {!active && available ? <Badge>{t('pack.installed')}</Badge> : null}
+              <Badge tone="muted">
+                {t('pack.build')} {pack.gameBuild}
+              </Badge>
+              {pack.placeholderArt ? <Badge tone="muted">{t('pack.placeholder')}</Badge> : null}
+            </div>
+            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-bone drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)]">
+              {pack.name}
+            </h1>
+            <p className="mt-1 text-sm text-bone/75">{pack.tagline}</p>
           </div>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-bone">
-            {pack.name}
-          </h1>
-          <p className="mt-1 text-sm text-muted">{pack.tagline}</p>
         </div>
       </div>
 
@@ -127,7 +135,7 @@ export function PackDetailPage({
                 className={cn(
                   '-mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors',
                   tab === id
-                    ? 'border-brand text-bone'
+                    ? 'border-bone text-bone'
                     : 'border-transparent text-muted hover:text-bone',
                 )}
               >
@@ -220,7 +228,7 @@ export function PackDetailPage({
                   value={modSearch}
                   onChange={(event) => setModSearch(event.target.value)}
                   placeholder={t('pack.searchMods')}
-                  className="h-10 w-full rounded-xl border border-line bg-panel-2/60 pl-10 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-brand/50"
+                  className="h-10 w-full rounded-xl border border-line bg-panel-2/60 pl-10 pr-4 text-sm text-bone outline-none transition-colors placeholder:text-muted/60 focus:border-white/30"
                 />
               </div>
 
@@ -243,7 +251,7 @@ export function PackDetailPage({
                           {mod.serverOnly ? (
                             <Server className="size-3.5 text-muted" />
                           ) : (
-                            <Sparkles className="size-3.5 text-brand/80" />
+                            <Sparkles className="size-3.5 text-bone/70" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -321,13 +329,14 @@ export function PackDetailPage({
 
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <Panel className="overflow-hidden">
+            <div className="h-0.5 w-full pack-accent-fill" />
             <div className="border-b border-line bg-panel-2/60 px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
                   {t('pack.requires')}
                 </span>
                 {active ? (
-                  <CheckCircle2 className="size-4 text-brand" />
+                  <CheckCircle2 className="size-4 text-success" />
                 ) : available ? (
                   <Badge>{t('pack.installedBadge')}</Badge>
                 ) : null}
@@ -349,7 +358,7 @@ export function PackDetailPage({
 
             <div className="border-t border-line p-4">
               <Button
-                variant="primary"
+                variant="light"
                 size="lg"
                 className="w-full"
                 onClick={() => (available ? onToggle(pack.id, !active) : onInstall(pack.id))}
@@ -397,7 +406,7 @@ function RequirementRow({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-line bg-panel-2/50 px-4 py-3">
       <div className="flex size-8 items-center justify-center rounded-lg bg-panel">
-        <Icon className="size-3.5 text-brand/80" />
+        <Icon className="size-3.5 text-bone/70" />
       </div>
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">

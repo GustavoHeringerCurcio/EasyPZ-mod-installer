@@ -29,7 +29,7 @@ import {
 import { getActiveModIds, getPack, type Catalog } from '@easypz/catalog'
 import type { Bootstrap, OperationResult, PendingAction, Settings } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
-import { loadCatalog, toCatalogView } from './catalog'
+import { getCatalogSource, loadCatalog, toCatalogView } from './catalog'
 import { ensureLogsDir, log, logsDir } from './logger'
 import { isLanguage, readSettings, updateSettings } from './settings'
 
@@ -146,7 +146,7 @@ async function buildBootstrap(): Promise<Bootstrap> {
     (await fileExists(paths.legacyInstallerDir))
 
   log.info(
-    `Bootstrap: catalog=${catalog.mode}/${catalog.packs.length} packs, game=${game.found ? 'found' : 'missing'}, active=${state.activePackId ?? 'none'}, legacy=${legacyDetected}, elevated=${game.elevated}`,
+    `Bootstrap: catalog=${catalog.mode}/${catalog.packs.length} packs (${getCatalogSource().source}), game=${game.found ? 'found' : 'missing'}, active=${state.activePackId ?? 'none'}, legacy=${legacyDetected}, elevated=${game.elevated}`,
   )
 
   return {
@@ -408,6 +408,20 @@ function registerIpc(): void {
     await ensureLogsDir()
     log.info('Opening logs folder')
     await shell.openPath(logsDir)
+  })
+
+  ipcMain.handle(IPC.clearCache, async () => {
+    try {
+      const paths = getAppPaths()
+      await fs.rm(paths.archiveDir, { recursive: true, force: true })
+      await fs.rm(paths.extractRoot, { recursive: true, force: true })
+      await fs.mkdir(paths.archiveDir, { recursive: true })
+      await fs.mkdir(paths.extractRoot, { recursive: true })
+      log.info('Download cache cleared')
+      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+    } catch (error) {
+      return fail(error)
+    }
   })
 
   ipcMain.handle(IPC.restartAsAdmin, async (_event, pending: unknown) => {

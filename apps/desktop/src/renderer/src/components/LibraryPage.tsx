@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import {
   AlertTriangle,
   CheckCircle2,
@@ -14,6 +15,7 @@ import type { PackHealth } from '@easypz/engine'
 import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, Switch } from './ui'
 import { formatDate } from '../lib/format'
+import { packAccent } from '../lib/packTheme'
 
 export function LibraryPage({
   bootstrap,
@@ -86,8 +88,8 @@ export function LibraryPage({
       </header>
 
       {bootstrap.legacyDetected ? (
-        <Panel className="mt-5 flex gap-3 border-brand/20 bg-brand/[0.04] p-4">
-          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand" />
+        <Panel className="mt-5 flex gap-3 border-success/20 bg-success/[0.04] p-4">
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
           <div>
             <div className="text-xs font-semibold text-bone">{t('settings.legacy')}</div>
             <div className="mt-1 text-[11px] leading-relaxed text-muted">
@@ -121,19 +123,26 @@ export function LibraryPage({
           const healthForPack = health[pack.id]
           const busy = busyPackId === pack.id
           const installRecord = bootstrap.state.installs[pack.id]
+          const accent = packAccent(pack)
 
           return (
             <Panel
               key={pack.id}
-              className={active ? 'overflow-hidden border-brand/35' : 'overflow-hidden'}
+              style={{ '--pack-accent': accent } as CSSProperties}
+              className={
+                active
+                  ? 'overflow-hidden border-success/30 shadow-[0_0_30px_rgba(34,197,94,0.08)]'
+                  : 'overflow-hidden'
+              }
             >
+              {active ? <div className="h-0.5 w-full pack-accent-fill" /> : null}
               <div className="flex flex-col gap-5 p-5 sm:flex-row">
                 <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-xl border border-line bg-panel-2 sm:w-48">
                   {pack.coverDataUrl ? (
                     <img src={pack.coverDataUrl} alt="" className="h-full w-full object-cover" />
                   ) : null}
-                  <div className="absolute left-2 top-2">
-                    {active ? <Badge tone="brand">{t('library.active')}</Badge> : null}
+                  <div className="absolute left-2 top-2 rounded-full bg-ink/70 p-0.5 backdrop-blur-sm">
+                    {active ? <Badge tone="success">{t('library.active')}</Badge> : null}
                   </div>
                 </div>
 
@@ -162,7 +171,7 @@ export function LibraryPage({
                     <div className="mt-3 rounded-xl border border-line bg-panel-2/50 px-3 py-2.5">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-bone">
                         {healthForPack.missing.length === 0 ? (
-                          <ShieldCheck className="size-3.5 text-brand" />
+                          <ShieldCheck className="size-3.5 text-success" />
                         ) : (
                           <AlertTriangle className="size-3.5 text-warn" />
                         )}
@@ -199,6 +208,7 @@ export function LibraryPage({
                       checked={active}
                       disabled={busy || bootstrap.game.gameRunning}
                       label={active ? t('catalog.on') : t('catalog.off')}
+                      showLabel={false}
                       onChange={(enabled) => onToggle(pack.id, enabled)}
                     />
                     {active ? (

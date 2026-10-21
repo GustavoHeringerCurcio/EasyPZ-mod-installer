@@ -4,22 +4,24 @@
   "name": "Advanced",
   "tagline": "Medium, plus mechanics, UI, and swimming",
   "description": "Everything in Medium with additional fixes, realism, and survival mechanics. Advanced is additive: it does not remove or replace the Medium base.",
-  "cover": "packs/advanced/cover.svg",
+  "cover": "packs/advanced/cover.jpg",
   "gallery": [],
-  "placeholderArt": true,
+  "accent": "#fd1a04",
+  "featured": true,
+  "placeholderArt": false,
   "gameBuild": "42.21",
   "tags": ["mechanics", "realism", "swimming", "additive"],
   "extends": "medium",
   "order": 20,
   "archive": {
-    "fileName": "PZ-Viewpoint-Mods-Advanced.tar",
-    "sha256": "abb58fcb08995847c0d8c8212def05dea69ad441529a31a7ea33e84abac2090c",
-    "sizeBytes": 1073741824,
+    "fileName": "PZ-Viewpoint-Mods-Advanced-v2.tar",
+    "sha256": "5b591b83341e7ffbbb8ec04ccde32022eac71878033d17d46da3a2c15cf88bd9",
+    "sizeBytes": 1171265024,
     "requiredDiskGB": 5,
-    "releaseTag": "mods-v3",
+    "releaseTag": "advanced-v2",
     "urls": {
-      "alpha": "https://github.com/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/mods-v3/PZ-Viewpoint-Mods-Advanced.tar",
-      "public": "https://github.com/GustavoHeringerCurcio/EasyPZ-mod-installer/releases/download/mods-v3/PZ-Viewpoint-Mods-Advanced.tar"
+      "alpha": "https://github.com/GustavoHeringerCurcio/EasyPZ-assets/releases/download/advanced-v2/PZ-Viewpoint-Mods-Advanced-v2.tar",
+      "public": "https://github.com/GustavoHeringerCurcio/EasyPZ-assets/releases/download/advanced-v2/PZ-Viewpoint-Mods-Advanced-v2.tar"
     }
   },
   "requirements": {

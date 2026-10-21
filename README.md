@@ -88,10 +88,10 @@ See [docs/architecture.md](docs/architecture.md), [docs/catalog.md](docs/catalog
 
 The app supports two catalog modes:
 
-- **Alpha:** catalog is bundled with the app; archive URLs temporarily point at the legacy public releases. This is what the private alpha uses, and it needs no GitHub token.
-- **Public:** catalog is served remotely from this repository and archives are hosted in this repository's releases. Enabled at public launch.
+- **Alpha:** the catalog is fetched from the public `EasyPZ-assets` repository, with the bundled catalog as offline fallback. Archives may still point at the legacy releases or the assets repository.
+- **Public:** the catalog is served remotely and archives are hosted in public GitHub releases.
 
-The mode is stored in `catalog/index.json` and validated by the app. See [docs/catalog.md](docs/catalog.md).
+The mode is stored in `catalog/index.json` and validated by the app. The app prefers the remote catalog and falls back to the bundled copy if GitHub is unavailable. See [docs/catalog.md](docs/catalog.md).
 
 ## Packaging
 
@@ -148,9 +148,11 @@ If it exists and its `Mods=` list does not match the active pack, EasyPZ shows a
 
 ## Public launch checklist
 
-- [ ] Flip the repository to public or create a public catalog/asset repository.
-- [ ] Re-upload `mods-v1` and `mods-v3` archives to this repository with identical SHA256.
-- [ ] Switch the catalog to `public` mode and host `catalog/index.json` remotely.
+- [x] Create the public `EasyPZ-assets` catalog/archive repository.
+- [x] Publish the Essentials and Advanced v2 archives there.
+- [x] Publish `catalog/index.json` and covers there.
+- [ ] Move the remaining Medium archive to `EasyPZ-assets` or the public main repo.
+- [ ] Switch the catalog to `public` mode.
 - [ ] Enable `electron-updater` (currently off in alpha).
 - [ ] Add the legacy banner to the old repository and archive it.
 - [ ] Decide on code signing (SignPath for open source, or a certificate).

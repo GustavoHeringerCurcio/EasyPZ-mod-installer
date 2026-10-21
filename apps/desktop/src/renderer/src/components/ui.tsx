@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '../lib/format'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'light'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -12,6 +12,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   ghost: 'text-muted hover:text-bone hover:bg-white/5',
   danger:
     'bg-danger/10 text-danger border border-danger/35 hover:bg-danger/20 hover:border-danger/60',
+  light: 'bg-bone text-ink hover:bg-bone/90 active:bg-bone/80',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -39,7 +40,7 @@ export function Button({
       disabled={disabled || loading}
       className={cn(
         'inline-flex items-center justify-center font-medium transition-colors duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
         'disabled:cursor-not-allowed disabled:opacity-50',
         variantClasses[variant],
         sizeClasses[size],
@@ -52,11 +53,12 @@ export function Button({
   )
 }
 
-type BadgeTone = 'neutral' | 'brand' | 'warn' | 'danger' | 'muted'
+type BadgeTone = 'neutral' | 'brand' | 'success' | 'warn' | 'danger' | 'muted'
 
 const badgeTones: Record<BadgeTone, string> = {
   neutral: 'bg-white/5 text-bone border-white/10',
   brand: 'bg-brand/10 text-brand border-brand/25',
+  success: 'bg-success/10 text-success border-success/25',
   warn: 'bg-warn/10 text-warn border-warn/25',
   danger: 'bg-danger/10 text-danger border-danger/25',
   muted: 'bg-white/[0.03] text-muted border-white/10',
@@ -97,7 +99,7 @@ export function Progress({
     <div className={cn('h-2 w-full overflow-hidden rounded-full bg-white/[0.07]', className)}>
       <div
         className={cn(
-          'h-full rounded-full bg-brand transition-[width] duration-300',
+          'h-full rounded-full bg-bone transition-[width] duration-300',
           indeterminate && 'w-1/3 animate-pulse',
         )}
         style={indeterminate ? undefined : { width: `${Math.max(0, Math.min(100, value))}%` }}
@@ -107,7 +109,7 @@ export function Progress({
 }
 
 export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cn('size-4 animate-spin text-brand', className)} />
+  return <Loader2 className={cn('size-4 animate-spin text-bone', className)} />
 }
 
 export function Switch({
@@ -115,12 +117,14 @@ export function Switch({
   onChange,
   disabled,
   label,
+  showLabel = true,
   className,
 }: {
   checked: boolean
   onChange: (checked: boolean) => void
   disabled?: boolean
   label?: string
+  showLabel?: boolean
   className?: string
 }) {
   return (
@@ -128,38 +132,53 @@ export function Switch({
       type="button"
       role="switch"
       aria-checked={checked}
+      aria-label={label}
       disabled={disabled}
-      onClick={() => onChange(!checked)}
+      onClick={(event) => {
+        event.stopPropagation()
+        onChange(!checked)
+      }}
+      onKeyDown={(event) => event.stopPropagation()}
       className={cn(
-        'inline-flex items-center gap-2.5 rounded-full border px-2 py-1.5 text-xs font-medium transition-colors',
-        checked
-          ? 'border-brand/35 bg-brand/10 text-bone'
-          : 'border-line bg-panel-2 text-muted hover:border-muted/50 hover:text-bone',
+        'inline-flex items-center gap-2.5 rounded-full transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
         'disabled:cursor-not-allowed disabled:opacity-45',
         className,
       )}
     >
       <span
         className={cn(
-          'relative h-5 w-9 rounded-full transition-colors',
-          checked ? 'bg-brand' : 'bg-white/15',
+          'relative h-6 w-11 shrink-0 rounded-full border transition-colors',
+          checked
+            ? 'border-success/50 bg-success shadow-[0_0_12px_rgba(34,197,94,0.35)]'
+            : 'border-white/15 bg-white/10',
         )}
       >
         <span
           className={cn(
-            'absolute top-0.5 size-4 rounded-full bg-ink transition-transform',
-            checked ? 'translate-x-[18px]' : 'translate-x-0.5',
+            'absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform',
+            checked ? 'translate-x-5' : 'translate-x-0',
           )}
         />
       </span>
-      {label ? <span>{label}</span> : null}
+      {showLabel && label ? <span className="text-xs font-medium text-bone">{label}</span> : null}
     </button>
   )
 }
 
-export function Panel({ children, className }: { children: ReactNode; className?: string }) {
+export function Panel({
+  children,
+  className,
+  style,
+}: {
+  children: ReactNode
+  className?: string
+  style?: CSSProperties
+}) {
   return (
-    <div className={cn('rounded-2xl border border-line bg-panel/80', className)}>{children}</div>
+    <div style={style} className={cn('rounded-2xl border border-line bg-panel/80', className)}>
+      {children}
+    </div>
   )
 }
 

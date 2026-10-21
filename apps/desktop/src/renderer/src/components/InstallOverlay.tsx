@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import type { CSSProperties } from 'react'
 import type { InstallUiState, StageName } from '../lib/install'
 import { STAGE_ORDER } from '../lib/install'
 import { Badge, Button, Progress, Spinner } from './ui'
@@ -19,6 +20,7 @@ import { cn, formatBytes, formatDate, formatEta, formatSpeed } from '../lib/form
 export function InstallOverlay({
   state,
   packName,
+  accent,
   canceling,
   onClose,
   onCancel,
@@ -28,6 +30,7 @@ export function InstallOverlay({
 }: {
   state: InstallUiState
   packName: string
+  accent?: string
   canceling: boolean
   onClose: () => void
   onCancel: () => void
@@ -48,11 +51,15 @@ export function InstallOverlay({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/85 p-6 backdrop-blur-sm">
-      <div className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-line bg-panel shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
+      <div
+        style={accent ? ({ '--pack-accent': accent } as CSSProperties) : undefined}
+        className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-line bg-panel shadow-[0_30px_100px_rgba(0,0,0,0.6)]"
+      >
+        <div className="h-0.5 w-full pack-accent-fill" />
         <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-bone">
                 {state.summary
                   ? t('install.doneTitle')
                   : state.error
@@ -102,8 +109,8 @@ export function InstallOverlay({
             </div>
           ) : state.summary ? (
             <div className="space-y-5">
-              <div className="flex gap-3 rounded-2xl border border-brand/25 bg-brand/[0.06] p-4">
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-brand" />
+              <div className="flex gap-3 rounded-2xl border border-success/25 bg-success/[0.06] p-4">
+                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
                 <div>
                   <div className="text-sm font-semibold text-bone">{t('install.doneTitle')}</div>
                   <div className="mt-1 text-xs leading-relaxed text-muted">
@@ -244,7 +251,7 @@ export function InstallOverlay({
                       <FolderOpen className="size-4" />
                       {t('install.openGame')}
                     </Button>
-                    <Button variant="primary" onClick={onClose}>
+                    <Button variant="light" onClick={onClose}>
                       {t('common.done')}
                     </Button>
                   </>
@@ -280,7 +287,7 @@ function StageRow({
     >
       <div className="flex size-5 items-center justify-center">
         {status === 'done' ? (
-          <CheckCircle2 className="size-4 text-brand" />
+          <CheckCircle2 className="size-4 text-success" />
         ) : status === 'skip' ? (
           <SkipForward className="size-3.5 text-muted" />
         ) : status === 'start' ? (

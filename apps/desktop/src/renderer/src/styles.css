@@ -14,7 +14,9 @@
   --color-brand: #fd1a04;
   --color-brand-hover: #ff3d26;
   --color-brand-active: #d81400;
-  --color-warn: #ff8a78;
+  --color-success: #22c55e;
+  --color-success-hover: #16a34a;
+  --color-warn: #eab308;
   --color-danger: #ff3b30;
 }
 
@@ -73,5 +75,33 @@ a {
 .noise {
   background-image:
     radial-gradient(circle at 15% 20%, rgba(253, 26, 4, 0.08), transparent 38%),
-    radial-gradient(circle at 85% 0%, rgba(255, 138, 120, 0.06), transparent 32%);
+    radial-gradient(circle at 85% 0%, rgba(234, 179, 8, 0.05), transparent 32%);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.pack-accent-text {
+  color: var(--pack-accent, var(--color-brand));
+}
+
+.pack-accent-fill {
+  background-color: var(--pack-accent, var(--color-brand));
+}
+
+.pack-accent-soft {
+  background-color: color-mix(
+    in srgb,
+    var(--pack-accent, var(--color-brand)) 18%,
+    var(--color-ink)
+  );
+}
+
+.pack-accent-border {
+  border-color: color-mix(in srgb, var(--pack-accent, var(--color-brand)) 48%, transparent);
 }

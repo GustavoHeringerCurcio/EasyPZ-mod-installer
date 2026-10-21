@@ -56,6 +56,12 @@ export const packSchema = z
     description: z.string().min(1),
     cover: z.string().min(1),
     gallery: z.array(z.string()).default([]),
+    accent: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .nullable()
+      .default(null),
+    featured: z.boolean().default(false),
     placeholderArt: z.boolean().default(false),
     gameBuild: z.string().min(1),
     tags: z.array(z.string()).default([]),

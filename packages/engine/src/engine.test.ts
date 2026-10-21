@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import type { Catalog } from '@easypz/catalog'
 import { buildDefaultTxt, writeDefaultTxt } from './activation.js'
 import { applyMods, removeModsNotInPack } from './apply.js'
+import { assertTarComplete } from './archive.js'
 import { applyGameConfig } from './gameConfig.js'
 import { applyHostIni, buildHostModsLine } from './host.js'
 import { getAppPaths } from './paths.js'
@@ -200,6 +201,22 @@ describe('state migration', () => {
     await saveState(paths, next)
     const reloaded = await loadState(paths)
     expect(reloaded.installs.medium?.archiveSha256).toBe(catalog.packs[0]!.archive.sha256)
+  })
+})
+
+describe('archive integrity', () => {
+  it('accepts a tar with the standard zero end blocks', async () => {
+    const root = await tempDir('tar-valid')
+    const file = path.join(root, 'valid.tar')
+    await fs.writeFile(file, Buffer.alloc(2048, 0))
+    await expect(assertTarComplete(file)).resolves.toBeUndefined()
+  })
+
+  it('rejects a truncated archive', async () => {
+    const root = await tempDir('tar-truncated')
+    const file = path.join(root, 'broken.tar')
+    await fs.writeFile(file, Buffer.alloc(2048, 0x41))
+    await expect(assertTarComplete(file)).rejects.toMatchObject({ code: 'ARCHIVE_CORRUPT' })
   })
 })
 

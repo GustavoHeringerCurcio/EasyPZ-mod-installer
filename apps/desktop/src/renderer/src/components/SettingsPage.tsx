@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Shield,
   ShieldCheck,
+  Trash2,
   Wrench,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -25,6 +26,7 @@ export function SettingsPage({
   onLanguage,
   onOpen,
   onOpenLogs,
+  onClearCache,
 }: {
   bootstrap: Bootstrap
   onPickGamePath: () => Promise<void>
@@ -32,6 +34,7 @@ export function SettingsPage({
   onLanguage: (language: Language) => void
   onOpen: (target: string | null) => void
   onOpenLogs: () => void
+  onClearCache: () => void
 }) {
   const { t } = useTranslation()
   const game = bootstrap.game
@@ -51,7 +54,7 @@ export function SettingsPage({
           <SectionTitle
             aside={
               game.found ? (
-                <Badge tone="brand">{t('settings.detected')}</Badge>
+                <Badge tone="success">{t('settings.detected')}</Badge>
               ) : (
                 <Badge tone="warn">{t('settings.notFound')}</Badge>
               )
@@ -118,13 +121,13 @@ export function SettingsPage({
               icon={game.gameRunning ? AlertTriangle : ShieldCheck}
               label={t('settings.gameProcess')}
               value={game.gameRunning ? t('settings.running') : t('settings.closed')}
-              tone={game.gameRunning ? 'warn' : 'brand'}
+              tone={game.gameRunning ? 'warn' : 'success'}
             />
             <FactRow
               icon={game.canWriteGame ? ShieldCheck : Shield}
               label={t('settings.writeAccess')}
               value={game.canWriteGame ? t('settings.writable') : t('settings.needsAdmin')}
-              tone={game.canWriteGame ? 'brand' : 'muted'}
+              tone={game.canWriteGame ? 'success' : 'muted'}
             />
             <FactRow
               icon={Globe2}
@@ -135,7 +138,7 @@ export function SettingsPage({
               icon={ShieldCheck}
               label={t('settings.admin')}
               value={bootstrap.isElevated ? t('settings.adminYes') : t('settings.adminNo')}
-              tone={bootstrap.isElevated ? 'brand' : 'muted'}
+              tone={bootstrap.isElevated ? 'success' : 'muted'}
             />
           </Panel>
         </section>
@@ -162,7 +165,7 @@ export function SettingsPage({
                   onClick={() => onLanguage(code)}
                   className={
                     bootstrap.settings.language === code
-                      ? 'rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-ink'
+                      ? 'rounded-lg bg-bone px-3 py-1.5 text-xs font-semibold text-ink'
                       : 'rounded-lg px-3 py-1.5 text-xs font-medium text-muted hover:text-bone'
                   }
                 >
@@ -185,6 +188,11 @@ export function SettingsPage({
               icon={Archive}
               label={t('settings.openCache')}
               onClick={() => onOpen(paths.cache)}
+            />
+            <MaintenanceButton
+              icon={Trash2}
+              label={t('settings.clearCache')}
+              onClick={onClearCache}
             />
             <MaintenanceButton
               icon={HardDrive}
@@ -270,14 +278,14 @@ function FactRow({
   icon: typeof Cpu
   label: string
   value: string
-  tone?: 'default' | 'brand' | 'warn' | 'muted'
+  tone?: 'default' | 'success' | 'warn' | 'muted'
 }) {
   return (
     <div className="flex items-center gap-3 px-5 py-3">
       <Icon
         className={
-          tone === 'brand'
-            ? 'size-3.5 text-brand'
+          tone === 'success'
+            ? 'size-3.5 text-success'
             : tone === 'warn'
               ? 'size-3.5 text-warn'
               : 'size-3.5 text-muted'

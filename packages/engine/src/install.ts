@@ -6,7 +6,7 @@ import type { AppPaths } from './paths.js'
 import { modsDir, defaultTxtPath } from './paths.js'
 import { getGameInfo, type GameInfo } from './detect.js'
 import { downloadFile, fileExists, hashFile } from './download.js'
-import { extractArchive, extractCacheComplete } from './archive.js'
+import { assertTarComplete, extractArchive, extractCacheComplete } from './archive.js'
 import { applyGameConfig } from './gameConfig.js'
 import { ensureZombieBuddy, isZombieBuddyInstalled, type ZombieBuddyStatus } from './zombiebuddy.js'
 import type { EngineEvent, EventSink, InstallSummary } from './events.js'
@@ -49,13 +49,22 @@ async function resolveArchive(options: {
   fileName: string
   sha256: string
   force: boolean
+  onEvent?: EventSink
 }): Promise<{ archivePath: string; source: 'cache' | 'legacy' | 'download' } | null> {
-  const { paths, fileName, sha256, force } = options
+  const { paths, fileName, sha256, force, onEvent } = options
   const target = path.join(paths.archiveDir, fileName)
 
   if (!force && (await fileExists(target))) {
     if ((await hashFile(target)) === sha256) {
-      return { archivePath: target, source: 'cache' }
+      try {
+        await assertTarComplete(target)
+        return { archivePath: target, source: 'cache' }
+      } catch {
+        emit(onEvent, {
+          type: 'warning',
+          message: 'Cached pack archive is incomplete; downloading a fresh copy.',
+        })
+      }
     }
     await fs.rm(target, { force: true })
   }
@@ -66,7 +75,15 @@ async function resolveArchive(options: {
   if (!force && (await fileExists(legacy))) {
     try {
       if ((await hashFile(legacy)) === sha256) {
-        return { archivePath: legacy, source: 'legacy' }
+        try {
+          await assertTarComplete(legacy)
+          return { archivePath: legacy, source: 'legacy' }
+        } catch {
+          emit(onEvent, {
+            type: 'warning',
+            message: 'Legacy cached pack archive is incomplete; downloading a fresh copy.',
+          })
+        }
       }
     } catch {
       // Ignore unreadable legacy cache.
@@ -135,6 +152,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       fileName: pack.archive.fileName,
       sha256: pack.archive.sha256,
       force: Boolean(options.forceRedownload),
+      onEvent,
     })
 
     let archivePath =
@@ -178,6 +196,12 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
         },
       })
       downloadedBytes = result.downloadedBytes
+      try {
+        await assertTarComplete(archivePath)
+      } catch (error) {
+        await fs.rm(archivePath, { force: true })
+        throw error
+      }
       stageEvent(onEvent, 'download', 'done')
     }
 

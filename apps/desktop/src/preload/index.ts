@@ -18,6 +18,7 @@ const api: EasyPzApi = {
   setLanguage: (language: Language) => ipcRenderer.invoke(IPC.setLanguage, language),
   openPath: (target: string) => ipcRenderer.invoke(IPC.openPath, target),
   openLogs: () => ipcRenderer.invoke(IPC.openLogs),
+  clearCache: () => ipcRenderer.invoke(IPC.clearCache),
   restartAsAdmin: (pending: PendingAction | null) =>
     ipcRenderer.invoke(IPC.restartAsAdmin, pending),
   consumePendingAction: () => ipcRenderer.invoke(IPC.consumePendingAction),

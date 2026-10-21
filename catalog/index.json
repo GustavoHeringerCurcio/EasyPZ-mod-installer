@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "alpha",
-  "generatedAt": "2026-10-20T22:23:17.045Z",
+  "generatedAt": "2026-10-21T01:16:57.552Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -9,9 +9,11 @@
       "name": "Essentials",
       "tagline": "The core Viewpoint experience, without the extras.",
       "description": "A lightweight starter pack with ZombieBuddy, Viewpoint, the 3D model pack, the first-person interface, recoil and ADS, and the right-click fix. No tactical, atmosphere, survival, or immersion extras.",
-      "cover": "packs/essentials/cover.svg",
+      "cover": "packs/essentials/cover.jpg",
       "gallery": [],
-      "placeholderArt": true,
+      "accent": "#4da3ff",
+      "featured": true,
+      "placeholderArt": false,
       "gameBuild": "42.21",
       "tags": [
         "starter",
@@ -121,9 +123,11 @@
       "name": "Medium",
       "tagline": "The balanced Viewpoint experience",
       "description": "The complete first and third-person Viewpoint setup: tactical gunplay, atmosphere, survival, quality-of-life, and immersion mods. Designed as the safest choice for an existing save.",
-      "cover": "packs/medium/cover.svg",
+      "cover": "packs/medium/cover.jpg",
       "gallery": [],
-      "placeholderArt": true,
+      "accent": "#f97316",
+      "featured": true,
+      "placeholderArt": false,
       "gameBuild": "42.21",
       "tags": [
         "balanced",
@@ -520,9 +524,11 @@
       "name": "Advanced",
       "tagline": "Medium, plus mechanics, UI, and swimming",
       "description": "Everything in Medium with additional fixes, realism, and survival mechanics. Advanced is additive: it does not remove or replace the Medium base.",
-      "cover": "packs/advanced/cover.svg",
+      "cover": "packs/advanced/cover.jpg",
       "gallery": [],
-      "placeholderArt": true,
+      "accent": "#fd1a04",
+      "featured": true,
+      "placeholderArt": false,
       "gameBuild": "42.21",
       "tags": [
         "mechanics",
@@ -533,12 +539,12 @@
       "extends": "medium",
       "order": 20,
       "archive": {
-        "fileName": "PZ-Viewpoint-Mods-Advanced.tar",
-        "sha256": "abb58fcb08995847c0d8c8212def05dea69ad441529a31a7ea33e84abac2090c",
-        "sizeBytes": 1073741824,
+        "fileName": "PZ-Viewpoint-Mods-Advanced-v2.tar",
+        "sha256": "5b591b83341e7ffbbb8ec04ccde32022eac71878033d17d46da3a2c15cf88bd9",
+        "sizeBytes": 1171265024,
         "requiredDiskGB": 5,
-        "releaseTag": "mods-v3",
-        "url": "https://github.com/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/mods-v3/PZ-Viewpoint-Mods-Advanced.tar"
+        "releaseTag": "advanced-v2",
+        "url": "https://github.com/GustavoHeringerCurcio/EasyPZ-assets/releases/download/advanced-v2/PZ-Viewpoint-Mods-Advanced-v2.tar"
       },
       "requirements": {
         "freeDiskGB": 5,

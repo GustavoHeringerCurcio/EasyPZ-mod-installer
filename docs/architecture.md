@@ -124,13 +124,21 @@ In development this relaunch is disabled; run the terminal as Administrator to t
 - The app never stores GitHub credentials.
 - Logs do not contain secrets.
 
-## Remote catalog (public launch)
+## Remote catalog
 
-The alpha build reads the bundled catalog from `resources/catalog`. The main process also supports a remote catalog for testing:
+The app prefers the public catalog at:
+
+```text
+https://raw.githubusercontent.com/GustavoHeringerCurcio/EasyPZ-assets/main/catalog/index.json
+```
+
+The bundled catalog in `resources/catalog` is the offline fallback. The remote fetch has an 8-second timeout; covers are resolved relative to the catalog URL and embedded as data URLs. If a cover fetch fails, the bundled cover is used.
+
+Override the catalog for development:
 
 ```powershell
-$env:EASYPZ_CATALOG_URL = 'https://raw.githubusercontent.com/GustavoHeringerCurcio/EasyPZ-mod-installer/main/catalog/index.json'
+$env:EASYPZ_CATALOG_URL = 'https://raw.githubusercontent.com/GustavoHeringerCurcio/EasyPZ-assets/main/catalog/index.json'
 pnpm dev
 ```
 
-Covers are resolved relative to the catalog URL and embedded as data URLs. For public launch, make the repository/catalog public, publish the archives in its releases, switch the catalog to `public` mode, and enable the updater. The schemas and app do not change; only the catalog source and archive URLs change.
+Publishing the catalog to `EasyPZ-assets` means new packs, archive fixes, and hash changes no longer require an app release. The schemas and app code do not change; only the catalog source and archive URLs change.

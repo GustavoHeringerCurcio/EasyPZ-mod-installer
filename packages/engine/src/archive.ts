@@ -16,6 +16,31 @@ function hasTraversal(entryPath: string): boolean {
   return entryPath.split(/[\\/]/).some((part) => part === '..')
 }
 
+/**
+ * A valid tar ends with at least two 512-byte zero blocks. Checking the tail is
+ * cheap and catches truncated archives before a multi-minute extraction.
+ */
+export async function assertTarComplete(archivePath: string): Promise<void> {
+  const stat = await fs.stat(archivePath)
+  if (stat.size < 1024) {
+    throw new EasyPzError('ARCHIVE_CORRUPT', 'The pack archive is too small to be valid.')
+  }
+
+  const handle = await fs.open(archivePath, 'r')
+  try {
+    const buffer = Buffer.alloc(1024)
+    await handle.read(buffer, 0, buffer.length, stat.size - buffer.length)
+    if (!buffer.every((byte) => byte === 0)) {
+      throw new EasyPzError(
+        'ARCHIVE_CORRUPT',
+        'The pack archive is incomplete. The published file is truncated or corrupt.',
+      )
+    }
+  } finally {
+    await handle.close()
+  }
+}
+
 export async function extractArchive(options: ExtractOptions): Promise<void> {
   const { archivePath, destination, signal, onEntry } = options
   await fs.mkdir(destination, { recursive: true })
@@ -36,7 +61,15 @@ export async function extractArchive(options: ExtractOptions): Promise<void> {
     })
   } catch (error) {
     if (signal?.aborted) throw cancelledError()
-    throw new EasyPzError('IO', `Could not extract the mod archive: ${toError(error).message}`, {
+    const message = toError(error).message
+    if (message.includes('TAR_BAD_ARCHIVE') || message.includes('Truncated input')) {
+      throw new EasyPzError(
+        'ARCHIVE_CORRUPT',
+        'The pack archive is incomplete or corrupt. The published file needs to be updated.',
+        { cause: toError(error) },
+      )
+    }
+    throw new EasyPzError('IO', `Could not extract the mod archive: ${message}`, {
       cause: toError(error),
     })
   }

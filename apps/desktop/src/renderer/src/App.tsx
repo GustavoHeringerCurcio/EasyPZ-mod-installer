@@ -21,6 +21,7 @@ import {
   type InstallUiState,
 } from './lib/install'
 import { cn } from './lib/format'
+import { packAccent } from './lib/packTheme'
 import logo from './assets/logo.png'
 
 type ToastKind = 'success' | 'error' | 'info'
@@ -384,6 +385,24 @@ export default function App() {
     [refreshBootstrap, showToast, t],
   )
 
+  const requestClearCache = useCallback(() => {
+    setConfirmRequest({
+      title: t('confirm.clearCacheTitle'),
+      body: t('confirm.clearCacheBody'),
+      confirmLabel: t('confirm.clearCacheAction'),
+      destructive: true,
+      onConfirm: async () => {
+        const result = await window.easypz.clearCache()
+        if (!result.ok) {
+          showToast('error', result.message)
+          return
+        }
+        setBootstrap(result.data)
+        showToast('success', t('toast.cacheCleared'))
+      },
+    })
+  }, [showToast, t])
+
   const requestHostSync = useCallback(
     (packId: string) => {
       setConfirmRequest({
@@ -421,6 +440,9 @@ export default function App() {
     bootstrap?.catalog.packs.find((pack) => pack.id === install.packId)?.name ??
     install.packId ??
     ''
+  const installAccent = packAccent(
+    bootstrap?.catalog.packs.find((pack) => pack.id === install.packId),
+  )
 
   if (!bootstrap && !bootError) {
     return <LoadingScreen />
@@ -510,6 +532,7 @@ export default function App() {
             onLanguage={(language) => void changeLanguage(language)}
             onOpen={(target) => void openPath(target)}
             onOpenLogs={() => void openLogs()}
+            onClearCache={requestClearCache}
           />
         ) : null}
 
@@ -525,6 +548,7 @@ export default function App() {
       <InstallOverlay
         state={install}
         packName={installPackName}
+        accent={installAccent}
         canceling={canceling}
         onClose={() => setInstall(emptyInstallState())}
         onCancel={() => void cancelInstall()}
@@ -539,8 +563,8 @@ export default function App() {
         <div className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/85 p-6 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-line bg-panel p-6 shadow-[0_30px_100px_rgba(0,0,0,0.6)]">
             <div className="flex items-start justify-between">
-              <div className="flex size-11 items-center justify-center rounded-xl border border-brand/25 bg-brand/10">
-                <ShieldCheck className="size-5 text-brand" />
+              <div className="flex size-11 items-center justify-center rounded-xl border border-success/25 bg-success/10">
+                <ShieldCheck className="size-5 text-success" />
               </div>
               <button
                 onClick={() => void dismissElevation()}
@@ -585,7 +609,7 @@ export default function App() {
           className={cn(
             'fixed bottom-5 right-5 z-[60] flex max-w-sm items-start gap-3 rounded-xl border px-4 py-3 text-xs shadow-2xl',
             toast.kind === 'success'
-              ? 'border-brand/30 bg-[#1c0906] text-bone'
+              ? 'border-success/30 bg-[#0b1a10] text-bone'
               : toast.kind === 'error'
                 ? 'border-danger/35 bg-[#210b0b] text-bone'
                 : 'border-line bg-panel text-bone',
@@ -594,7 +618,7 @@ export default function App() {
           {toast.kind === 'error' ? (
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-danger" />
           ) : toast.kind === 'success' ? (
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-brand" />
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" />
           ) : (
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
           )}

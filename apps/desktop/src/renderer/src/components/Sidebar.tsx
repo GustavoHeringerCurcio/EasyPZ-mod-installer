@@ -40,7 +40,7 @@ export function Sidebar({
           <div className="font-display text-[15px] font-bold leading-none tracking-tight text-bone">
             {t('app.name')}
           </div>
-          <div className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-brand">
+          <div className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-muted">
             {t('app.suffix')}
           </div>
         </div>
@@ -57,14 +57,14 @@ export function Sidebar({
               className={cn(
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-brand/10 text-bone'
+                  ? 'bg-white/[0.07] text-bone'
                   : 'text-muted hover:bg-white/[0.04] hover:text-bone',
               )}
             >
               <Icon
                 className={cn(
                   'size-[18px] transition-colors',
-                  active ? 'text-brand' : 'text-muted group-hover:text-bone',
+                  active ? 'text-bone' : 'text-muted group-hover:text-bone',
                 )}
               />
               <span className="flex-1 text-left">{t(item.key)}</span>
@@ -73,7 +73,7 @@ export function Sidebar({
                   {installedCount}
                 </span>
               ) : null}
-              {active ? <span className="h-4 w-0.5 rounded-full bg-brand" /> : null}
+              {active ? <span className="h-4 w-0.5 rounded-full bg-bone" /> : null}
             </button>
           )
         })}
@@ -91,7 +91,7 @@ export function Sidebar({
                 onClick={() => onLanguage(code)}
                 className={cn(
                   'rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition-colors',
-                  language === code ? 'bg-brand text-ink' : 'text-muted hover:text-bone',
+                  language === code ? 'bg-bone text-ink' : 'text-muted hover:text-bone',
                 )}
               >
                 {code === 'en' ? 'EN' : 'PT'}
@@ -102,7 +102,7 @@ export function Sidebar({
 
         <div className="flex items-center gap-2 text-[11px] text-muted">
           {isElevated ? (
-            <ShieldCheck className="size-3.5 text-brand" />
+            <ShieldCheck className="size-3.5 text-success" />
           ) : (
             <Shield className="size-3.5" />
           )}
@@ -111,7 +111,7 @@ export function Sidebar({
 
         <div className="flex items-center justify-between text-[10px] text-muted">
           <span>v{appVersion}</span>
-          <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-semibold uppercase tracking-wider text-brand">
+          <span className="rounded-full border border-line bg-panel-2 px-2 py-0.5 font-semibold uppercase tracking-wider text-muted">
             {t('app.alpha')}
           </span>
         </div>

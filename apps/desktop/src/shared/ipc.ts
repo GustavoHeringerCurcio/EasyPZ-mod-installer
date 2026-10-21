@@ -82,6 +82,7 @@ export interface EasyPzApi {
   setLanguage: (language: Language) => Promise<OperationResult<Bootstrap>>
   openPath: (target: string) => Promise<void>
   openLogs: () => Promise<void>
+  clearCache: () => Promise<OperationResult<Bootstrap>>
   restartAsAdmin: (pending: PendingAction | null) => Promise<OperationResult<never>>
   consumePendingAction: () => Promise<PendingAction | null>
   onInstallEvent: (callback: (event: EngineEvent) => void) => () => void
@@ -101,6 +102,7 @@ export const IPC = {
   setLanguage: 'settings:setLanguage',
   openPath: 'app:openPath',
   openLogs: 'app:openLogs',
+  clearCache: 'app:clearCache',
   restartAsAdmin: 'app:restartAsAdmin',
   consumePendingAction: 'app:consumePendingAction',
   installEvent: 'install:event',
