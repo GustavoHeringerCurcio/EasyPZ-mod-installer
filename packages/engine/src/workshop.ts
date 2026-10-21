@@ -281,7 +281,7 @@ function findItemRoot(workshopId: string, workshopRoot: string, paths: AppPaths)
     candidates.find(
       (candidate) =>
         existsSync(candidate) &&
-        (candidate === storeRoot ? existsSync(path.join(candidate, 'mods')) : true),
+        (existsSync(path.join(candidate, 'mods')) || existsSync(path.join(candidate, 'mod.info'))),
     ) ?? null
   )
 }
