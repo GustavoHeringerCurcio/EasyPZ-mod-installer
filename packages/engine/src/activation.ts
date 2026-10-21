@@ -17,9 +17,21 @@ export async function ensureResetFile(modsDir: string): Promise<void> {
   }
 }
 
+/**
+ * ZombieBuddy loads Java mods in default.txt order. Viewpoint must be on the
+ * classpath before any Viewpoint add-on initializes its static API handles.
+ */
+const LOAD_ORDER_PRIORITY = ['ZombieBuddy', 'Viewpoint']
+
+export function sortModIdsForLoadOrder(modIds: string[]): string[] {
+  const prioritized = LOAD_ORDER_PRIORITY.filter((id) => modIds.includes(id))
+  const remaining = modIds.filter((id) => !LOAD_ORDER_PRIORITY.includes(id))
+  return [...prioritized, ...remaining]
+}
+
 export function buildDefaultTxt(modIds: string[]): string {
   const lines = ['VERSION = 1,', '', 'mods', '{']
-  for (const id of modIds) lines.push(`    mod = ${id},`)
+  for (const id of sortModIdsForLoadOrder(modIds)) lines.push(`    mod = ${id},`)
   lines.push('}', '', 'maps', '{', '}', '')
   return lines.join('\r\n')
 }
