@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "alpha",
-  "generatedAt": "2026-10-21T02:32:23.994Z",
+  "generatedAt": "2026-10-21T03:47:12.263Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -642,6 +642,687 @@
         "serverMods": 1,
         "totalMods": 46,
         "workshopCount": 43
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "ultra",
+      "name": "Ultra",
+      "tagline": "The complete co-op Viewpoint base",
+      "description": "The complete co-op Viewpoint base. Advanced plus horses, immersive snow, terrain, 3D world detail, gameplay, and a curated vehicle fleet. Built from a pinned Workshop item list; start a new save.",
+      "cover": "packs/ultra/cover.jpg",
+      "gallery": [],
+      "accent": "#f5b301",
+      "featured": true,
+      "placeholderArt": false,
+      "gameBuild": "42.21",
+      "tags": [
+        "viewpoint",
+        "ultra",
+        "co-op",
+        "vehicles",
+        "horses",
+        "snow",
+        "new-save",
+        "workshop"
+      ],
+      "extends": null,
+      "order": 25,
+      "source": "workshop",
+      "archive": null,
+      "workshop": {
+        "collectionId": "0",
+        "downloadBytes": 2715912966,
+        "items": [
+          {
+            "id": "3619862853",
+            "name": "ZombieBuddy",
+            "sizeBytes": 14466055
+          },
+          {
+            "id": "3809306528",
+            "name": "Project Viewpoint",
+            "sizeBytes": 34153469
+          },
+          {
+            "id": "3810302175",
+            "name": "6244 3D models for Viewpoint [sour_kisel]",
+            "sizeBytes": 450786523
+          },
+          {
+            "id": "3812616893",
+            "name": "Viewpoint - Interface",
+            "sizeBytes": 2147565
+          },
+          {
+            "id": "3812702301",
+            "name": "Viewpoint Advanced Movement",
+            "sizeBytes": 56134761
+          },
+          {
+            "id": "3813230118",
+            "name": "Viewpoint - Equipment Overlays",
+            "sizeBytes": 5717707
+          },
+          {
+            "id": "3813194971",
+            "name": "Viewpoint - Advanced Throwables",
+            "sizeBytes": 1302734
+          },
+          {
+            "id": "3812864848",
+            "name": "Viewpoint True Ballistics",
+            "sizeBytes": 772927
+          },
+          {
+            "id": "3812612054",
+            "name": "Project Viewpoint: Recoil & ADS",
+            "sizeBytes": 1391740
+          },
+          {
+            "id": "3813908957",
+            "name": "Project Viewpoint: True Weathers & Lighting",
+            "sizeBytes": 1815182
+          },
+          {
+            "id": "3810179295",
+            "name": "Project Viewpoint Minimap (PZ3D Minimap) [B42.21.0] [SP/MP]",
+            "sizeBytes": 6331190
+          },
+          {
+            "id": "2956146279",
+            "name": "Rain Cleans Blood [B42.20 + MP]",
+            "sizeBytes": 2315561
+          },
+          {
+            "id": "3607686447",
+            "name": "Immersive Blackouts [B42MP]",
+            "sizeBytes": 149568
+          },
+          {
+            "id": "3504753006",
+            "name": "Thump with Friends [B42]",
+            "sizeBytes": 480554
+          },
+          {
+            "id": "3778511497",
+            "name": "Skully's Zombie Collision [B42.20+]",
+            "sizeBytes": 281781
+          },
+          {
+            "id": "3780683663",
+            "name": "Cye's Push Doors! [SP/MP]",
+            "sizeBytes": 1244927
+          },
+          {
+            "id": "3577903007",
+            "name": "Vanilla Foods Expanded",
+            "sizeBytes": 114166963
+          },
+          {
+            "id": "3592172476",
+            "name": "[B42:SP/MP] Take A Bath And Shower",
+            "sizeBytes": 40044551
+          },
+          {
+            "id": "2142622992",
+            "name": "Repair Any Clothes",
+            "sizeBytes": 57680
+          },
+          {
+            "id": "3615135168",
+            "name": "Zombie Virus Vaccine [B42.14 to B42.20 - SP/MP]",
+            "sizeBytes": 83594074
+          },
+          {
+            "id": "3779561845",
+            "name": "LG Extended Plumbing",
+            "sizeBytes": 1466549
+          },
+          {
+            "id": "3171167894",
+            "name": "that DAMN Library",
+            "sizeBytes": 42407848
+          },
+          {
+            "id": "2625625421",
+            "name": "Containers!",
+            "sizeBytes": 10907100
+          },
+          {
+            "id": "3775549570",
+            "name": "Alice's Weapon Sling",
+            "sizeBytes": 1399513
+          },
+          {
+            "id": "2804531012",
+            "name": "Draw On The Map - Free Hand Drawing [DISCONTINUED]",
+            "sizeBytes": 5429892
+          },
+          {
+            "id": "2503622437",
+            "name": "Skill Recovery Journal",
+            "sizeBytes": 4460232
+          },
+          {
+            "id": "2896041179",
+            "name": "errorMagnifier",
+            "sizeBytes": 394032
+          },
+          {
+            "id": "3077900375",
+            "name": "Mod Update and Alert System",
+            "sizeBytes": 674130
+          },
+          {
+            "id": "3772052709",
+            "name": "Spawn Selector [B42 Stable]",
+            "sizeBytes": 574320
+          },
+          {
+            "id": "3817413313",
+            "name": "Project Viewpoint - Immersive Driving",
+            "sizeBytes": 120306
+          },
+          {
+            "id": "3820965001",
+            "name": "Viewpoint - Visceral",
+            "sizeBytes": 809551
+          },
+          {
+            "id": "3758880254",
+            "name": "PZ Simple Crossbows [B42.21 MP]",
+            "sizeBytes": 5284802
+          },
+          {
+            "id": "3812984535",
+            "name": "Viewpoint - Immersive Effects",
+            "sizeBytes": 403128
+          },
+          {
+            "id": "3818432217",
+            "name": "Immersive Camera Motion : Project Viewpoint Add-on",
+            "sizeBytes": 285234
+          },
+          {
+            "id": "3818189653",
+            "name": "Viewpoint - Visible Loot",
+            "sizeBytes": 188736546
+          },
+          {
+            "id": "3811256204",
+            "name": "Project Viewpoint QOL",
+            "sizeBytes": 1189002
+          },
+          {
+            "id": "3819018807",
+            "name": "Viewpoint - Right Click Fix",
+            "sizeBytes": 355470
+          },
+          {
+            "id": "3815544725",
+            "name": "Viewpoint Immersive Map",
+            "sizeBytes": 702665
+          },
+          {
+            "id": "3814994364",
+            "name": "Viewpoint Foraging",
+            "sizeBytes": 1753896
+          },
+          {
+            "id": "3814560827",
+            "name": "Viewpoint Fishing",
+            "sizeBytes": 310761
+          },
+          {
+            "id": "3802372726",
+            "name": "True Swimming",
+            "sizeBytes": 2652103
+          },
+          {
+            "id": "3814178814",
+            "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
+            "sizeBytes": 229203342
+          },
+          {
+            "id": "3661336777",
+            "name": "Horse Mod [B42.20+/MP]",
+            "sizeBytes": 58507343
+          },
+          {
+            "id": "3784003967",
+            "name": "Horse Utility Add-on",
+            "sizeBytes": 434280
+          },
+          {
+            "id": "3813760573",
+            "name": "HorseMod + Viewpoint Controls Patch",
+            "sizeBytes": 270690
+          },
+          {
+            "id": "3820421584",
+            "name": "Project Viewpoint - Solid Horses",
+            "sizeBytes": 118763
+          },
+          {
+            "id": "3810071828",
+            "name": "Immersive Snow",
+            "sizeBytes": 22131915
+          },
+          {
+            "id": "3816586790",
+            "name": "Immersive Snow - Viewpoint",
+            "sizeBytes": 164269
+          },
+          {
+            "id": "2584112711",
+            "name": "[B41/B42] Faster Hood Opening",
+            "sizeBytes": 50826
+          },
+          {
+            "id": "3816588758",
+            "name": "Death Cam Mod for Project Viewpoint",
+            "sizeBytes": 247908
+          },
+          {
+            "id": "3774776279",
+            "name": "Climb Ladders [B42SP & MP]",
+            "sizeBytes": 59468
+          },
+          {
+            "id": "3330403100",
+            "name": "Trailers!",
+            "sizeBytes": 11786296
+          },
+          {
+            "id": "3816856700",
+            "name": "Yeah it's water bitch-(fix-update)",
+            "sizeBytes": 6151240
+          },
+          {
+            "id": "3815245833",
+            "name": "Visible Corpses in Trailers [B42]",
+            "sizeBytes": 3911813
+          },
+          {
+            "id": "3815223174",
+            "name": "Viewpoint Better Terrain",
+            "sizeBytes": 6312501
+          },
+          {
+            "id": "3815630947",
+            "name": "Viewpoint Rolling Hills",
+            "sizeBytes": 304280
+          },
+          {
+            "id": "3817555882",
+            "name": "Rolling Hills Physics Addon (Project Viewpoint)",
+            "sizeBytes": 3022516
+          },
+          {
+            "id": "3820772682",
+            "name": "Viewpoint Terrain Lights Fix [B42]",
+            "sizeBytes": 434852
+          },
+          {
+            "id": "3817137006",
+            "name": "Viewpoint - World Actions Fix",
+            "sizeBytes": 1164625
+          },
+          {
+            "id": "3816521966",
+            "name": "Viewpoint Placement Fix",
+            "sizeBytes": 267899
+          },
+          {
+            "id": "3817129409",
+            "name": "Viewpoint Stability Fix",
+            "sizeBytes": 48607
+          },
+          {
+            "id": "3817501459",
+            "name": "Viewpoint Texture Fix",
+            "sizeBytes": 64337
+          },
+          {
+            "id": "3821308495",
+            "name": "Viewpoint Visual Fixes",
+            "sizeBytes": 50570
+          },
+          {
+            "id": "3814208706",
+            "name": "Viewpoint Aim Smoothing",
+            "sizeBytes": 81059
+          },
+          {
+            "id": "3822667831",
+            "name": "Viewpoint Audio Fix",
+            "sizeBytes": 429978
+          },
+          {
+            "id": "3812510377",
+            "name": "Project Viewpoint - Fixes",
+            "sizeBytes": 387480
+          },
+          {
+            "id": "3811344119",
+            "name": "Light Fix - Project Viewpoint",
+            "sizeBytes": 160248
+          },
+          {
+            "id": "3814398576",
+            "name": "Surface Fix - Project Viewpoint",
+            "sizeBytes": 548863
+          },
+          {
+            "id": "3818859807",
+            "name": "Project Viewpoint - 3D Doors, Gates & Garages",
+            "sizeBytes": 36621221
+          },
+          {
+            "id": "3820833348",
+            "name": "3D All Windows for Viewpoint [B42] byDGV",
+            "sizeBytes": 112303748
+          },
+          {
+            "id": "3818873810",
+            "name": "[V2] 3D Curtains & Blinds - Project Viewpoint [B42]",
+            "sizeBytes": 24054024
+          },
+          {
+            "id": "3814486926",
+            "name": "Viewpoint - 3D Fences",
+            "sizeBytes": 2991662
+          },
+          {
+            "id": "3818605173",
+            "name": "Any Wall Posters 3D - Project Viewpoint [B42]",
+            "sizeBytes": 35307331
+          },
+          {
+            "id": "3818605688",
+            "name": "Any Wall Flags 3D - Project Viewpoint [B42]",
+            "sizeBytes": 26769811
+          },
+          {
+            "id": "3815931973",
+            "name": "Project Viewpoint: KK's Shelves in 3D",
+            "sizeBytes": 184844234
+          },
+          {
+            "id": "3822411039",
+            "name": "Viewpoint - Forage 3D",
+            "sizeBytes": 239589
+          },
+          {
+            "id": "3820279516",
+            "name": "Viewpoint Directional Melee",
+            "sizeBytes": 136228
+          },
+          {
+            "id": "3820063546",
+            "name": "Viewpoint: Free Aim",
+            "sizeBytes": 161847
+          },
+          {
+            "id": "3821892101",
+            "name": "Viewpoint Tension",
+            "sizeBytes": 2874512
+          },
+          {
+            "id": "3812396995",
+            "name": "Viewpoint Threat Detector",
+            "sizeBytes": 4001291
+          },
+          {
+            "id": "3816823515",
+            "name": "Project Viewpoint Free Look",
+            "sizeBytes": 11606
+          },
+          {
+            "id": "3811645644",
+            "name": "Project Viewpoint Parkour",
+            "sizeBytes": 9402245
+          },
+          {
+            "id": "3818585720",
+            "name": "Viewpoint Binoculars",
+            "sizeBytes": 486347
+          },
+          {
+            "id": "3815538848",
+            "name": "Drag Bodies - Project Viewpoint (First & Third Person)",
+            "sizeBytes": 13867
+          },
+          {
+            "id": "3812518796",
+            "name": "Project Viewpoint - Place Items (SUB-MOD)",
+            "sizeBytes": 50863
+          },
+          {
+            "id": "3812198995",
+            "name": "Project Viewpoint - Shovel Graves(SUBMOD)",
+            "sizeBytes": 224806
+          },
+          {
+            "id": "3026723485",
+            "name": "'67 Shelby GT500 + Eleanor",
+            "sizeBytes": 18168337
+          },
+          {
+            "id": "2991201484",
+            "name": "'69 Chevrolet Camaro",
+            "sizeBytes": 19382006
+          },
+          {
+            "id": "2873290424",
+            "name": "'70 Dodge Challenger",
+            "sizeBytes": 19081050
+          },
+          {
+            "id": "3379334330",
+            "name": "'82 Porsche 911",
+            "sizeBytes": 26748311
+          },
+          {
+            "id": "3631989559",
+            "name": "'69 Dodge Charger",
+            "sizeBytes": 21182272
+          },
+          {
+            "id": "3253385114",
+            "name": "'81 DeLorean DMC-12",
+            "sizeBytes": 11324850
+          },
+          {
+            "id": "3110913021",
+            "name": "'90 BMW 3 Series (E30)",
+            "sizeBytes": 37589795
+          },
+          {
+            "id": "2846036306",
+            "name": "'92 NISSAN Skyline GT-R (R32)",
+            "sizeBytes": 18649998
+          },
+          {
+            "id": "3647735736",
+            "name": "'95 Subaru Impreza WRX STI",
+            "sizeBytes": 10569960
+          },
+          {
+            "id": "3647736504",
+            "name": "'96 Mitsubishi Lancer EVO IV",
+            "sizeBytes": 11342232
+          },
+          {
+            "id": "2962175696",
+            "name": "'92 Ford Crown Victoria",
+            "sizeBytes": 20320227
+          },
+          {
+            "id": "2971246021",
+            "name": "'99 Ford Crown Victoria Police Interceptor",
+            "sizeBytes": 9881697
+          },
+          {
+            "id": "2942793445",
+            "name": "'90 Pierce Arrow Pumper and Ladder Trucks",
+            "sizeBytes": 14320704
+          },
+          {
+            "id": "2952802178",
+            "name": "'90 Ford F350 Ambulance",
+            "sizeBytes": 10079679
+          },
+          {
+            "id": "3041122351",
+            "name": "'63 Volkswagen Type 2 Van",
+            "sizeBytes": 26792604
+          },
+          {
+            "id": "2870394916",
+            "name": "'86 Ford Econoline E-150 + Pop Culture vans",
+            "sizeBytes": 56479405
+          },
+          {
+            "id": "3614034284",
+            "name": "'85 Chevrolet Step-Van",
+            "sizeBytes": 28373857
+          },
+          {
+            "id": "3812312558",
+            "name": "Construction 1P Viewpoint",
+            "sizeBytes": 745568
+          },
+          {
+            "id": "3821174725",
+            "name": "Viewpoint - 3D RV Van",
+            "sizeBytes": 57157437
+          },
+          {
+            "id": "3817030886",
+            "name": "RV Viewpoint Patch",
+            "sizeBytes": 4083
+          },
+          {
+            "id": "3814635273",
+            "name": "RVV+Viewpoint",
+            "sizeBytes": 798498
+          },
+          {
+            "id": "3670064951",
+            "name": "Campers!",
+            "sizeBytes": 28114112
+          },
+          {
+            "id": "3570973322",
+            "name": "'89 LAND ROVER Defender",
+            "sizeBytes": 29075908
+          },
+          {
+            "id": "3435796523",
+            "name": "'88 Toyota Hilux",
+            "sizeBytes": 11811514
+          },
+          {
+            "id": "2705406713",
+            "name": "Military Tool Kit",
+            "sizeBytes": 31547512
+          },
+          {
+            "id": "3823702935",
+            "name": "M3 Half-track [B42]",
+            "sizeBytes": 184249273
+          },
+          {
+            "id": "3818039291",
+            "name": "Steel Sights: Tank Gunner Overhaul + M1 Abrams [B42]",
+            "sizeBytes": 26221527
+          },
+          {
+            "id": "3783444342",
+            "name": "[B42]Aviation Core (Beta)",
+            "sizeBytes": 6270078
+          },
+          {
+            "id": "3409723807",
+            "name": "[B42] UH-1B Helicopter (Beta)",
+            "sizeBytes": 14383910
+          },
+          {
+            "id": "3818359767",
+            "name": "3D Helicopter Event (Project Viewpoint)",
+            "sizeBytes": 6564512
+          },
+          {
+            "id": "3812896812",
+            "name": "Helicopter Fix - Project Viewpoint",
+            "sizeBytes": 233652
+          },
+          {
+            "id": "3819322670",
+            "name": "Project Viewpoint - Visible Helicopter Events",
+            "sizeBytes": 935039
+          },
+          {
+            "id": "3815019204",
+            "name": "Project Viewpoint - KI5 Vehicle Parts Fix",
+            "sizeBytes": 179498
+          },
+          {
+            "id": "3818260104",
+            "name": "Viewpoint - Vehicle Mirrors",
+            "sizeBytes": 951147
+          },
+          {
+            "id": "3812659488",
+            "name": "Viewpoint - Papa_Chad Vehicle Compatibility [B42.21]",
+            "sizeBytes": 45070
+          },
+          {
+            "id": "3815739336",
+            "name": "Viewpoint Vehicle Tuning Compatibility",
+            "sizeBytes": 5847
+          },
+          {
+            "id": "3816442251",
+            "name": "Viewpoint: Living Props",
+            "sizeBytes": 81759686
+          },
+          {
+            "id": "3713362869",
+            "name": "[B42] Faster Reading",
+            "sizeBytes": 88319
+          }
+        ]
+      },
+      "requirements": {
+        "freeDiskGB": 12,
+        "ramGB": 8,
+        "recommendedRamGB": 16,
+        "vramGB": 8
+      },
+      "groups": [],
+      "warnings": [
+        "This package downloads 124 items from Steam Workshop and can take a long time.",
+        "Start a new save. Terrain, snow, roof, and world overhauls are not safe to remove mid-save.",
+        "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items.",
+        "Workshop updates can change this pack at any time. Update all clients and the server together.",
+        "Horses, vehicles, and trailer mods must be installed and enabled on both client and server.",
+        "Faster Reading is placed last in the item list for load order. If books are still slow, verify it is enabled and check console.txt for Lua errors.",
+        "ZombieBuddy may ask you to approve its JAR on first launch."
+      ],
+      "credits": [
+        "All mods belong to their respective authors.",
+        "This catalog entry uses public Steam Workshop item IDs; it is not claimed as original work.",
+        "Not affiliated with The Indie Stone."
+      ],
+      "updatedAt": "2026-10-21",
+      "stats": {
+        "clientMods": 124,
+        "serverMods": 0,
+        "totalMods": 124,
+        "workshopCount": 124
       }
     },
     {

@@ -19,12 +19,14 @@ describe('catalog', () => {
       'essentials',
       'medium',
       'advanced',
+      'ultra',
       'viewpoint-collection',
       'viewpoint-addons',
     ])
     expect(getPack(catalog, 'essentials').stats.clientMods).toBe(6)
     expect(getPack(catalog, 'medium').stats.clientMods).toBe(38)
     expect(getPack(catalog, 'advanced').stats.clientMods).toBe(45)
+    expect(getPack(catalog, 'ultra').stats.clientMods).toBe(124)
     expect(getPack(catalog, 'viewpoint-collection').stats.clientMods).toBe(90)
     expect(getPack(catalog, 'viewpoint-addons').stats.clientMods).toBe(198)
     expect(getPack(catalog, 'essentials').extends).toBeNull()
@@ -36,6 +38,13 @@ describe('catalog', () => {
     expect(workshop.archive).toBeNull()
     expect(workshop.workshop?.collectionId).toBe('3820219222')
     expect(workshop.workshop?.items).toHaveLength(90)
+
+    const ultra = getPack(catalog, 'ultra')
+    expect(ultra.source).toBe('workshop')
+    expect(ultra.archive).toBeNull()
+    expect(ultra.workshop?.collectionId).toBe('0')
+    expect(ultra.workshop?.items).toHaveLength(124)
+    expect(ultra.workshop?.items.at(-1)?.id).toBe('3713362869')
   })
 
   it('points alpha archives at the legacy mirror and public archives at this repo', async () => {

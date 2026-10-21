@@ -104,7 +104,7 @@ Do not create cycles. Validation rejects unknown parents.
 - The current covers are branded placeholders with `"placeholderArt": true`.
 - Do not use Project Zomboid trademarks or unlicensed screenshots in the app identity.
 
-## Workshop collection packs
+## Workshop packs
 
 A pack can use Steam Workshop instead of a prebuilt archive:
 
@@ -124,6 +124,12 @@ A pack can use Steam Workshop instead of a prebuilt archive:
 ```
 
 Workshop packs require `workshop`, must not define `archive`, cannot extend another pack, and have empty `groups`. The engine downloads items with SteamCMD and discovers the actual mod IDs and folders from each item’s `mod.info`.
+
+### Explicit item lists
+
+A Workshop pack does not need to mirror a real Steam collection. Use `"collectionId": "0"` as a local sentinel and provide the complete pinned `items` list. The engine downloads every item by ID; `collectionId` is only used as a progress identity key and is never sent to Steam. Use a real collection ID when the pack mirrors a public collection.
+
+Pinned lists are the safest choice for a curated base pack: Workshop edits to the source collection cannot silently change which items ship. Keep item order stable and put late-loading overrides at the end of `items`.
 
 ## Modes
 
