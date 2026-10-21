@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "alpha",
-  "generatedAt": "2026-10-21T03:47:12.263Z",
+  "generatedAt": "2026-10-21T04:53:58.599Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -649,7 +649,7 @@
       "id": "ultra",
       "name": "Ultra",
       "tagline": "The complete co-op Viewpoint base",
-      "description": "The complete co-op Viewpoint base. Advanced plus horses, immersive snow, terrain, 3D world detail, gameplay, and a curated vehicle fleet. Built from a pinned Workshop item list; start a new save.",
+      "description": "The complete co-op Viewpoint base: Advanced plus horses, weather, maps, missions, events, 3D world detail, and a curated vehicle fleet. Built from a pinned Workshop item list.",
       "cover": "packs/ultra/cover.jpg",
       "gallery": [],
       "accent": "#f5b301",
@@ -662,7 +662,9 @@
         "co-op",
         "vehicles",
         "horses",
-        "snow",
+        "maps",
+        "missions",
+        "weather",
         "new-save",
         "workshop"
       ],
@@ -672,7 +674,7 @@
       "archive": null,
       "workshop": {
         "collectionId": "0",
-        "downloadBytes": 2715912966,
+        "downloadBytes": 3513104431,
         "items": [
           {
             "id": "3619862853",
@@ -885,6 +887,36 @@
             "sizeBytes": 229203342
           },
           {
+            "id": "3816175183",
+            "name": "Big Bear Lake [ALPHA] [B42]",
+            "sizeBytes": 88770434
+          },
+          {
+            "id": "3480990544",
+            "name": "Constown (B42)",
+            "sizeBytes": 38204329
+          },
+          {
+            "id": "3484263516",
+            "name": "Raven Creek B42",
+            "sizeBytes": 120169463
+          },
+          {
+            "id": "3747595202",
+            "name": "Greenport, KY (B42)",
+            "sizeBytes": 37359556
+          },
+          {
+            "id": "3810223506",
+            "name": "Greenport, KY (B42) - Ground Item Fix",
+            "sizeBytes": 9241
+          },
+          {
+            "id": "2815966702",
+            "name": "Rabbit Hash, KY [B42+ Update]",
+            "sizeBytes": 8009049
+          },
+          {
             "id": "3661336777",
             "name": "Horse Mod [B42.20+/MP]",
             "sizeBytes": 58507343
@@ -903,16 +935,6 @@
             "id": "3820421584",
             "name": "Project Viewpoint - Solid Horses",
             "sizeBytes": 118763
-          },
-          {
-            "id": "3810071828",
-            "name": "Immersive Snow",
-            "sizeBytes": 22131915
-          },
-          {
-            "id": "3816586790",
-            "name": "Immersive Snow - Viewpoint",
-            "sizeBytes": 164269
           },
           {
             "id": "2584112711",
@@ -963,6 +985,11 @@
             "id": "3820772682",
             "name": "Viewpoint Terrain Lights Fix [B42]",
             "sizeBytes": 434852
+          },
+          {
+            "id": "3822754688",
+            "name": "Immersive Physics & Weather (Project Viewpoint)",
+            "sizeBytes": 678886
           },
           {
             "id": "3817137006",
@@ -1285,6 +1312,56 @@
             "sizeBytes": 5847
           },
           {
+            "id": "3821554678",
+            "name": "Brief Sprinters",
+            "sizeBytes": 52546
+          },
+          {
+            "id": "3818733381",
+            "name": "The Only Cure+ (Field Surgery)",
+            "sizeBytes": 419038899
+          },
+          {
+            "id": "3386906181",
+            "name": "[B42+] Sandbox Options",
+            "sizeBytes": 9300440
+          },
+          {
+            "id": "2987772693",
+            "name": "Wolf Extraction Quest",
+            "sizeBytes": 10323528
+          },
+          {
+            "id": "3716405632",
+            "name": "Dynamic Horde Events B42",
+            "sizeBytes": 3158279
+          },
+          {
+            "id": "3738819163",
+            "name": "Airdrop B42.21",
+            "sizeBytes": 6136318
+          },
+          {
+            "id": "3461415167",
+            "name": "[B42.20+/MP] Bicycle!",
+            "sizeBytes": 52932500
+          },
+          {
+            "id": "3456675747",
+            "name": "[B42.20+ MP] Skateboard!",
+            "sizeBytes": 21350874
+          },
+          {
+            "id": "3816324722",
+            "name": "Attachments UI [B42]",
+            "sizeBytes": 980910
+          },
+          {
+            "id": "3812559973",
+            "name": "Viewpoint Turbo - Light Performance Improvement [B42]",
+            "sizeBytes": 3012397
+          },
+          {
             "id": "3816442251",
             "name": "Viewpoint: Living Props",
             "sizeBytes": 81759686
@@ -1297,18 +1374,19 @@
         ]
       },
       "requirements": {
-        "freeDiskGB": 12,
+        "freeDiskGB": 14,
         "ramGB": 8,
         "recommendedRamGB": 16,
         "vramGB": 8
       },
       "groups": [],
       "warnings": [
-        "This package downloads 124 items from Steam Workshop and can take a long time.",
-        "Start a new save. Terrain, snow, roof, and world overhauls are not safe to remove mid-save.",
-        "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items.",
+        "This package downloads 139 items from Steam Workshop and can take a long time.",
+        "Start a new save. Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash add map cells and are not safe to remove mid-save.",
+        "Big Bear Lake is an alpha map. Some depth-map and first-person Viewpoint visuals may be unfinished.",
+        "Immersive Physics & Weather replaces Immersive Snow to avoid two competing 3D snow systems. Disable experimental vehicle soft-body physics if vehicles misbehave.",
+        "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items and maps.",
         "Workshop updates can change this pack at any time. Update all clients and the server together.",
-        "Horses, vehicles, and trailer mods must be installed and enabled on both client and server.",
         "Faster Reading is placed last in the item list for load order. If books are still slow, verify it is enabled and check console.txt for Lua errors.",
         "ZombieBuddy may ask you to approve its JAR on first launch."
       ],
@@ -1319,10 +1397,10 @@
       ],
       "updatedAt": "2026-10-21",
       "stats": {
-        "clientMods": 124,
+        "clientMods": 139,
         "serverMods": 0,
-        "totalMods": 124,
-        "workshopCount": 124
+        "totalMods": 139,
+        "workshopCount": 139
       }
     },
     {
