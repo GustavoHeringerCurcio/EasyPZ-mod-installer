@@ -5,6 +5,10 @@ export function buildHostModsLine(modIds: string[]): string {
   return `Mods=${modIds.join(';')}`
 }
 
+export function buildHostWorkshopLine(workshopIds: string[]): string {
+  return `WorkshopItems=${workshopIds.join(';')}`
+}
+
 export interface HostApplyResult {
   updated: boolean
   backupPath: string | null
@@ -15,9 +19,10 @@ export interface HostApplyResult {
 export async function applyHostIni(options: {
   iniPath: string
   modIds: string[]
+  workshopIds?: string[]
   backupDir: string
 }): Promise<HostApplyResult> {
-  const { iniPath, modIds, backupDir } = options
+  const { iniPath, modIds, workshopIds, backupDir } = options
 
   let text: string
   try {
@@ -42,6 +47,15 @@ export async function applyHostIni(options: {
     next = text.replace(/^Mods=.*$/m, modsLine)
   } else {
     next = `${text.replace(/\s+$/, '')}\r\n${modsLine}\r\n`
+  }
+
+  if (workshopIds) {
+    const workshopLine = buildHostWorkshopLine(workshopIds)
+    if (/^WorkshopItems=/m.test(next)) {
+      next = next.replace(/^WorkshopItems=.*$/m, workshopLine)
+    } else {
+      next = `${next.replace(/\s+$/, '')}\r\n${workshopLine}\r\n`
+    }
   }
 
   await fs.writeFile(iniPath, next, 'utf8')

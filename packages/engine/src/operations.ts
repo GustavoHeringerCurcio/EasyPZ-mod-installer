@@ -4,7 +4,7 @@ import { getActiveModIds, getPack } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
 import { hostIniPath, modsDir } from './paths.js'
 import { getGameInfo, isGameRunning } from './detect.js'
-import { updateDefaultTxt } from './activation.js'
+import { sortModIdsForLoadOrder, updateDefaultTxt } from './activation.js'
 import { applyHostIni, type HostApplyResult } from './host.js'
 import { applyGameConfig } from './gameConfig.js'
 import { isZombieBuddyInstalled } from './zombiebuddy.js'
@@ -266,11 +266,15 @@ export async function applyHostForPack(options: {
   }
 
   const state = await loadState(paths, { catalog, migrate: true })
+  const pack = getPack(catalog, packId)
   const mods = await getPackStorageMods(catalog, packId, paths, state)
-  const modIds = mods.map((mod) => mod.id)
+  const modIds = sortModIdsForLoadOrder(mods.map((mod) => mod.id))
+  const workshopIds =
+    pack.source === 'workshop' ? (pack.workshop?.items.map((item) => item.id) ?? []) : []
   const result = await applyHostIni({
     iniPath: hostIniPath(paths),
     modIds,
+    workshopIds,
     backupDir: paths.backupDir,
   })
 

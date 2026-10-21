@@ -7,7 +7,7 @@ import { buildDefaultTxt, writeDefaultTxt } from './activation.js'
 import { applyMods, removeModsNotInPack } from './apply.js'
 import { assertTarComplete } from './archive.js'
 import { applyGameConfig } from './gameConfig.js'
-import { applyHostIni, buildHostModsLine } from './host.js'
+import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.js'
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
 
@@ -92,6 +92,17 @@ describe('activation', () => {
     expect(text).toContain('maps')
   })
 
+  it('puts ZombieBuddy and Viewpoint before Viewpoint add-ons', () => {
+    const text = buildDefaultTxt(['ViewpointSurface', 'Viewpoint', 'ZombieBuddy', 'Other'])
+    const modLines = text.split('\r\n').filter((line) => line.includes('mod = '))
+    expect(modLines).toEqual([
+      '    mod = ZombieBuddy,',
+      '    mod = Viewpoint,',
+      '    mod = ViewpointSurface,',
+      '    mod = Other,',
+    ])
+  })
+
   it('backs up default.txt and creates the reset marker', async () => {
     const root = await tempDir('activation')
     const modsDir = path.join(root, 'mods')
@@ -114,17 +125,44 @@ describe('host', () => {
     const root = await tempDir('host')
     const ini = path.join(root, 'servertest.ini')
     const backupDir = path.join(root, 'backups')
-    await fs.writeFile(ini, 'ServerName=Test\r\nMods=OldMod\r\nPublic=false\r\n', 'utf8')
+    await fs.writeFile(
+      ini,
+      'ServerName=Test\r\nMods=OldMod\r\nWorkshopItems=OldItem\r\nPublic=false\r\n',
+      'utf8',
+    )
 
-    const result = await applyHostIni({ iniPath: ini, modIds: ['ModA', 'ModB'], backupDir })
+    const result = await applyHostIni({
+      iniPath: ini,
+      modIds: ['ModA', 'ModB'],
+      workshopIds: ['111', '222'],
+      backupDir,
+    })
     const text = await fs.readFile(ini, 'utf8')
 
     expect(result.updated).toBe(true)
     expect(text).toContain('Mods=ModA;ModB')
+    expect(text).toContain('WorkshopItems=111;222')
     expect(text).toContain('ServerName=Test')
     expect(text).toContain('Public=false')
     expect(buildHostModsLine(['A'])).toBe('Mods=A')
+    expect(buildHostWorkshopLine(['1', '2'])).toBe('WorkshopItems=1;2')
     expect(result.backupPath).not.toBeNull()
+  })
+
+  it('adds WorkshopItems when the line is absent', async () => {
+    const root = await tempDir('host-workshop')
+    const ini = path.join(root, 'servertest.ini')
+    await fs.writeFile(ini, 'ServerName=Test\r\nMods=OldMod\r\n', 'utf8')
+
+    await applyHostIni({
+      iniPath: ini,
+      modIds: ['ModA'],
+      workshopIds: ['111', '222'],
+      backupDir: path.join(root, 'backups'),
+    })
+
+    const text = await fs.readFile(ini, 'utf8')
+    expect(text).toContain('WorkshopItems=111;222')
   })
 
   it('does nothing when the host INI is missing', async () => {
