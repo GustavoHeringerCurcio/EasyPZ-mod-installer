@@ -1,4 +1,4 @@
-﻿import { execFile } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -54,6 +54,11 @@ const execFileAsync = promisify(execFile)
 
 let mainWindow: BrowserWindow | null = null
 let activeInstall: AbortController | null = null
+let activeDelete = false
+
+function operationBusy(): boolean {
+  return activeInstall !== null || activeDelete
+}
 
 function pendingActionPath(): string {
   return path.join(app.getPath('userData'), 'pending-action.json')
@@ -215,11 +220,11 @@ function registerIpc(): void {
     if (uiSuiteId !== undefined && uiSuiteId !== null && typeof uiSuiteId !== 'string') {
       return fail(new Error('Invalid UI suite selection.'))
     }
-    if (activeInstall) {
+    if (operationBusy()) {
       return {
         ok: false,
         code: 'BUSY',
-        message: 'Another installation is already running.',
+        message: 'Wait for the current operation to finish.',
       } satisfies OperationResult<never>
     }
 
@@ -276,11 +281,11 @@ function registerIpc(): void {
   ipcMain.handle(IPC.setPackEnabled, async (_event, packId: unknown, enabled: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
     if (typeof enabled !== 'boolean') return fail(new Error('Invalid pack state.'))
-    if (activeInstall) {
+    if (operationBusy()) {
       return {
         ok: false,
         code: 'BUSY',
-        message: 'Wait for the installation to finish.',
+        message: 'Wait for the current operation to finish.',
       } satisfies OperationResult<never>
     }
     try {
@@ -301,11 +306,11 @@ function registerIpc(): void {
     if (typeof packId !== 'string' || typeof suiteId !== 'string') {
       return fail(new Error('Invalid UI suite selection.'))
     }
-    if (activeInstall) {
+    if (operationBusy()) {
       return {
         ok: false,
         code: 'BUSY',
-        message: 'Wait for the installation to finish.',
+        message: 'Wait for the current operation to finish.',
       } satisfies OperationResult<never>
     }
     try {
@@ -326,11 +331,11 @@ function registerIpc(): void {
 
   ipcMain.handle(IPC.repairPack, async (_event, packId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
-    if (activeInstall) {
+    if (operationBusy()) {
       return {
         ok: false,
         code: 'BUSY',
-        message: 'Wait for the installation to finish.',
+        message: 'Wait for the current operation to finish.',
       } satisfies OperationResult<never>
     }
     try {
@@ -351,28 +356,43 @@ function registerIpc(): void {
 
   ipcMain.handle(IPC.deletePack, async (_event, packId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
-    if (activeInstall) {
+    if (operationBusy()) {
       return {
         ok: false,
         code: 'BUSY',
-        message: 'Wait for the installation to finish.',
+        message: 'Wait for the current operation to finish.',
       } satisfies OperationResult<never>
     }
     try {
+      activeDelete = true
+      log.info(`[delete] start ${packId}`)
       const result = await deletePack({
         catalog: await loadCatalogForOperation(),
         packId,
         paths: getAppPaths(),
         onEvent: sendInstallEvent,
       })
+      log.info(
+        `[delete] done ${packId}: removed=${result.removedFolders} shared=${result.sharedFolders} failed=${result.failedFolders.length} disabled=${result.disabled}`,
+      )
       return { ok: true, data: result } satisfies OperationResult<DeletePackResult>
     } catch (error) {
+      log.error(`[delete] failed ${packId}`, error)
       return fail(error)
+    } finally {
+      activeDelete = false
     }
   })
 
   ipcMain.handle(IPC.verify, async (_event, packId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
+    if (operationBusy()) {
+      return {
+        ok: false,
+        code: 'BUSY',
+        message: 'Wait for the current operation to finish.',
+      } satisfies OperationResult<never>
+    }
     try {
       const settings = await readSettings()
       const health = await getPackHealth({

@@ -7,7 +7,7 @@ import { buildDefaultTxt, parseDefaultModIds } from './activation.js'
 import { hasModInfo } from './archive.js'
 import { getAppPaths, activeModPath, defaultTxtPath, modsDir, storeModPath } from './paths.js'
 import { deletePack, setPackEnabled } from './operations.js'
-import { createEmptyState, loadState, saveState } from './state.js'
+import { createEmptyState, loadState, recordInstall, saveState, setActivePack } from './state.js'
 import { getAvailablePackIds, recoverStorageJournal } from './storage.js'
 
 const temps: string[] = []
@@ -210,9 +210,13 @@ describe('pack storage', () => {
     expect(state.activePackId).toBeNull()
   })
 
-  it('deletes only folders not shared with another available pack', async () => {
+  it('deletes only folders not shared with another installed pack', async () => {
     const { paths, catalog } = await setup()
     await writeModInfo(storeModPath(paths, '222', 'ModC'))
+
+    const withMedium = recordInstall(createEmptyState(), catalog, 'medium')
+    const withAdvanced = recordInstall(withMedium, catalog, 'advanced')
+    await saveState(paths, setActivePack(withAdvanced, 'advanced'))
 
     await setPackEnabled({
       catalog,
@@ -231,9 +235,62 @@ describe('pack storage', () => {
 
     expect(result.disabled).toBe(true)
     expect(result.removedFolders).toBe(1)
+    expect(result.sharedFolders).toBe(2)
+    expect(result.failedFolders).toEqual([])
+    expect(await hasModInfo(activeModPath(paths, 'ModC'))).toBe(false)
     expect(await hasModInfo(storeModPath(paths, '222', 'ModC'))).toBe(false)
-    expect(await hasModInfo(storeModPath(paths, '111', 'ModA'))).toBe(true)
-    expect(await hasModInfo(storeModPath(paths, '999', 'ModShared'))).toBe(true)
+    expect(await hasModInfo(activeModPath(paths, 'ModA'))).toBe(true)
+    expect(await hasModInfo(activeModPath(paths, 'ModShared'))).toBe(true)
+
+    const state = await loadState(paths, { catalog })
+    expect(state.activePackId).toBeNull()
+    expect(state.installs.advanced).toBeUndefined()
+    expect(state.installs.medium).toBeDefined()
+
+    const ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toEqual(['UserMod'])
+  })
+
+  it('does not protect folders of packs without a state record', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '222', 'ModC'))
+    await saveState(paths, recordInstall(createEmptyState(), catalog, 'advanced'))
+
+    const result = await deletePack({
+      catalog,
+      packId: 'advanced',
+      paths,
+      skipGameCheck: true,
+    })
+
+    expect(result.removedFolders).toBe(3)
+    expect(result.sharedFolders).toBe(0)
+    expect(await hasModInfo(storeModPath(paths, '111', 'ModA'))).toBe(false)
+    expect(await hasModInfo(storeModPath(paths, '999', 'ModShared'))).toBe(false)
+    expect(await hasModInfo(storeModPath(paths, '222', 'ModC'))).toBe(false)
+  })
+
+  it('emits delete progress for each folder it removes', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '222', 'ModC'))
+    await saveState(paths, recordInstall(createEmptyState(), catalog, 'advanced'))
+
+    const events: Array<{ index: number; total: number; folder: string }> = []
+    await deletePack({
+      catalog,
+      packId: 'advanced',
+      paths,
+      skipGameCheck: true,
+      onEvent: (event) => {
+        if (event.type === 'delete-progress') {
+          events.push({ index: event.index, total: event.total, folder: event.folder })
+        }
+      },
+    })
+
+    expect(events).toHaveLength(3)
+    expect(events.map((event) => event.index)).toEqual([1, 2, 3])
+    expect(events.every((event) => event.total === 3)).toBe(true)
   })
 
   it('activates a downloaded Workshop collection from its install record', async () => {

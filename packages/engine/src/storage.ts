@@ -361,54 +361,161 @@ export async function storePackMods(options: {
   return { stored: entries.length, skipped: mods.length - entries.length }
 }
 
+const DELETE_CONCURRENCY = 6
+
+function modKey(mod: Pick<InstalledMod, 'workshopId' | 'folder'>): string {
+  return `${mod.workshopId}:${mod.folder}`
+}
+
+function dedupeStorageMods(mods: StorageMod[]): StorageMod[] {
+  const seen = new Set<string>()
+  return mods.filter((mod) => {
+    const key = modKey(mod)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function resolveDeleteMods(
+  catalog: Catalog,
+  packId: string,
+  install: AppState['installs'][string] | undefined,
+): StorageMod[] {
+  if (install) {
+    if (install.allMods.length > 0) return dedupeStorageMods(install.allMods)
+    if (install.mods.length > 0) return dedupeStorageMods(install.mods)
+  }
+
+  const pack = catalog.packs.find((candidate) => candidate.id === packId)
+  if (!pack || pack.source === 'workshop') return []
+  return dedupeStorageMods(getEffectiveMods(catalog, packId))
+}
+
+/**
+ * Builds the set of mods the deletion must preserve. Only packs with a state
+ * record count as installed, so this never inspects the filesystem.
+ */
+export function collectSharedMods(
+  catalog: Catalog,
+  state: AppState,
+  excludePackId: string,
+): { keys: Set<string>; folders: Set<string> } {
+  const keys = new Set<string>()
+  const folders = new Set<string>()
+
+  for (const [packId, install] of Object.entries(state.installs)) {
+    if (packId === excludePackId) continue
+
+    let mods: StorageMod[] = install.allMods.length > 0 ? install.allMods : install.mods
+    if (mods.length === 0) {
+      const pack = catalog.packs.find((candidate) => candidate.id === packId)
+      if (pack && pack.source !== 'workshop') {
+        mods = getEffectiveMods(catalog, packId)
+      }
+    }
+
+    for (const mod of mods) {
+      keys.add(modKey(mod))
+      folders.add(mod.folder)
+    }
+  }
+
+  return { keys, folders }
+}
+
+function normalizePathKey(target: string): string {
+  const normalized = path.normalize(target)
+  return process.platform === 'win32' ? normalized.toLowerCase() : normalized
+}
+
+async function runPool<T>(
+  items: T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<void>,
+): Promise<void> {
+  let nextIndex = 0
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (true) {
+      const index = nextIndex
+      nextIndex += 1
+      if (index >= items.length) return
+      await worker(items[index]!, index)
+    }
+  })
+  await Promise.all(workers)
+}
+
 export async function deletePackStorage(options: {
   catalog: Catalog
   packId: string
   paths: AppPaths
-  otherAvailablePackIds: string[]
   state?: AppState
-}): Promise<{ removed: number; keptShared: number }> {
-  const { catalog, packId, paths, otherAvailablePackIds, state } = options
+  onEvent?: EventSink
+}): Promise<{ removed: number; keptShared: number; failedFolders: string[] }> {
+  const { catalog, packId, paths, state, onEvent } = options
   const currentState = state ?? (await loadState(paths, { catalog, migrate: true }))
   const install = currentState.installs[packId]
-  const targetMods =
-    install && install.allMods.length > 0
-      ? install.allMods
-      : await getPackStorageMods(catalog, packId, paths, currentState)
-  const otherKeys = new Set<string>()
-  for (const otherId of otherAvailablePackIds) {
-    if (otherId === packId) continue
-    const otherMods = await getPackStorageMods(catalog, otherId, paths, currentState)
-    for (const mod of otherMods) {
-      otherKeys.add(`${mod.workshopId}:${mod.folder}`)
+  const targetMods = resolveDeleteMods(catalog, packId, install)
+  const shared = collectSharedMods(catalog, currentState, packId)
+
+  const claimed = new Set<string>()
+  const targets: Array<{ folder: string; paths: string[] }> = []
+  let keptShared = 0
+
+  for (const mod of targetMods) {
+    if (shared.keys.has(modKey(mod)) || shared.folders.has(mod.folder)) {
+      keptShared += 1
+      continue
     }
+
+    const modPaths: string[] = []
+    for (const candidate of [
+      storeModPath(paths, mod.workshopId, mod.folder),
+      activeModPath(paths, mod.folder),
+    ]) {
+      const key = normalizePathKey(candidate)
+      if (claimed.has(key)) continue
+      claimed.add(key)
+      modPaths.push(candidate)
+    }
+    if (modPaths.length === 0) continue
+    targets.push({ folder: mod.folder, paths: modPaths })
   }
 
   let removed = 0
-  let keptShared = 0
-  for (const mod of targetMods) {
-    const key = `${mod.workshopId}:${mod.folder}`
-    if (otherKeys.has(key)) {
-      keptShared += 1
-      continue
+  const failedFolders = new Set<string>()
+
+  await runPool(targets, DELETE_CONCURRENCY, async (target, index) => {
+    onEvent?.({
+      type: 'delete-progress',
+      packId,
+      index: index + 1,
+      total: targets.length,
+      folder: target.folder,
+    })
+
+    let failed = false
+    for (const targetPath of target.paths) {
+      try {
+        await fs.rm(targetPath, {
+          recursive: true,
+          force: true,
+          maxRetries: 3,
+          retryDelay: 150,
+        })
+      } catch (error) {
+        failed = true
+        failedFolders.add(target.folder)
+        onEvent?.({
+          type: 'warning',
+          message: `Could not delete ${target.folder}: ${toError(error).message}`,
+        })
+      }
     }
 
-    if (await modIsActive(paths, mod.folder)) {
-      keptShared += 1
-      continue
-    }
+    if (!failed) removed += 1
+  })
 
-    const storePath = storeModPath(paths, mod.workshopId, mod.folder)
-    if (!(await pathExists(storePath))) continue
-    try {
-      await fs.rm(storePath, { recursive: true, force: true })
-      removed += 1
-    } catch (error) {
-      throw new EasyPzError('IO', `Could not delete ${mod.folder}: ${toError(error).message}`, {
-        cause: toError(error),
-      })
-    }
-  }
-
-  return { removed, keptShared }
+  return { removed, keptShared, failedFolders: [...failedFolders] }
 }

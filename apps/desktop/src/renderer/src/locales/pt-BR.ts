@@ -202,6 +202,8 @@ const ptBR = {
     modsCount: '{{installed}}/{{total}} mods',
     activeCount: '{{count}} ativos agora',
     deleteMods: 'Apagar mods',
+    deleting: 'Apagando {{done}} / {{total}} mods',
+    preparingDelete: 'Preparando a exclusão…',
     hostOutOfSync: 'Lista de mods do servidor diferente',
     hostOutOfSyncHint:
       'Este PC hospeda um servidor de Project Zomboid. A lista de mods dele não corresponde ao pack {{pack}}.',
@@ -349,6 +351,9 @@ const ptBR = {
     deleted: 'Mods de {{pack}} apagados.',
     deactivated: 'Mods movidos para a pasta de backup do EasyPZ.',
     purged: 'Os mods gerenciados foram apagados.',
+    deletedCounts:
+      '{{pack}} apagado: {{removed}} pastas removidas, {{shared}} compartilhadas mantidas.',
+    deletePartial: 'Não foi possível apagar {{count}} pasta(s). Feche o jogo e tente novamente.',
     verifiedOk: 'Todos os mods gerenciados estão presentes.',
     verifiedMissing: '{{count}} mod(s) ausente(s). Use Reparar.',
     hostUpdated: 'Configuração do host atualizada.',

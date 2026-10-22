@@ -201,6 +201,8 @@
     modsCount: '{{installed}}/{{total}} mods',
     activeCount: '{{count}} active now',
     deleteMods: 'Delete mods',
+    deleting: 'Deleting {{done}} / {{total}} mods',
+    preparingDelete: 'Preparing deletion…',
     hostOutOfSync: 'Server mod list is out of sync',
     hostOutOfSyncHint:
       'This PC hosts a Project Zomboid server. Its mod list does not match {{pack}}.',
@@ -355,6 +357,8 @@
     disabled: '{{pack}} disabled. Its mods stay stored.',
     repaired: '{{pack}} repaired from the local pack store.',
     deleted: '{{pack}} mods deleted.',
+    deletedCounts: '{{pack}} deleted: {{removed}} folders removed, {{shared}} shared kept.',
+    deletePartial: '{{count}} folder(s) could not be deleted. Close the game and try again.',
     deactivated: 'Mods moved to the EasyPZ backup folder.',
     purged: 'Managed mods were deleted.',
     verifiedOk: 'All managed mods are present.',

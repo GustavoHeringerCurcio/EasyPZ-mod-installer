@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import type { PackHealth } from '@easypz/engine'
 import type { Bootstrap, PackView } from '../../../shared/ipc'
-import { Badge, Button, Panel, Switch } from './ui'
+import { Badge, Button, Panel, Progress, Spinner, Switch } from './ui'
 import { formatDate } from '../lib/format'
 import { packAccent } from '../lib/packTheme'
 import { packUpdateAvailable } from '../lib/packStatus'
@@ -22,6 +22,7 @@ import { packUpdateAvailable } from '../lib/packStatus'
 export function LibraryPage({
   bootstrap,
   busyPackId,
+  deleteProgress,
   onBrowse,
   onRepair,
   onUpdate,
@@ -32,6 +33,7 @@ export function LibraryPage({
 }: {
   bootstrap: Bootstrap
   busyPackId: string | null
+  deleteProgress: { packId: string; index: number; total: number; folder: string } | null
   onBrowse: () => void
   onRepair: (packId: string) => void
   onUpdate: (packId: string) => void
@@ -64,6 +66,7 @@ export function LibraryPage({
   }
 
   const activePackId = bootstrap.state.activePackId
+  const anyBusy = busyPackId !== null
   const hostOutOfSync =
     Boolean(activePackId) && bootstrap.host.exists && bootstrap.host.matchesActivePack === false
 
@@ -125,7 +128,9 @@ export function LibraryPage({
         {availablePacks.map((pack) => {
           const active = activePackId === pack.id
           const healthForPack = health[pack.id]
-          const busy = busyPackId === pack.id
+          const progress = deleteProgress?.packId === pack.id ? deleteProgress : null
+          const progressPercent =
+            progress && progress.total > 0 ? (progress.index / progress.total) * 100 : 0
           const installRecord = bootstrap.state.installs[pack.id]
           const updateAvailable = packUpdateAvailable(bootstrap, pack.id)
           const accent = packAccent(pack)
@@ -219,10 +224,40 @@ export function LibraryPage({
                     </div>
                   ) : null}
 
+                  {progress ? (
+                    <div className="mt-3 rounded-xl border border-danger/25 bg-danger/[0.04] px-3 py-2.5">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-bone">
+                        <span>
+                          {progress.total > 0
+                            ? t('library.deleting', {
+                                done: progress.index,
+                                total: progress.total,
+                              })
+                            : t('library.preparingDelete')}
+                        </span>
+                        {progress.total > 0 ? (
+                          <span>{Math.round(progressPercent)}%</span>
+                        ) : (
+                          <Spinner />
+                        )}
+                      </div>
+                      <Progress
+                        className="mt-2"
+                        value={progressPercent}
+                        indeterminate={progress.total === 0}
+                      />
+                      {progress.folder ? (
+                        <div className="mt-1.5 truncate font-mono text-[10px] text-muted">
+                          {progress.folder}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     <Switch
                       checked={active}
-                      disabled={busy || bootstrap.game.gameRunning}
+                      disabled={anyBusy || bootstrap.game.gameRunning}
                       label={active ? t('catalog.on') : t('catalog.off')}
                       showLabel={false}
                       onChange={(enabled) => onToggle(pack.id, enabled)}
@@ -232,7 +267,7 @@ export function LibraryPage({
                         size="sm"
                         variant="light"
                         onClick={() => onUpdate(pack.id)}
-                        disabled={busy}
+                        disabled={anyBusy}
                       >
                         <Download className="size-3.5" />
                         {t('library.update')}
@@ -242,7 +277,7 @@ export function LibraryPage({
                         size="sm"
                         variant="secondary"
                         onClick={() => onRepair(pack.id)}
-                        disabled={busy}
+                        disabled={anyBusy}
                       >
                         <Wrench className="size-3.5" />
                         {t('library.repair')}
@@ -253,6 +288,7 @@ export function LibraryPage({
                       variant="secondary"
                       onClick={() => void verify(pack.id)}
                       loading={verifyBusy === pack.id}
+                      disabled={anyBusy}
                     >
                       <RefreshCw className="size-3.5" />
                       {t('library.verify')}
@@ -261,7 +297,7 @@ export function LibraryPage({
                       size="sm"
                       variant="danger"
                       onClick={() => onDelete(pack.id)}
-                      disabled={busy}
+                      disabled={anyBusy}
                     >
                       <Trash2 className="size-3.5" />
                       {t('library.deleteMods')}

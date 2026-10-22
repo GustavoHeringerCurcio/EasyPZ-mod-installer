@@ -27,6 +27,7 @@ import logo from './assets/logo.png'
 
 type ToastKind = 'success' | 'error' | 'info'
 type Toast = { kind: ToastKind; text: string }
+type DeleteProgress = { packId: string; index: number; total: number; folder: string }
 
 export default function App() {
   const { t, i18n } = useTranslation()
@@ -53,6 +54,7 @@ export default function App() {
   const [confirmRequest, setConfirmRequest] = useState<ConfirmRequest | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [busyPackId, setBusyPackId] = useState<string | null>(null)
+  const [deleteProgress, setDeleteProgress] = useState<DeleteProgress | null>(null)
   const startedPending = useRef(false)
 
   const showToast = useCallback((kind: ToastKind, text: string) => {
@@ -93,7 +95,14 @@ export default function App() {
     return window.easypz.onInstallEvent((event) => {
       setInstall((current) => reduceInstallEvent(current, event))
 
-      if (event.type === 'warning') {
+      if (event.type === 'delete-progress') {
+        setDeleteProgress({
+          packId: event.packId,
+          index: event.index,
+          total: event.total,
+          folder: event.folder,
+        })
+      } else if (event.type === 'warning') {
         appendLog('warn', event.message)
       } else if (event.type === 'error') {
         appendLog('error', event.message)
@@ -431,6 +440,7 @@ export default function App() {
         destructive: true,
         onConfirm: async () => {
           setBusyPackId(packId)
+          setDeleteProgress({ packId, index: 0, total: 0, folder: '' })
           try {
             const result = await window.easypz.deletePack(packId)
             if (!result.ok) {
@@ -438,9 +448,24 @@ export default function App() {
               return
             }
             await refreshBootstrap()
-            showToast('success', t('toast.deleted', { pack: packNameFor(packId) }))
+            if (result.data.failedFolders.length > 0) {
+              showToast(
+                'error',
+                t('toast.deletePartial', { count: result.data.failedFolders.length }),
+              )
+              return
+            }
+            showToast(
+              'success',
+              t('toast.deletedCounts', {
+                pack: packNameFor(packId),
+                removed: result.data.removedFolders,
+                shared: result.data.sharedFolders,
+              }),
+            )
           } finally {
             setBusyPackId(null)
+            setDeleteProgress(null)
           }
         },
       })
@@ -620,6 +645,7 @@ export default function App() {
             onVerify={verifyPack}
             onHost={requestHostSync}
             busyPackId={busyPackId}
+            deleteProgress={deleteProgress}
           />
         ) : null}
 

@@ -34,7 +34,6 @@ import {
   deactivationEntriesForMods,
   deletePackStorage,
   detectActivePackId,
-  getAvailablePackIds,
   getPackStorageMods,
   runMoveTransaction,
 } from './storage.js'
@@ -300,60 +299,95 @@ export async function activateInstalledPack(options: {
 export interface DeletePackResult {
   removedFolders: number
   sharedFolders: number
+  failedFolders: string[]
   disabled: boolean
+}
+
+function logDeleteTiming(onEvent: EventSink | undefined, label: string, start: number): void {
+  onEvent?.({
+    type: 'log',
+    level: 'info',
+    message: `[delete] ${label}: ${Date.now() - start}ms`,
+  })
 }
 
 export async function deletePack(options: {
   catalog: Catalog
   packId: string
   paths: AppPaths
-  signal?: AbortSignal
   onEvent?: EventSink
   skipGameCheck?: boolean
 }): Promise<DeletePackResult> {
-  const { catalog, packId, paths, signal, onEvent, skipGameCheck } = options
+  const { catalog, packId, paths, onEvent, skipGameCheck } = options
   if (!skipGameCheck && (await isGameRunning())) {
     throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before deleting mods.')
   }
 
+  const started = Date.now()
+  let phaseStart = started
   let state = await loadState(paths, { catalog, migrate: true })
+  logDeleteTiming(onEvent, 'load state', phaseStart)
+
+  const install = state.installs[packId]
   let disabled = false
 
   if (state.activePackId === packId) {
-    await setPackEnabled({
-      catalog,
-      packId,
-      paths,
-      enabled: false,
-      signal,
-      onEvent,
-      skipGameCheck: true,
+    phaseStart = Date.now()
+    const activeMods =
+      install && install.mods.length > 0
+        ? install.mods
+        : install && install.allMods.length > 0
+          ? install.allMods
+          : getPack(catalog, packId).source === 'workshop'
+            ? []
+            : getEffectiveMods(catalog, packId)
+    const clientIds = [...new Set(activeMods.filter((mod) => !mod.serverOnly).map((mod) => mod.id))]
+
+    await updateDefaultTxt({
+      addIds: [],
+      removeIds: clientIds,
+      modsDir: modsDir(paths),
+      backupDir: paths.backupDir,
     })
+    state = setActivePack(state, null)
+    await saveState(paths, state)
     disabled = true
-    state = await loadState(paths, { catalog, migrate: true })
+    logDeleteTiming(onEvent, 'clear active state', phaseStart)
   }
 
-  const available = await getAvailablePackIds(catalog, paths, state)
-  const otherAvailable = available.filter((id) => id !== packId)
+  phaseStart = Date.now()
   const result = await deletePackStorage({
     catalog,
     packId,
     paths,
-    otherAvailablePackIds: otherAvailable,
     state,
+    onEvent,
   })
+  logDeleteTiming(onEvent, 'delete folders', phaseStart)
 
+  phaseStart = Date.now()
   await saveState(paths, clearPackInstall(state, packId))
+  if (result.failedFolders.length > 0) {
+    onEvent?.({
+      type: 'warning',
+      message: `${result.failedFolders.length} folder(s) could not be deleted and may remain on disk.`,
+    })
+  }
+  logDeleteTiming(onEvent, 'save state', phaseStart)
+  logDeleteTiming(onEvent, 'total', started)
 
   onEvent?.({
     type: 'log',
     level: 'info',
-    message: `Deleted ${result.removed} mod folder(s); kept ${result.keptShared} shared folder(s).`,
+    message: `Deleted ${result.removed} mod folder(s); kept ${result.keptShared} shared folder(s)${
+      result.failedFolders.length > 0 ? `; ${result.failedFolders.length} failed` : ''
+    }.`,
   })
 
   return {
     removedFolders: result.removed,
     sharedFolders: result.keptShared,
+    failedFolders: result.failedFolders,
     disabled,
   }
 }

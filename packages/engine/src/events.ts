@@ -48,6 +48,13 @@ export type EngineEvent =
       name: string
       action: 'moved' | 'kept' | 'backedUp' | 'removed'
     }
+  | {
+      type: 'delete-progress'
+      packId: string
+      index: number
+      total: number
+      folder: string
+    }
   | { type: 'warning'; message: string }
   | { type: 'log'; level: 'info' | 'warn' | 'error'; message: string }
   | { type: 'done'; summary: InstallSummary }
