@@ -9,7 +9,16 @@ import type {
   InstallSummary,
   PackHealth,
   PackToggleResult,
+  PerformanceConfigResult,
+  PerformancePreset,
 } from '@easypz/engine'
+
+export type { PerformancePreset } from '@easypz/engine'
+
+export interface FpsBoostApplyResult {
+  bootstrap: Bootstrap
+  performance: PerformanceConfigResult
+}
 
 export type Language = 'en' | 'pt-BR'
 
@@ -82,7 +91,10 @@ export interface EasyPzApi {
   pickGamePath: () => Promise<string | null>
   setLanguage: (language: Language) => Promise<OperationResult<Bootstrap>>
   setHeapMB: (heapMB: number) => Promise<OperationResult<Bootstrap>>
-  applyFpsBoost: (heapMB: number) => Promise<OperationResult<Bootstrap>>
+  applyFpsBoost: (
+    preset: PerformancePreset,
+    heapMB: number,
+  ) => Promise<OperationResult<FpsBoostApplyResult>>
   openPath: (target: string) => Promise<void>
   openLogs: () => Promise<void>
   clearCache: () => Promise<OperationResult<Bootstrap>>

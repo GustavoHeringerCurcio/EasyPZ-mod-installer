@@ -15,6 +15,7 @@ import {
 import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.js'
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
+import { parseSteamCmdDownloadedBytes, parseSteamCmdProgress } from './workshop.js'
 
 const temps: string[] = []
 
@@ -183,6 +184,44 @@ describe('host', () => {
 })
 
 describe('game configuration', () => {
+  async function setupPerformanceFiles(): Promise<{
+    pzPath: string
+    zomboidDir: string
+  }> {
+    const root = await tempDir('fps')
+    const pzPath = path.join(root, 'ProjectZomboid')
+    const zomboidDir = path.join(root, 'Zomboid')
+    await fs.mkdir(pzPath, { recursive: true })
+    await fs.mkdir(path.join(zomboidDir, 'Lua'), { recursive: true })
+
+    await fs.writeFile(
+      path.join(pzPath, 'ProjectZomboid64.json'),
+      JSON.stringify({ vmArgs: ['-Xmx3g'] }),
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(pzPath, 'ProjectZomboid64.bat'),
+      'SET _JAVA_OPTIONS=\njava -Xmx3g -jar game.jar\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'viewpoint-live.properties'),
+      'memory.floorMiB=512\npack.trueweathers.occlusion=true\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'options.ini'),
+      'bloodDecals=10\nmaxActiveRagdolls=20\nmaxVehicleTextureSize=2\ntextureCompression=false\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'Lua', 'ModOptions.ini'),
+      'combobox|ViewpointTrueWeathers|quality|3\ncombobox|ViewpointTrueWeathers|precipitation|3\n',
+      'utf8',
+    )
+    return { pzPath, zomboidDir }
+  }
+
   it('patches the launcher JSON, BAT, and options.ini', async () => {
     const root = await tempDir('config')
     const pzPath = path.join(root, 'ProjectZomboid')
@@ -231,44 +270,13 @@ describe('game configuration', () => {
     expect(maxHeapMB(16384)).toBe(8192)
   })
 
-  it('applies the FPS Boost profile and backs up the edited config', async () => {
-    const root = await tempDir('fps')
-    const pzPath = path.join(root, 'ProjectZomboid')
-    const zomboidDir = path.join(root, 'Zomboid')
-    const backupDir = path.join(root, 'backups')
-    await fs.mkdir(path.join(pzPath), { recursive: true })
-    await fs.mkdir(path.join(zomboidDir, 'Lua'), { recursive: true })
-
-    await fs.writeFile(
-      path.join(pzPath, 'ProjectZomboid64.json'),
-      JSON.stringify({ vmArgs: ['-Xmx3g'] }),
-      'utf8',
-    )
-    await fs.writeFile(
-      path.join(pzPath, 'ProjectZomboid64.bat'),
-      'SET _JAVA_OPTIONS=\njava -Xmx3g -jar game.jar\n',
-      'utf8',
-    )
-    await fs.writeFile(
-      path.join(zomboidDir, 'viewpoint-live.properties'),
-      'memory.floorMiB=512\npack.trueweathers.occlusion=true\n',
-      'utf8',
-    )
-    await fs.writeFile(
-      path.join(zomboidDir, 'options.ini'),
-      'bloodDecals=10\nmaxActiveRagdolls=20\nmaxVehicleTextureSize=2\ntextureCompression=false\n',
-      'utf8',
-    )
-    await fs.writeFile(
-      path.join(zomboidDir, 'Lua', 'ModOptions.ini'),
-      'combobox|ViewpointTrueWeathers|quality|3\ncombobox|ViewpointTrueWeathers|precipitation|3\n',
-      'utf8',
-    )
+  it('applies the recommended performance profile without a backup', async () => {
+    const { pzPath, zomboidDir } = await setupPerformanceFiles()
 
     const result = await applyPerformanceConfig({
       pzPath,
       zomboidDir,
-      backupDir,
+      preset: 'recommended',
       heapMB: 8192,
       zombieBuddyInstalled: true,
     })
@@ -287,9 +295,82 @@ describe('game configuration', () => {
     expect(modOptions).toContain('combobox|ViewpointTrueWeathers|quality|2')
     expect(modOptions).toContain('combobox|ViewpointTrueWeathers|precipitation|2')
     expect(json.vmArgs).toContain('-Xmx8192m')
+    expect(result.preset).toBe('recommended')
     expect(result.modOptionsPatched).toBe(true)
-    expect(result.backupDir).not.toBeNull()
-    await expect(fs.access(result.backupDir!)).resolves.toBeUndefined()
+    expect(result.skipped).toEqual([])
+  })
+
+  it('applies the light profile without combat or vehicle changes', async () => {
+    const { pzPath, zomboidDir } = await setupPerformanceFiles()
+
+    const result = await applyPerformanceConfig({
+      pzPath,
+      zomboidDir,
+      preset: 'light',
+      heapMB: 8192,
+      zombieBuddyInstalled: true,
+    })
+
+    const properties = await fs.readFile(path.join(zomboidDir, 'viewpoint-live.properties'), 'utf8')
+    const ini = await fs.readFile(path.join(zomboidDir, 'options.ini'), 'utf8')
+    const modOptions = await fs.readFile(path.join(zomboidDir, 'Lua', 'ModOptions.ini'), 'utf8')
+
+    expect(properties).toContain('memory.floorMiB=768')
+    expect(properties).toContain('pack.trueweathers.occlusion=false')
+    expect(ini).toContain('bloodDecals=10')
+    expect(ini).toContain('maxActiveRagdolls=20')
+    expect(ini).toContain('maxVehicleTextureSize=2')
+    expect(modOptions).toContain('combobox|ViewpointTrueWeathers|quality|2')
+    expect(result.preset).toBe('light')
+    expect(result.optionsPatched).toBe(true)
+  })
+
+  it('restores performance defaults without a backup', async () => {
+    const { pzPath, zomboidDir } = await setupPerformanceFiles()
+    await applyPerformanceConfig({
+      pzPath,
+      zomboidDir,
+      preset: 'recommended',
+      heapMB: 8192,
+      zombieBuddyInstalled: true,
+    })
+
+    const result = await applyPerformanceConfig({
+      pzPath,
+      zomboidDir,
+      preset: 'defaults',
+      heapMB: 8192,
+      zombieBuddyInstalled: true,
+    })
+
+    const properties = await fs.readFile(path.join(zomboidDir, 'viewpoint-live.properties'), 'utf8')
+    const ini = await fs.readFile(path.join(zomboidDir, 'options.ini'), 'utf8')
+    const modOptions = await fs.readFile(path.join(zomboidDir, 'Lua', 'ModOptions.ini'), 'utf8')
+
+    expect(properties).toContain('memory.floorMiB=512')
+    expect(properties).toContain('pack.trueweathers.occlusion=true')
+    expect(ini).toContain('bloodDecals=10')
+    expect(ini).toContain('maxActiveRagdolls=20')
+    expect(ini).toContain('maxVehicleTextureSize=2')
+    expect(modOptions).toContain('combobox|ViewpointTrueWeathers|quality|3')
+    expect(result.preset).toBe('defaults')
+  })
+})
+
+describe('workshop progress', () => {
+  it('parses SteamCMD byte progress and completion lines', () => {
+    expect(
+      parseSteamCmdProgress(
+        'Update state (0x61) downloading, progress: 42.50 (4250000 / 10000000)',
+      ),
+    ).toEqual({ percent: 42.5, transferredBytes: 4250000, totalBytes: 10000000 })
+    expect(parseSteamCmdProgress('Downloading item 123 ...')).toBeNull()
+    expect(
+      parseSteamCmdDownloadedBytes(
+        'Success. Downloaded item 123 to "C:\\cache\\123" (10000000 bytes)',
+      ),
+    ).toBe(10000000)
+    expect(parseSteamCmdDownloadedBytes('Downloading item 123 ...')).toBeNull()
   })
 })
 

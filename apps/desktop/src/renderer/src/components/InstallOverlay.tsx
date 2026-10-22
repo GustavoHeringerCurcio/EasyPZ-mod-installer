@@ -47,6 +47,7 @@ export function InstallOverlay({
   }).length
   const download = state.progress.download
   const workshop = state.progress.workshop
+  const workshopItem = state.workshopItem
   const extract = state.progress.extract
   const activeStage = STAGE_ORDER.find((stage) => state.stages[stage]?.status === 'start')
 
@@ -190,18 +191,79 @@ export function InstallOverlay({
                 </div>
               ) : null}
 
-              {workshop && state.stages.workshop?.status === 'start' ? (
-                <div className="space-y-2 rounded-xl border border-line bg-panel-2/60 p-4">
+              {state.stages.workshop?.status === 'start' ? (
+                <div className="space-y-3 rounded-xl border border-line bg-panel-2/60 p-4">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-bone">{t('install.stages.workshop')}</span>
-                    <span className="font-mono text-muted">{workshop.percent.toFixed(0)}%</span>
+                    <span className="font-medium text-bone">{t('install.workshopSource')}</span>
+                    <span className="font-mono text-muted">
+                      {workshop ? `${workshop.percent.toFixed(0)}%` : '...'}
+                    </span>
                   </div>
-                  <Progress value={workshop.percent} />
-                  <div className="text-[11px] text-muted">
-                    {t('install.workshopItems', {
-                      done: workshop.transferred ?? 0,
-                      total: workshop.total ?? 0,
-                    })}
+                  <Progress value={workshop?.percent ?? 0} indeterminate={!workshop} />
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted">
+                    <span>
+                      {workshop
+                        ? t('install.workshopItems', {
+                            done: workshop.transferred ?? 0,
+                            total: workshop.total ?? 0,
+                          })
+                        : t('install.workshopPreparing')}
+                    </span>
+                    {workshop ? (
+                      <span>
+                        {t('install.workshopCounts', {
+                          downloaded: workshop.downloaded ?? 0,
+                          cached: workshop.cached ?? 0,
+                          failed: workshop.failed ?? 0,
+                        })}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {workshopItem ? (
+                    <div className="space-y-2 rounded-lg border border-line bg-panel/70 p-3">
+                      <div className="flex items-center justify-between gap-3 text-xs">
+                        <span className="font-medium text-bone">
+                          {t('install.workshopCurrent', {
+                            index: workshopItem.index,
+                            total: workshopItem.total,
+                          })}
+                        </span>
+                        <span
+                          className={cn(
+                            'font-mono',
+                            workshopItem.status === 'failed' ? 'text-danger' : 'text-muted',
+                          )}
+                        >
+                          {workshopItem.status === 'failed'
+                            ? t('install.workshopFailed')
+                            : workshopItem.percent === null
+                              ? t('install.workshopWaiting')
+                              : `${workshopItem.percent.toFixed(0)}%`}
+                        </span>
+                      </div>
+                      <div className="truncate text-[13px] font-medium text-bone">
+                        {workshopItem.name}
+                      </div>
+                      <Progress
+                        value={workshopItem.percent ?? 0}
+                        indeterminate={workshopItem.percent === null}
+                      />
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted">
+                        <span>
+                          {formatBytes(workshopItem.transferredBytes)} /{' '}
+                          {formatBytes(workshopItem.totalBytes)}
+                        </span>
+                        <span>
+                          {formatSpeed(workshopItem.bytesPerSecond)} ·{' '}
+                          {formatEta(workshopItem.etaSeconds)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="text-[10px] leading-relaxed text-muted">
+                    {t('install.workshopSourceHint')}
                   </div>
                 </div>
               ) : null}

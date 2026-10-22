@@ -10,12 +10,13 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 
 - Catalog with pack covers, tags, requirements, and full mod lists.
 - One-click install of the complete pack: mods, ZombieBuddy, launcher heap/agent configuration, and activation.
+- Live Workshop progress for SteamCDN packs: current item, byte progress when SteamCMD reports it, speed/ETA, and cached/downloaded/failed counts.
 - One active pack at a time. Inactive packs stay installed in EasyPZ storage and can be toggled on instantly.
 - Download progress, checksum verification, extraction progress, cancellation, and actionable errors.
 - Switching moves only EasyPZ-managed mod folders; unmanaged mods and `default.txt` entries are preserved.
 - Library health checks, toggles, delete, repair, and explicit host sync.
 - Legacy migration: reuses the old profile, marker, and archive cache when the hash matches.
-- **FPS Boost** section in Settings: a game RAM slider and a one-click performance profile for Viewpoint, True Weathers, blood, ragdolls and vehicle textures.
+- **FPS Boost** section in Settings: an independent game RAM slider, Recommended/Light one-click presets, restore defaults, and an explicit change preview.
 - English by default, Portuguese (BR) toggle.
 - Remote-catalog-ready architecture; the alpha build uses a bundled catalog because the repository is private.
 
@@ -36,14 +37,12 @@ Essentials is standalone. Medium and Advanced are additive to each other, but Es
 
 Settings now includes an **FPS Boost** section for every pack:
 
-- **Game RAM slider** writes `-Xmx` to `ProjectZomboid64.json` and `ProjectZomboid64.bat` when saved. The slider starts from the current game heap, uses the detected recommended value, and enforces a 3 GB minimum.
-- **Apply FPS Boost** writes the same performance profile used by Ultra:
-  - Viewpoint floor atlas 768 MB
-  - lighter True Weathers occlusion, reflections, shadows, sun shafts, rain and wet walls
-  - blood decals 6, active ragdolls 12, vehicle texture size 1
-  - True Weathers quality and precipitation 2
-- Existing `viewpoint-live.properties`, `options.ini`, and `Lua\ModOptions.ini` are backed up to `Zomboid\backups\easyPZ-fps-boost-<timestamp>` before they are changed.
-- The game must be closed. Visual mods, maps, and vehicles stay installed; FPS Boost only lowers resource-heavy settings.
+- **Game RAM slider** is independent. It starts from the current game heap, uses the detected recommended value, and enforces a 3 GB minimum. **Save RAM** writes `-Xmx` to `ProjectZomboid64.json` and `ProjectZomboid64.bat`.
+- **Recommended Boost** is the one-click path: it applies the full performance profile and sets game RAM to the recommended value.
+- **Light Boost** keeps blood, ragdolls, and vehicle textures untouched; it only reduces Viewpoint floor, weather, shadow, rain, and render-scale cost.
+- **Restore defaults** returns the managed performance keys to their default values and sets game RAM to the recommended value. It uses fixed defaults, not a backup.
+- The expanded “See exactly what changes” list shows the settings and files before applying.
+- No backup is created for FPS Boost. The game must be closed. Visual mods, maps, and vehicles stay installed; FPS Boost only lowers resource-heavy settings.
 
 Ultra intentionally excludes Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather, and the 99 CVPI for stability.
 

@@ -120,7 +120,15 @@ export async function applyGameConfig(options: {
   return result
 }
 
-const FPS_BOOST_PROPERTIES: Record<string, string> = {
+export type PerformancePreset = 'recommended' | 'light' | 'defaults'
+
+interface PerformanceKeySet {
+  properties: Record<string, string>
+  options: Record<string, string>
+  modOptions: Record<string, string>
+}
+
+const BOOST_PROPERTIES: Record<string, string> = {
   'memory.floorMiB': '768',
   'pack.trueweathers.occlusion': 'false',
   'pack.trueweathers.reflections': 'low',
@@ -132,21 +140,63 @@ const FPS_BOOST_PROPERTIES: Record<string, string> = {
   'pack.trueweathers.renderScale': '90',
 }
 
-const FPS_BOOST_OPTIONS: Record<string, string> = {
+const BOOST_OPTIONS: Record<string, string> = {
   bloodDecals: '6',
   maxActiveRagdolls: '12',
   maxVehicleTextureSize: '1',
 }
 
-const FPS_BOOST_MOD_OPTIONS: Record<string, string> = {
+const BOOST_MOD_OPTIONS: Record<string, string> = {
   'combobox|ViewpointTrueWeathers|quality': '2',
   'combobox|ViewpointTrueWeathers|precipitation': '2',
 }
 
+const DEFAULT_PROPERTIES: Record<string, string> = {
+  'memory.floorMiB': '512',
+  'pack.trueweathers.occlusion': 'true',
+  'pack.trueweathers.reflections': 'medium',
+  'pack.trueweathers.shadowCascades': '3',
+  'pack.trueweathers.shadowResolution': '2048',
+  'pack.trueweathers.sunShafts': 'true',
+  'pack.trueweathers.rainDensity': '100',
+  'pack.trueweathers.wetWalls': 'true',
+  'pack.trueweathers.renderScale': '100',
+}
+
+const DEFAULT_OPTIONS: Record<string, string> = {
+  bloodDecals: '10',
+  maxActiveRagdolls: '20',
+  maxVehicleTextureSize: '2',
+}
+
+const DEFAULT_MOD_OPTIONS: Record<string, string> = {
+  'combobox|ViewpointTrueWeathers|quality': '3',
+  'combobox|ViewpointTrueWeathers|precipitation': '3',
+}
+
+function performanceKeys(preset: PerformancePreset): PerformanceKeySet {
+  if (preset === 'defaults') {
+    return {
+      properties: DEFAULT_PROPERTIES,
+      options: DEFAULT_OPTIONS,
+      modOptions: DEFAULT_MOD_OPTIONS,
+    }
+  }
+  if (preset === 'light') {
+    return { properties: BOOST_PROPERTIES, options: {}, modOptions: BOOST_MOD_OPTIONS }
+  }
+  return {
+    properties: BOOST_PROPERTIES,
+    options: BOOST_OPTIONS,
+    modOptions: BOOST_MOD_OPTIONS,
+  }
+}
+
 export interface PerformanceConfigResult extends GameConfigResult {
+  preset: PerformancePreset
   propertiesPatched: boolean
   modOptionsPatched: boolean
-  backupDir: string | null
+  skipped: string[]
 }
 
 function escapeRegExp(value: string): string {
@@ -181,54 +231,47 @@ async function readOptional(file: string): Promise<string | null> {
 export async function applyPerformanceConfig(options: {
   pzPath: string
   zomboidDir: string
-  backupDir: string | null
+  preset: PerformancePreset
   heapMB: number
   zombieBuddyInstalled: boolean
 }): Promise<PerformanceConfigResult> {
-  const { pzPath, zomboidDir, zombieBuddyInstalled } = options
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const backupTarget = options.backupDir
-    ? path.join(options.backupDir, `easyPZ-fps-boost-${stamp}`)
-    : null
-
-  if (backupTarget) await fs.mkdir(backupTarget, { recursive: true })
-
-  const backup = async (source: string): Promise<void> => {
-    if (!backupTarget) return
-    try {
-      await fs.copyFile(source, path.join(backupTarget, path.basename(source)))
-    } catch {
-      // The file does not exist yet; nothing to back up.
-    }
-  }
+  const { pzPath, zomboidDir, zombieBuddyInstalled, preset } = options
+  const keys = performanceKeys(preset)
+  const skipped: string[] = []
 
   const propertiesPath = path.join(zomboidDir, 'viewpoint-live.properties')
-  await backup(propertiesPath)
   let properties = (await readOptional(propertiesPath)) ?? ''
-  for (const [key, value] of Object.entries(FPS_BOOST_PROPERTIES)) {
+  for (const [key, value] of Object.entries(keys.properties)) {
     properties = setIniValue(properties, key, value)
   }
   await fs.writeFile(propertiesPath, properties, 'utf8')
 
   const optionsPath = path.join(zomboidDir, 'options.ini')
-  await backup(optionsPath)
-  let ini = (await readOptional(optionsPath)) ?? ''
-  for (const [key, value] of Object.entries(FPS_BOOST_OPTIONS)) {
-    ini = setIniValue(ini, key, value)
+  const optionsText = await readOptional(optionsPath)
+  if (Object.keys(keys.options).length > 0) {
+    if (optionsText === null) {
+      skipped.push('options.ini')
+    } else {
+      let ini = optionsText
+      for (const [key, value] of Object.entries(keys.options)) {
+        ini = setIniValue(ini, key, value)
+      }
+      await fs.writeFile(optionsPath, ini, 'ascii')
+    }
   }
-  await fs.writeFile(optionsPath, ini, 'ascii')
 
   const modOptionsPath = path.join(zomboidDir, 'Lua', 'ModOptions.ini')
   let modOptionsPatched = false
   const modOptions = await readOptional(modOptionsPath)
   if (modOptions !== null) {
-    await backup(modOptionsPath)
     let next = modOptions
-    for (const [key, value] of Object.entries(FPS_BOOST_MOD_OPTIONS)) {
+    for (const [key, value] of Object.entries(keys.modOptions)) {
       next = setPipeValue(next, key, value)
     }
     await fs.writeFile(modOptionsPath, next, 'utf8')
     modOptionsPatched = true
+  } else {
+    skipped.push('Lua/ModOptions.ini')
   }
 
   const gameConfig = await applyGameConfig({
@@ -240,8 +283,9 @@ export async function applyPerformanceConfig(options: {
 
   return {
     ...gameConfig,
+    preset,
     propertiesPatched: true,
     modOptionsPatched,
-    backupDir: backupTarget,
+    skipped,
   }
 }

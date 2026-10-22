@@ -242,7 +242,7 @@ async function installWorkshopPack(args: {
     clientMods: downloaded.mods.filter((mod) => !mod.serverOnly).length,
     serverMods: downloaded.mods.filter((mod) => mod.serverOnly).length,
     workshopItems: downloaded.downloadedItems,
-    downloadedBytes: pack.workshop.downloadBytes,
+    downloadedBytes: downloaded.downloadedBytes,
     installedAt: nextState.installs[packId]?.installedAt ?? new Date().toISOString(),
     zombieBuddy,
     hostUpdated: false,

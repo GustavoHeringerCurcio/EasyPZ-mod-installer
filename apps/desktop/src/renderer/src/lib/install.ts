@@ -1,4 +1,4 @@
-﻿import type { EngineEvent, InstallSummary } from '@easypz/engine'
+﻿import type { EngineEvent, InstallSummary, WorkshopItemProgress } from '@easypz/engine'
 
 export type StageName =
   | 'preflight'
@@ -38,6 +38,9 @@ export interface InstallProgress {
   total?: number
   bytesPerSecond?: number
   etaSeconds?: number
+  downloaded?: number
+  cached?: number
+  failed?: number
 }
 
 export interface InstallLogLine {
@@ -52,6 +55,7 @@ export interface InstallUiState {
   packId: string | null
   stages: Partial<Record<StageName, StageState>>
   progress: Partial<Record<'download' | 'workshop' | 'extract', InstallProgress>>
+  workshopItem: WorkshopItemProgress | null
   currentMod: { index: number; total: number; name: string; action: string } | null
   logs: InstallLogLine[]
   summary: InstallSummary | null
@@ -65,6 +69,7 @@ export function createInstallState(packId: string): InstallUiState {
     packId,
     stages: {},
     progress: {},
+    workshopItem: null,
     currentMod: null,
     logs: [],
     summary: null,
@@ -79,6 +84,7 @@ export function emptyInstallState(): InstallUiState {
     packId: null,
     stages: {},
     progress: {},
+    workshopItem: null,
     currentMod: null,
     logs: [],
     summary: null,
@@ -116,9 +122,14 @@ export function reduceInstallEvent(state: InstallUiState, event: EngineEvent): I
             total: event.total,
             bytesPerSecond: event.bytesPerSecond,
             etaSeconds: event.etaSeconds,
+            downloaded: event.downloaded,
+            cached: event.cached,
+            failed: event.failed,
           },
         },
       }
+    case 'workshop-item':
+      return { ...state, workshopItem: event.item }
     case 'mod':
       return {
         ...state,

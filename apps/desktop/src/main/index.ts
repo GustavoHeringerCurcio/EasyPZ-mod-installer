@@ -33,7 +33,14 @@ import {
   type PackToggleResult,
 } from '@easypz/engine'
 import { getPack, type Catalog } from '@easypz/catalog'
-import type { Bootstrap, OperationResult, PendingAction, Settings } from '../shared/ipc'
+import type { PerformancePreset } from '@easypz/engine'
+import type {
+  Bootstrap,
+  FpsBoostApplyResult,
+  OperationResult,
+  PendingAction,
+  Settings,
+} from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { getCatalogSource, loadCatalog, toCatalogView } from './catalog'
 import { ensureLogsDir, log, logsDir } from './logger'
@@ -449,9 +456,13 @@ function registerIpc(): void {
     }
   })
 
-  ipcMain.handle(IPC.applyFpsBoost, async (_event, heapMB: unknown) => {
+  ipcMain.handle(IPC.applyFpsBoost, async (_event, preset: unknown, heapMB: unknown) => {
+    if (preset !== 'recommended' && preset !== 'light' && preset !== 'defaults') {
+      return fail(new Error('Invalid performance preset.'))
+    }
     if (typeof heapMB !== 'number') return fail(new Error('Invalid game RAM value.'))
     try {
+      const selectedPreset: PerformancePreset = preset
       const paths = getAppPaths()
       const settings = await readSettings()
       const game = await getGameInfo(paths, { gamePathOverride: settings.gamePathOverride })
@@ -485,15 +496,19 @@ function registerIpc(): void {
       const result = await applyPerformanceConfig({
         pzPath: game.pzPath,
         zomboidDir: paths.zomboidDir,
-        backupDir: paths.backupDir,
+        preset: selectedPreset,
         heapMB: heap,
         zombieBuddyInstalled: await isZombieBuddyInstalled(game.pzPath),
       })
       await updateSettings({ heapMB: heap })
       log.info(
-        `FPS Boost applied: heap=${result.heapMB} MB, backup=${result.backupDir ?? 'none'}, modOptions=${result.modOptionsPatched}`,
+        `Performance ${selectedPreset} applied: heap=${result.heapMB} MB, json=${result.jsonPatched}, bat=${result.batPatched}, options=${result.optionsPatched}, properties=${result.propertiesPatched}, modOptions=${result.modOptionsPatched}, skipped=${result.skipped.join(',') || 'none'}`,
       )
-      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+      const data: FpsBoostApplyResult = {
+        bootstrap: await buildBootstrap(),
+        performance: result,
+      }
+      return { ok: true, data } satisfies OperationResult<FpsBoostApplyResult>
     } catch (error) {
       return fail(error)
     }

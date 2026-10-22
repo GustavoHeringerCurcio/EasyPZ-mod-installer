@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Loader2, ShieldCheck, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { PackHealth } from '@easypz/engine'
-import type { Bootstrap, Language } from '../../shared/ipc'
+import type { PackHealth, PerformanceConfigResult } from '@easypz/engine'
+import type { Bootstrap, Language, PerformancePreset } from '../../shared/ipc'
 import { Sidebar, type View } from './components/Sidebar'
 import { CatalogPage } from './components/CatalogPage'
 import { PackDetailPage } from './components/PackDetailPage'
@@ -190,14 +190,18 @@ export default function App() {
   )
 
   const applyFpsBoost = useCallback(
-    async (heapMB: number) => {
-      const result = await window.easypz.applyFpsBoost(heapMB)
+    async (preset: PerformancePreset, heapMB: number): Promise<PerformanceConfigResult | null> => {
+      const result = await window.easypz.applyFpsBoost(preset, heapMB)
       if (result.ok) {
-        setBootstrap(result.data)
-        showToast('success', t('toast.fpsBoostApplied'))
-      } else {
-        showToast('error', result.message)
+        setBootstrap(result.data.bootstrap)
+        showToast(
+          'success',
+          preset === 'defaults' ? t('toast.defaultsRestored') : t('toast.fpsBoostApplied'),
+        )
+        return result.data.performance
       }
+      showToast('error', result.message)
+      return null
     },
     [showToast, t],
   )

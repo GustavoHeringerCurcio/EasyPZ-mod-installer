@@ -13,6 +13,18 @@ export type InstallStage =
 
 export type StageStatus = 'start' | 'done' | 'skip'
 
+export interface WorkshopItemProgress {
+  index: number
+  total: number
+  name: string
+  status: 'starting' | 'downloading' | 'done' | 'failed'
+  percent: number | null
+  transferredBytes?: number
+  totalBytes?: number
+  bytesPerSecond?: number
+  etaSeconds?: number
+}
+
 export type EngineEvent =
   | { type: 'stage'; stage: InstallStage; status: StageStatus; detail?: string }
   | {
@@ -23,7 +35,11 @@ export type EngineEvent =
       total?: number
       bytesPerSecond?: number
       etaSeconds?: number
+      downloaded?: number
+      cached?: number
+      failed?: number
     }
+  | { type: 'workshop-item'; item: WorkshopItemProgress }
   | {
       type: 'mod'
       index: number

@@ -40,6 +40,35 @@ function getProgressPath(paths: AppPaths): string {
   return path.join(paths.stateDir, 'workshop-progress.json')
 }
 
+export interface SteamCmdProgress {
+  percent: number
+  transferredBytes: number
+  totalBytes: number
+}
+
+export function parseSteamCmdProgress(line: string): SteamCmdProgress | null {
+  const match = /progress:\s*([\d.]+)\s*\((\d+)\s*\/\s*(\d+)\)/i.exec(line)
+  if (!match) return null
+  const percent = Number(match[1])
+  const transferredBytes = Number(match[2])
+  const totalBytes = Number(match[3])
+  if (
+    !Number.isFinite(percent) ||
+    !Number.isFinite(transferredBytes) ||
+    !Number.isFinite(totalBytes)
+  ) {
+    return null
+  }
+  return { percent, transferredBytes, totalBytes }
+}
+
+export function parseSteamCmdDownloadedBytes(line: string): number | null {
+  const match = /Success\. Downloaded item \d+ .*?\((\d+) bytes\)/i.exec(line)
+  if (!match) return null
+  const bytes = Number(match[1])
+  return Number.isFinite(bytes) ? bytes : null
+}
+
 interface WorkshopProgress {
   packId: string
   collectionId: string
@@ -139,7 +168,14 @@ async function runSteamCmdItem(
   steamCmd: string,
   id: string,
   signal?: AbortSignal,
-): Promise<{ code: number; output: string; timedOut: boolean }> {
+  onProgress?: (progress: {
+    percent: number
+    transferredBytes: number
+    totalBytes: number
+    bytesPerSecond?: number
+    etaSeconds?: number
+  }) => void,
+): Promise<{ code: number; output: string; timedOut: boolean; downloadedBytes: number | null }> {
   const args = ['+login', 'anonymous', '+workshop_download_item', APP_ID, id, '+quit']
 
   return new Promise((resolve, reject) => {
@@ -151,7 +187,11 @@ async function runSteamCmdItem(
 
     let settled = false
     let output = ''
+    let lineBuffer = ''
     let idleTimer: NodeJS.Timeout | null = null
+    const startedAt = Date.now()
+    let lastBytes = 0
+    let lastTick = startedAt
 
     const resetIdle = (): void => {
       if (idleTimer) clearTimeout(idleTimer)
@@ -162,8 +202,32 @@ async function runSteamCmdItem(
     }
 
     const append = (chunk: Buffer): void => {
-      output += chunk.toString('utf8')
+      const text = chunk.toString('utf8')
+      output += text
       if (output.length > 20_000) output = output.slice(-20_000)
+
+      lineBuffer += text
+      const lines = lineBuffer.split(/\r|\n/)
+      lineBuffer = lines.pop() ?? ''
+      for (const line of lines) {
+        const progress = parseSteamCmdProgress(line)
+        if (!progress) continue
+        const now = Date.now()
+        const elapsed = Math.max((now - startedAt) / 1000, 0.001)
+        const instant =
+          now - lastTick > 0
+            ? ((progress.transferredBytes - lastBytes) * 1000) / (now - lastTick)
+            : 0
+        const bytesPerSecond = instant > 0 ? instant : progress.transferredBytes / elapsed
+        const etaSeconds =
+          progress.totalBytes > 0 && bytesPerSecond > 0
+            ? Math.max(0, (progress.totalBytes - progress.transferredBytes) / bytesPerSecond)
+            : undefined
+        onProgress?.({ ...progress, bytesPerSecond, etaSeconds })
+        lastBytes = progress.transferredBytes
+        lastTick = now
+      }
+
       resetIdle()
     }
 
@@ -182,7 +246,13 @@ async function runSteamCmdItem(
       if (idleTimer) clearTimeout(idleTimer)
       if (signal) signal.removeEventListener('abort', onAbort)
       if (error) reject(error)
-      else resolve({ code, output, timedOut })
+      else
+        resolve({
+          code,
+          output,
+          timedOut,
+          downloadedBytes: parseSteamCmdDownloadedBytes(output),
+        })
     }
     const onAbort = (): void => {
       child.kill()
@@ -289,6 +359,8 @@ function findItemRoot(workshopId: string, workshopRoot: string, paths: AppPaths)
 export interface WorkshopInstallResult {
   mods: InstalledMod[]
   downloadedItems: number
+  cachedItems: number
+  downloadedBytes: number
   failedItems: Array<{ id: string; name: string; reason: string }>
 }
 
@@ -307,11 +379,12 @@ export async function downloadWorkshopPack(options: {
     throw new EasyPzError('IO', 'Workshop pack is missing collection metadata.')
   }
 
-  const steamCmd = await ensureSteamCmd(paths, onEvent, signal)
   const items = collection.items
   const failedItems: Array<{ id: string; name: string; reason: string }> = []
   const discovered: DiscoveredMod[] = []
   let downloadedItems = 0
+  let cachedItems = 0
+  let downloadedBytes = 0
   let processed = 0
 
   const storedCount = items.filter((item) =>
@@ -337,13 +410,39 @@ export async function downloadWorkshopPack(options: {
       : [],
   )
 
+  onEvent?.({
+    type: 'progress',
+    stage: 'workshop',
+    percent: 0,
+    transferred: 0,
+    total: items.length,
+    downloaded: 0,
+    cached: storedCount,
+    failed: 0,
+  })
+  onEvent?.({
+    type: 'log',
+    level: 'info',
+    message: 'Preparing SteamCMD for Workshop downloads...',
+  })
+  const steamCmd = await ensureSteamCmd(paths, onEvent, signal)
+
   const emitProgress = (name: string): void => {
+    onEvent?.({
+      type: 'stage',
+      stage: 'workshop',
+      status: 'start',
+      detail: `${processed}/${items.length} · ${name}`,
+    })
     onEvent?.({
       type: 'progress',
       stage: 'workshop',
       percent: (processed / items.length) * 100,
       transferred: processed,
       total: items.length,
+      downloaded: Math.max(0, downloadedItems - cachedItems),
+      cached: cachedItems,
+      failed: failedItems.length,
     })
     onEvent?.({
       type: 'log',
@@ -354,15 +453,45 @@ export async function downloadWorkshopPack(options: {
 
   for (const item of items) {
     ensureNotCancelled(signal)
+    const itemIndex = processed + 1
     let root = findItemRoot(item.id, workshopRoot, paths)
+    const wasCached = Boolean(root)
+
+    onEvent?.({
+      type: 'workshop-item',
+      item: {
+        index: itemIndex,
+        total: items.length,
+        name: item.name,
+        status: wasCached ? 'done' : 'starting',
+        percent: wasCached ? 100 : null,
+        totalBytes: item.sizeBytes,
+        transferredBytes: wasCached ? item.sizeBytes : undefined,
+      },
+    })
 
     if (!root) {
       onEvent?.({
         type: 'log',
         level: 'info',
-        message: `Downloading Workshop item ${processed + 1}/${items.length}: ${item.name}`,
+        message: `Downloading Workshop item ${itemIndex}/${items.length}: ${item.name}`,
       })
-      const result = await runSteamCmdItem(steamCmd, item.id, signal)
+      const result = await runSteamCmdItem(steamCmd, item.id, signal, (progress) => {
+        onEvent?.({
+          type: 'workshop-item',
+          item: {
+            index: itemIndex,
+            total: items.length,
+            name: item.name,
+            status: 'downloading',
+            percent: progress.percent,
+            transferredBytes: progress.transferredBytes,
+            totalBytes: progress.totalBytes,
+            bytesPerSecond: progress.bytesPerSecond,
+            etaSeconds: progress.etaSeconds,
+          },
+        })
+      })
       root = findItemRoot(item.id, workshopRoot, paths)
       if (!root) {
         failedItems.push({
@@ -372,16 +501,39 @@ export async function downloadWorkshopPack(options: {
             ? 'SteamCMD timed out or stalled on this item.'
             : `SteamCMD failed with code ${result.code}.`,
         })
+        onEvent?.({
+          type: 'workshop-item',
+          item: {
+            index: itemIndex,
+            total: items.length,
+            name: item.name,
+            status: 'failed',
+            percent: null,
+            totalBytes: item.sizeBytes,
+          },
+        })
         processed += 1
         emitProgress(item.name)
         continue
       }
+      downloadedBytes += result.downloadedBytes ?? item.sizeBytes ?? 0
     }
 
     try {
       const itemMods = await discoverItemMods(root, item.id)
       if (itemMods.length === 0) {
         failedItems.push({ id: item.id, name: item.name, reason: 'No mod.info found.' })
+        onEvent?.({
+          type: 'workshop-item',
+          item: {
+            index: itemIndex,
+            total: items.length,
+            name: item.name,
+            status: 'failed',
+            percent: null,
+            totalBytes: item.sizeBytes,
+          },
+        })
       } else {
         for (const mod of itemMods) {
           const destination = storeModPath(paths, mod.workshopId, mod.folder)
@@ -392,6 +544,19 @@ export async function downloadWorkshopPack(options: {
           discovered.push(mod)
         }
         downloadedItems += 1
+        if (wasCached) cachedItems += 1
+        onEvent?.({
+          type: 'workshop-item',
+          item: {
+            index: itemIndex,
+            total: items.length,
+            name: item.name,
+            status: 'done',
+            percent: 100,
+            transferredBytes: item.sizeBytes,
+            totalBytes: item.sizeBytes,
+          },
+        })
 
         const storeRoot = getStoreItemRoot(paths, item.id)
         await fs.mkdir(storeRoot, { recursive: true })
@@ -410,6 +575,17 @@ export async function downloadWorkshopPack(options: {
       }
     } catch (error) {
       failedItems.push({ id: item.id, name: item.name, reason: toError(error).message })
+      onEvent?.({
+        type: 'workshop-item',
+        item: {
+          index: itemIndex,
+          total: items.length,
+          name: item.name,
+          status: 'failed',
+          percent: null,
+          totalBytes: item.sizeBytes,
+        },
+      })
     }
 
     processed += 1
@@ -455,7 +631,7 @@ export async function downloadWorkshopPack(options: {
     message: `Workshop download finished: ${mods.length} mods, ${downloadedItems}/${items.length} items, ${failedItems.length} failed.`,
   })
 
-  return { mods, downloadedItems, failedItems }
+  return { mods, downloadedItems, cachedItems, downloadedBytes, failedItems }
 }
 
 function ensureNotCancelled(signal?: AbortSignal): void {
