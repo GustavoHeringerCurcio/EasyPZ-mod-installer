@@ -88,6 +88,8 @@ const ptBR = {
   uiSuite: {
     installTitle: 'Escolha uma UI suite',
     changeTitle: 'Trocar UI suite',
+    recommended: 'Recomendado',
+    continue: 'Continuar',
     subtitle:
       'A suite troca o HUD, o inventário, o loot e as dependências do Viewpoint. Todos os jogadores do servidor precisam usar a mesma suite.',
     change: 'Trocar',

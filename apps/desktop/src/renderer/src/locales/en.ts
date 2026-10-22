@@ -88,6 +88,8 @@
   uiSuite: {
     installTitle: 'Choose a UI suite',
     changeTitle: 'Change UI suite',
+    recommended: 'Recommended',
+    continue: 'Continue',
     subtitle:
       'The suite replaces Viewpoint HUD, inventory, loot and their dependencies. Every player on the server must use the same suite.',
     change: 'Change',

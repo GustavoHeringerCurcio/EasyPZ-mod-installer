@@ -133,6 +133,7 @@ export const uiSuiteSchema = z
       .nullable()
       .default(null),
     order: z.number().int().default(0),
+    recommended: z.boolean().default(false),
     add: z.array(modSchema).default([]),
     remove: z.array(z.string()).default([]),
     removedItems: z.array(z.string()).default([]),

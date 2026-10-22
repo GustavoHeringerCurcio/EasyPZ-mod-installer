@@ -68,6 +68,12 @@ describe('catalog', () => {
     expect(tarkov.some((mod) => mod.id === 'INVENTORY_TETRIS')).toBe(true)
     expect(tarkov.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
 
+    const native = getEffectiveModsForSuite(catalog, 'medium', 'native')
+    expect(native.some((mod) => mod.id === 'Viewpoint')).toBe(true)
+    expect(native.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
+    expect(native.some((mod) => mod.id === 'ViewpointDayZInventory')).toBe(false)
+    expect(native.some((mod) => mod.id === 'ProjectTarkovHUD')).toBe(false)
+
     const ultraDayZItems = getWorkshopIdsForSuite(catalog, 'ultra', 'dayz')
     expect(ultraDayZItems).toContain('3816819422')
     expect(ultraDayZItems).not.toContain('3812616893')

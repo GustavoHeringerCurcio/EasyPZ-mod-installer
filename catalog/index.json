@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-22T19:08:43.853Z",
+  "generatedAt": "2026-10-22T19:28:14.423Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -3075,10 +3075,11 @@
       "name": "Viewpoint UI",
       "tagline": "The current Viewpoint interface",
       "description": "The full Viewpoint Interface suite already used by the packs: first and third person interactions, the clean Viewpoint HUD, inventory, looting, crafting, building and vehicle screens. This is the default and the most tested option.",
-      "cover": "assets/ui-suites/viewpoint-ui.jpg",
+      "cover": "assets/ui-suites/viewpoint-ui.webp",
       "gallery": [],
       "accent": "#38bdf8",
       "order": 10,
+      "recommended": true,
       "add": [],
       "remove": [
         "ViewpointDayZInventory",
@@ -3111,12 +3112,11 @@
       "name": "DayZ UI",
       "tagline": "DayZ HUD and inventory for Viewpoint",
       "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed. Everyone on the server must use this same suite.",
-      "cover": "assets/ui-suites/dayz-ui.jpg",
-      "gallery": [
-        "assets/ui-suites/dayz-hud.jpg"
-      ],
+      "cover": "assets/ui-suites/dayz-ui.webp",
+      "gallery": [],
       "accent": "#d6b25e",
       "order": 20,
+      "recommended": false,
       "add": [
         {
           "id": "ViewpointDayZInventory",
@@ -3169,12 +3169,11 @@
       "name": "Tarkov UI",
       "tagline": "Project Tarkov HUD, inventory and Viewpoint loot",
       "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together. Everyone on the server must use this same suite.",
-      "cover": "assets/ui-suites/tarkov-ui.jpg",
-      "gallery": [
-        "assets/ui-suites/tarkov-loot.jpg"
-      ],
+      "cover": "assets/ui-suites/tarkov-ui.webp",
+      "gallery": [],
       "accent": "#c7a76a",
       "order": 30,
+      "recommended": false,
       "add": [
         {
           "id": "ProjectTarkovFramework",
@@ -3280,6 +3279,54 @@
       "conflicts": [
         "ViewpointUI",
         "ViewpointDayZInventory"
+      ]
+    },
+    {
+      "id": "native",
+      "name": "Native Zomboid",
+      "tagline": "Native HUD and inventory",
+      "description": "Keeps Project Viewpoint and ZombieBuddy for the camera and gameplay, but removes ViewpointUI, DayZ, Tarkov and every inventory/HUD replacement. Project Zomboid uses its native HUD, inventory and loot windows.",
+      "cover": "assets/ui-suites/native-ui.webp",
+      "gallery": [],
+      "accent": "#9ca3af",
+      "order": 40,
+      "recommended": false,
+      "add": [],
+      "remove": [
+        "ViewpointUI",
+        "ViewpointVehicleTuningCompat",
+        "ViewpointDayZInventory",
+        "DayZ_HUD",
+        "ProjectTarkovFramework",
+        "ProjectTarkovHealth",
+        "ProjectTarkovHUD",
+        "ProjectTarkovLootInventory",
+        "ProjectTarkovMainMenu",
+        "ProjectTarkovMap",
+        "ProjectTarkovOverall",
+        "ProjectTarkovSkills",
+        "TarkovHUDAddons",
+        "ViewpointXTarkovHUD",
+        "INVENTORY_TETRIS"
+      ],
+      "removedItems": [
+        "3812616893",
+        "3815739336",
+        "3816819422",
+        "3786513059",
+        "3775513231",
+        "3814571205",
+        "3820130782"
+      ],
+      "items": [],
+      "requires": [
+        "Viewpoint",
+        "ZombieBuddy"
+      ],
+      "conflicts": [
+        "ViewpointUI",
+        "ViewpointDayZInventory",
+        "ProjectTarkovFramework"
       ]
     }
   ]
