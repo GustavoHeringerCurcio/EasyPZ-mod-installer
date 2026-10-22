@@ -1,7 +1,7 @@
 ﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
-import { getPack } from '@easypz/catalog'
+import { getDefaultUiSuite, getEffectiveMods, getPack, getUiSuite } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
 import { modsDir, defaultTxtPath } from './paths.js'
 import { getGameInfo, type GameInfo } from './detect.js'
@@ -15,6 +15,7 @@ import { loadState, recordInstall, saveState } from './state.js'
 import { storePackMods } from './storage.js'
 import { setPackEnabled } from './operations.js'
 import { downloadWorkshopPack } from './workshop.js'
+import { ensureUiSuiteMods } from './uiSuite.js'
 
 export interface InstallOptions {
   catalog: Catalog
@@ -23,6 +24,7 @@ export interface InstallOptions {
   gamePathOverride?: string | null
   heapMB?: number | null
   forceRedownload?: boolean
+  uiSuiteId?: string | null
   skipZombieBuddy?: boolean
   skipActivate?: boolean
   signal?: AbortSignal
@@ -144,6 +146,8 @@ async function installWorkshopPack(args: {
 }): Promise<InstallSummary> {
   const { options, game, pack, pzPath } = args
   const { catalog, packId, paths, signal, onEvent } = options
+  const suiteId =
+    getUiSuite(catalog, options.uiSuiteId)?.id ?? getDefaultUiSuite(catalog)?.id ?? null
 
   if (!pack.workshop) {
     throw new EasyPzError('IO', 'Workshop pack is missing collection metadata.')
@@ -157,16 +161,72 @@ async function installWorkshopPack(args: {
   stageEvent(onEvent, 'extract', 'skip', 'Steam Workshop collection')
   stageEvent(onEvent, 'workshop', 'start')
 
-  const downloaded = await downloadWorkshopPack({
+  let state = await loadState(paths, { catalog, migrate: true })
+  let deactivatedForUpdate = false
+  if (!options.skipActivate && state.activePackId === packId) {
+    await setPackEnabled({
+      catalog,
+      packId,
+      paths,
+      enabled: false,
+      onEvent,
+      skipGameCheck: true,
+    })
+    deactivatedForUpdate = true
+    state = await loadState(paths, { catalog, migrate: true })
+  }
+
+  let downloaded: Awaited<ReturnType<typeof downloadWorkshopPack>>
+  try {
+    downloaded = await downloadWorkshopPack({
+      catalog,
+      packId,
+      paths,
+      workshopRoot: game.workshopRoot,
+      signal,
+      onEvent,
+    })
+  } catch (error) {
+    if (deactivatedForUpdate) {
+      try {
+        await setPackEnabled({
+          catalog,
+          packId,
+          paths,
+          enabled: true,
+          onEvent,
+          skipGameCheck: true,
+        })
+      } catch {
+        // Keep the original download error; the user can re-enable the old pack.
+      }
+    }
+    throw error
+  }
+
+  stageEvent(onEvent, 'workshop', 'done', `${downloaded.mods.length} mods`)
+
+  const suiteMods = await ensureUiSuiteMods({
     catalog,
     packId,
+    suiteId,
     paths,
     workshopRoot: game.workshopRoot,
     signal,
     onEvent,
   })
+  stageEvent(
+    onEvent,
+    'ui-suite',
+    suiteMods.mods.length > 0 ? 'done' : 'skip',
+    suiteMods.mods.length > 0 ? `${suiteMods.mods.length} mods` : undefined,
+  )
 
-  stageEvent(onEvent, 'workshop', 'done', `${downloaded.mods.length} mods`)
+  const modMap = new Map<string, (typeof downloaded.mods)[number]>()
+  for (const mod of [...downloaded.mods, ...suiteMods.mods]) {
+    modMap.set(`${mod.workshopId}:${mod.folder}`, mod)
+  }
+  const allMods = [...modMap.values()]
 
   if (downloaded.failedItems.length > 0) {
     emit(onEvent, {
@@ -209,10 +269,18 @@ async function installWorkshopPack(args: {
   ensureNotCancelled(signal)
 
   stageEvent(onEvent, 'apply', 'start')
-  const state = await loadState(paths, { catalog, migrate: true })
-  const installedState = recordInstall(state, catalog, packId, { mods: downloaded.mods })
+  const installedState = recordInstall(state, catalog, packId, {
+    mods: allMods,
+    allMods,
+    uiSuiteId: suiteId,
+  })
   await saveState(paths, { ...installedState, activePackId: state.activePackId })
-  stageEvent(onEvent, 'apply', 'done', `${downloaded.mods.length} mods`)
+  stageEvent(
+    onEvent,
+    'apply',
+    'done',
+    `${installedState.installs[packId]?.mods.length ?? allMods.length} mods`,
+  )
 
   stageEvent(onEvent, 'activate', 'start')
   if (options.skipActivate) {
@@ -233,16 +301,20 @@ async function installWorkshopPack(args: {
   stageEvent(onEvent, 'host', 'skip')
   stageEvent(onEvent, 'state', 'start')
   const finalState = await loadState(paths, { catalog, migrate: true })
-  const nextState = recordInstall(finalState, catalog, packId, { mods: downloaded.mods })
+  const nextState = recordInstall(finalState, catalog, packId, {
+    mods: allMods,
+    allMods,
+    uiSuiteId: suiteId,
+  })
   await saveState(paths, nextState)
   stageEvent(onEvent, 'state', 'done')
 
   const summary: InstallSummary = {
     packId,
-    clientMods: downloaded.mods.filter((mod) => !mod.serverOnly).length,
-    serverMods: downloaded.mods.filter((mod) => mod.serverOnly).length,
-    workshopItems: downloaded.downloadedItems,
-    downloadedBytes: downloaded.downloadedBytes,
+    clientMods: (nextState.installs[packId]?.mods ?? []).filter((mod) => !mod.serverOnly).length,
+    serverMods: (nextState.installs[packId]?.mods ?? []).filter((mod) => mod.serverOnly).length,
+    workshopItems: downloaded.downloadedItems + suiteMods.downloadedItems,
+    downloadedBytes: downloaded.downloadedBytes + suiteMods.downloadedBytes,
     installedAt: nextState.installs[packId]?.installedAt ?? new Date().toISOString(),
     zombieBuddy,
     hostUpdated: false,
@@ -273,6 +345,8 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       })
     }
 
+    const suiteId =
+      getUiSuite(catalog, options.uiSuiteId)?.id ?? getDefaultUiSuite(catalog)?.id ?? null
     const archive = pack.archive
     if (!archive) {
       throw new EasyPzError('IO', 'Archive pack is missing archive metadata.')
@@ -400,6 +474,42 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       message: `Stored ${stored.stored} mod folder(s); ${stored.skipped} already available.`,
     })
 
+    const suite = getUiSuite(catalog, suiteId)
+    if (!game.workshopRoot && suite && suite.items.length > 0) {
+      throw new EasyPzError(
+        'GAME_NOT_FOUND',
+        'The Steam Workshop folder is required for the selected UI suite.',
+      )
+    }
+
+    const suiteMods = game.workshopRoot
+      ? await ensureUiSuiteMods({
+          catalog,
+          packId,
+          suiteId,
+          paths,
+          workshopRoot: game.workshopRoot,
+          signal,
+          onEvent,
+        })
+      : { mods: [], downloadedItems: 0, cachedItems: 0, downloadedBytes: 0, failedItems: [] }
+    stageEvent(
+      onEvent,
+      'ui-suite',
+      suiteMods.mods.length > 0 ? 'done' : 'skip',
+      suiteMods.mods.length > 0 ? `${suiteMods.mods.length} mods` : undefined,
+    )
+
+    const baseMods = getEffectiveMods(catalog, packId).map((mod) => ({
+      id: mod.id,
+      name: mod.name,
+      folder: mod.folder,
+      workshopId: mod.workshopId,
+      serverOnly: mod.serverOnly,
+    }))
+    const allMods = [...baseMods, ...suiteMods.mods]
+    downloadedBytes += suiteMods.downloadedBytes
+
     ensureNotCancelled(signal)
 
     let zombieBuddy: ZombieBuddyStatus = 'skipped'
@@ -468,15 +578,18 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
 
     stageEvent(onEvent, 'state', 'start')
     const finalState = await loadState(paths, { catalog, migrate: true })
-    const nextState = recordInstall(finalState, catalog, packId)
+    const nextState = recordInstall(finalState, catalog, packId, {
+      mods: allMods,
+      uiSuiteId: suiteId,
+    })
     await saveState(paths, nextState)
     stageEvent(onEvent, 'state', 'done')
 
     summary = {
       packId,
-      clientMods: pack.stats.clientMods,
-      serverMods: pack.stats.serverMods,
-      workshopItems: pack.stats.workshopCount,
+      clientMods: (nextState.installs[packId]?.mods ?? []).filter((mod) => !mod.serverOnly).length,
+      serverMods: (nextState.installs[packId]?.mods ?? []).filter((mod) => mod.serverOnly).length,
+      workshopItems: suiteMods.downloadedItems,
       downloadedBytes,
       installedAt: nextState.installs[packId]?.installedAt ?? new Date().toISOString(),
       zombieBuddy,

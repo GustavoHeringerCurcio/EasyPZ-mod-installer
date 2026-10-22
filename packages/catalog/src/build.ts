@@ -1,9 +1,9 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { Catalog, CatalogMode, IndexedPack, PackDefinition, PackStats } from './schema.js'
-import { CATALOG_SCHEMA_VERSION, catalogSchema, packSchema } from './schema.js'
-import { catalogIndexPath, packsRoot } from './paths.js'
+import { CATALOG_SCHEMA_VERSION, catalogSchema, packSchema, uiSuiteSchema } from './schema.js'
+import { catalogIndexPath, packsRoot, uiSuitesPath } from './paths.js'
 
 const ALPHA_HOST = 'github.com'
 const ALPHA_PATH_PREFIX = '/GustavoHeringerCurcio/pz-viewpoint-starter/releases/download/'
@@ -125,7 +125,35 @@ async function readPackFiles(): Promise<PackDefinition[]> {
   return packs
 }
 
-async function validateCovers(packs: PackDefinition[]): Promise<void> {
+async function readUiSuites(): Promise<ReturnType<typeof uiSuiteSchema.parse>[]> {
+  let raw: string
+  try {
+    raw = await fs.readFile(uiSuitesPath, 'utf8')
+  } catch {
+    return []
+  }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch (error) {
+    throw new Error(`${uiSuitesPath} is not valid JSON: ${(error as Error).message}`)
+  }
+
+  if (!Array.isArray(parsed)) throw new Error(`${uiSuitesPath} must contain an array`)
+  return parsed.map((entry) => {
+    try {
+      return uiSuiteSchema.parse(entry)
+    } catch (error) {
+      throw new Error(`${uiSuitesPath}:\n${formatZodError(error)}`)
+    }
+  })
+}
+
+async function validateCovers(
+  packs: PackDefinition[],
+  uiSuites: ReturnType<typeof uiSuiteSchema.parse>[],
+): Promise<void> {
   for (const pack of packs) {
     for (const asset of [pack.cover, ...pack.gallery]) {
       const absolute = path.join(path.dirname(catalogIndexPath), asset)
@@ -133,6 +161,16 @@ async function validateCovers(packs: PackDefinition[]): Promise<void> {
         await fs.access(absolute)
       } catch {
         throw new Error(`${pack.id}: missing catalog asset ${asset}`)
+      }
+    }
+  }
+  for (const suite of uiSuites) {
+    for (const asset of [suite.cover, ...suite.gallery]) {
+      const absolute = path.join(path.dirname(catalogIndexPath), asset)
+      try {
+        await fs.access(absolute)
+      } catch {
+        throw new Error(`${suite.id}: missing catalog asset ${asset}`)
       }
     }
   }
@@ -170,7 +208,8 @@ export async function buildCatalog(options: BuildOptions): Promise<Catalog> {
     ids.add(pack.id)
   }
 
-  await validateCovers(definitions)
+  const uiSuites = await readUiSuites()
+  await validateCovers(definitions, uiSuites)
 
   const packs: IndexedPack[] = definitions
     .sort((left, right) => left.order - right.order || left.name.localeCompare(right.name))
@@ -201,6 +240,7 @@ export async function buildCatalog(options: BuildOptions): Promise<Catalog> {
     mode: options.mode,
     generatedAt: new Date().toISOString(),
     packs,
+    uiSuites,
   }
 
   catalogSchema.parse(catalog)

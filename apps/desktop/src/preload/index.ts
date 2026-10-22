@@ -1,11 +1,12 @@
-import { contextBridge, ipcRenderer } from 'electron'
+﻿import { contextBridge, ipcRenderer } from 'electron'
 import type { EngineEvent } from '@easypz/engine'
 import type { EasyPzApi, Language, PendingAction } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 
 const api: EasyPzApi = {
   getBootstrap: () => ipcRenderer.invoke(IPC.getBootstrap),
-  startInstall: (packId: string) => ipcRenderer.invoke(IPC.startInstall, packId),
+  startInstall: (packId: string, uiSuiteId?: string | null) =>
+    ipcRenderer.invoke(IPC.startInstall, packId, uiSuiteId),
   cancelInstall: () => ipcRenderer.invoke(IPC.cancelInstall),
   setPackEnabled: (packId: string, enabled: boolean) =>
     ipcRenderer.invoke(IPC.setPackEnabled, packId, enabled),
@@ -13,6 +14,8 @@ const api: EasyPzApi = {
   deletePack: (packId: string) => ipcRenderer.invoke(IPC.deletePack, packId),
   verify: (packId: string) => ipcRenderer.invoke(IPC.verify, packId),
   applyHost: (packId: string) => ipcRenderer.invoke(IPC.applyHost, packId),
+  applyUiSuite: (packId: string, uiSuiteId: string) =>
+    ipcRenderer.invoke(IPC.applyUiSuite, packId, uiSuiteId),
   setGamePath: (gamePath: string | null) => ipcRenderer.invoke(IPC.setGamePath, gamePath),
   pickGamePath: () => ipcRenderer.invoke(IPC.pickGamePath),
   setLanguage: (language: Language) => ipcRenderer.invoke(IPC.setLanguage, language),
@@ -20,6 +23,7 @@ const api: EasyPzApi = {
   applyFpsBoost: (preset, heapMB) => ipcRenderer.invoke(IPC.applyFpsBoost, preset, heapMB),
   openPath: (target: string) => ipcRenderer.invoke(IPC.openPath, target),
   openLogs: () => ipcRenderer.invoke(IPC.openLogs),
+  refreshCatalog: () => ipcRenderer.invoke(IPC.refreshCatalog),
   clearCache: () => ipcRenderer.invoke(IPC.clearCache),
   restartAsAdmin: (pending: PendingAction | null) =>
     ipcRenderer.invoke(IPC.restartAsAdmin, pending),

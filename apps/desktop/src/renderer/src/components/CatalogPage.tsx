@@ -6,12 +6,14 @@ import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, Switch } from './ui'
 import { cn, formatBytes } from '../lib/format'
 import { isRecommendedPack, packAccent } from '../lib/packTheme'
+import { packUpdateAvailable } from '../lib/packStatus'
 import otherModpackImage from '../assets/other-modpack.jpg'
 
 function PackCard({
   pack,
   available,
   active,
+  updateAvailable,
   busy,
   gameRunning,
   onOpen,
@@ -22,6 +24,7 @@ function PackCard({
   pack: PackView
   available: boolean
   active: boolean
+  updateAvailable: boolean
   busy: boolean
   gameRunning: boolean
   onOpen: () => void
@@ -72,9 +75,18 @@ function PackCard({
         <span className="pack-accent-soft pack-accent-border pack-accent-text absolute left-3 top-3 inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] backdrop-blur-sm">
           {pack.tags[0] ?? pack.name}
         </span>
-        {active ? (
-          <div className="absolute right-3 top-3 rounded-full bg-ink/70 p-0.5 backdrop-blur-sm">
-            <Badge tone="success">{t('catalog.active')}</Badge>
+        {active || updateAvailable ? (
+          <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
+            {active ? (
+              <div className="rounded-full bg-ink/70 p-0.5 backdrop-blur-sm">
+                <Badge tone="success">{t('catalog.active')}</Badge>
+              </div>
+            ) : null}
+            {updateAvailable ? (
+              <div className="rounded-full bg-ink/70 p-0.5 backdrop-blur-sm">
+                <Badge tone="warn">{t('catalog.updateAvailable')}</Badge>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <span className="absolute inset-x-0 top-0 h-0.5 pack-accent-fill" />
@@ -105,7 +117,7 @@ function PackCard({
               <div className="flex h-9 items-center px-2">
                 <Loader2 className="size-4 animate-spin text-bone" />
               </div>
-            ) : available ? (
+            ) : available && !updateAvailable ? (
               <Switch
                 checked={active}
                 disabled={gameRunning}
@@ -124,7 +136,7 @@ function PackCard({
                 }}
               >
                 <Download className="size-3.5" />
-                {t('catalog.install')}
+                {updateAvailable ? t('catalog.update') : t('catalog.install')}
               </Button>
             )}
           </div>
@@ -203,6 +215,7 @@ export function CatalogPage({
         pack={pack}
         available={available}
         active={active}
+        updateAvailable={packUpdateAvailable(bootstrap, pack.id)}
         busy={busyPackId === pack.id}
         gameRunning={bootstrap.game.gameRunning}
         onOpen={() => onSelectPack(pack.id)}

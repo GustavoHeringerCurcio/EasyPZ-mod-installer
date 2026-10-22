@@ -1,6 +1,14 @@
 ﻿import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
-import { getActiveModIds, getPack } from '@easypz/catalog'
+import {
+  getActiveModIdsForSuite,
+  getEffectiveMods,
+  getEffectiveModsForSuite,
+  getPack,
+  getUiSuite,
+  getWorkshopIdsForSuite,
+  resolveUiSuiteId,
+} from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
 import { hostIniPath, modsDir } from './paths.js'
 import { getGameInfo, isGameRunning } from './detect.js'
@@ -8,10 +16,18 @@ import { sortModIdsForLoadOrder, updateDefaultTxt } from './activation.js'
 import { applyHostIni, type HostApplyResult } from './host.js'
 import { applyGameConfig } from './gameConfig.js'
 import { isZombieBuddyInstalled } from './zombiebuddy.js'
-import { verifyMods, verifyPack, type PackHealth } from './verify.js'
+import { verifyMods, type PackHealth } from './verify.js'
+import { ensureUiSuiteMods } from './uiSuite.js'
 import type { EventSink } from './events.js'
 import { EasyPzError } from './errors.js'
-import { clearPackInstall, loadState, saveState, setActivePack, type AppState } from './state.js'
+import {
+  clearPackInstall,
+  loadState,
+  recordInstall,
+  saveState,
+  setActivePack,
+  type AppState,
+} from './state.js'
 import {
   activationEntriesForMods,
   assertPackAvailable,
@@ -26,13 +42,14 @@ import {
 function allPackClientIds(catalog: Catalog, state: AppState): string[] {
   const ids = new Set<string>()
   for (const pack of catalog.packs) {
-    if (pack.source === 'workshop') {
-      for (const mod of state.installs[pack.id]?.mods ?? []) {
+    const install = state.installs[pack.id]
+    if (install) {
+      for (const mod of install.mods) {
         if (!mod.serverOnly) ids.add(mod.id)
       }
       continue
     }
-    for (const id of getActiveModIds(catalog, pack.id, false)) ids.add(id)
+    for (const id of getActiveModIdsForSuite(catalog, pack.id, false, null)) ids.add(id)
   }
   return [...ids]
 }
@@ -143,6 +160,134 @@ export async function setPackEnabled(options: {
   return { activePackId: null, modCount: 0, previousPackId }
 }
 
+function suiteAddIds(catalog: Catalog): Set<string> {
+  return new Set((catalog.uiSuites ?? []).flatMap((suite) => suite.add.map((mod) => mod.id)))
+}
+
+function dedupeMods(
+  mods: Array<{
+    id: string
+    name: string
+    folder: string
+    workshopId: string
+    serverOnly: boolean
+  }>,
+) {
+  const seen = new Set<string>()
+  return mods.filter((mod) => {
+    const key = `${mod.workshopId}:${mod.folder}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+export async function applyUiSuite(options: {
+  catalog: Catalog
+  packId: string
+  suiteId: string
+  paths: AppPaths
+  gamePathOverride?: string | null
+  signal?: AbortSignal
+  onEvent?: EventSink
+}): Promise<PackToggleResult> {
+  const { catalog, packId, suiteId, paths, signal, onEvent } = options
+  if (await isGameRunning()) {
+    throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before changing the UI suite.')
+  }
+
+  const suite = getUiSuite(catalog, suiteId)
+  if (!suite) throw new EasyPzError('IO', `Unknown UI suite: ${suiteId}`)
+
+  const state = await loadState(paths, { catalog, migrate: true })
+  const install = state.installs[packId]
+  if (!install)
+    throw new EasyPzError('MISSING_MODS', 'Install the pack before changing its UI suite.')
+
+  const game = await getGameInfo(paths, { gamePathOverride: options.gamePathOverride })
+  if (suite.items.length > 0 && !game.workshopRoot) {
+    throw new EasyPzError('GAME_NOT_FOUND', 'The Steam Workshop folder could not be found.')
+  }
+
+  const suiteMods = game.workshopRoot
+    ? await ensureUiSuiteMods({
+        catalog,
+        packId,
+        suiteId,
+        paths,
+        workshopRoot: game.workshopRoot,
+        signal,
+        onEvent,
+      })
+    : { mods: [], downloadedItems: 0, cachedItems: 0, downloadedBytes: 0, failedItems: [] }
+
+  const pack = getPack(catalog, packId)
+  const allAddIds = suiteAddIds(catalog)
+  const base =
+    pack.source === 'workshop'
+      ? (install.allMods.length > 0 ? install.allMods : install.mods).filter(
+          (mod) => !allAddIds.has(mod.id),
+        )
+      : getEffectiveMods(catalog, packId).map((mod) => ({
+          id: mod.id,
+          name: mod.name,
+          folder: mod.folder,
+          workshopId: mod.workshopId,
+          serverOnly: mod.serverOnly,
+        }))
+  const removed = new Set(suite.remove)
+  const allMods = dedupeMods([...base, ...suiteMods.mods])
+  const nextMods = allMods.filter((mod) => !removed.has(mod.id))
+  if (nextMods.length === 0) {
+    throw new EasyPzError('MISSING_MODS', `The ${suite.name} suite produced no installable mods.`)
+  }
+
+  const wasActive = state.activePackId === packId
+  if (wasActive) {
+    await setPackEnabled({
+      catalog,
+      packId,
+      paths,
+      enabled: false,
+      signal,
+      onEvent,
+      skipGameCheck: true,
+    })
+  }
+
+  const current = await loadState(paths, { catalog, migrate: true })
+  const nextState = recordInstall(current, catalog, packId, {
+    mods: nextMods,
+    allMods,
+    uiSuiteId: suite.id,
+  })
+  await saveState(paths, { ...nextState, activePackId: current.activePackId })
+
+  if (wasActive) {
+    const result = await setPackEnabled({
+      catalog,
+      packId,
+      paths,
+      enabled: true,
+      signal,
+      onEvent,
+      skipGameCheck: true,
+    })
+    onEvent?.({
+      type: 'log',
+      level: 'info',
+      message: `UI suite changed to ${suite.name}: ${result.modCount} client mods.`,
+    })
+    return result
+  }
+
+  onEvent?.({
+    type: 'log',
+    level: 'info',
+    message: `UI suite saved for ${getPack(catalog, packId).name}: ${suite.name}.`,
+  })
+  return { activePackId: null, modCount: 0, previousPackId: null }
+}
 export async function activateInstalledPack(options: {
   catalog: Catalog
   packId: string
@@ -268,10 +413,10 @@ export async function applyHostForPack(options: {
 
   const state = await loadState(paths, { catalog, migrate: true })
   const pack = getPack(catalog, packId)
+  const suiteId = resolveUiSuiteId(catalog, state.installs[packId]?.uiSuiteId)
   const mods = await getPackStorageMods(catalog, packId, paths, state)
   const modIds = sortModIdsForLoadOrder(mods.map((mod) => mod.id))
-  const workshopIds =
-    pack.source === 'workshop' ? (pack.workshop?.items.map((item) => item.id) ?? []) : []
+  const workshopIds = getWorkshopIdsForSuite(catalog, packId, suiteId)
   const result = await applyHostIni({
     iniPath: hostIniPath(paths),
     modIds,
@@ -302,23 +447,25 @@ export async function getPackHealth(options: {
   const state = await loadState(options.paths, { catalog: options.catalog, migrate: true })
   const pack = getPack(options.catalog, options.packId)
 
-  if (pack.source === 'workshop') {
-    const mods = (state.installs[pack.id]?.mods ?? []).map((mod) => ({
-      ...mod,
-      group: 'Workshop',
+  const suiteId = resolveUiSuiteId(options.catalog, state.installs[pack.id]?.uiSuiteId)
+  const installed = state.installs[pack.id]?.mods
+  const mods = (
+    installed ??
+    getEffectiveModsForSuite(options.catalog, pack.id, suiteId).map((mod) => ({
+      id: mod.id,
+      name: mod.name,
+      folder: mod.folder,
+      workshopId: mod.workshopId,
+      serverOnly: mod.serverOnly,
     }))
-    return verifyMods({
-      packId: pack.id,
-      mods,
-      paths: options.paths,
-      pzPath: game.pzPath,
-      hostIniPath: hostIniPath(options.paths),
-    })
-  }
+  ).map((mod) => ({
+    ...mod,
+    group: pack.source === 'workshop' ? 'Workshop' : 'Pack',
+  }))
 
-  return verifyPack({
-    catalog: options.catalog,
-    packId: options.packId,
+  return verifyMods({
+    packId: pack.id,
+    mods,
     paths: options.paths,
     pzPath: game.pzPath,
     hostIniPath: hostIniPath(options.paths),

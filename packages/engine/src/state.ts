@@ -1,8 +1,15 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import { z } from 'zod'
 import type { Catalog } from '@easypz/catalog'
-import { getEffectiveMods, getManagedFolders, getPack } from '@easypz/catalog'
+import {
+  getDefaultUiSuite,
+  getEffectiveMods,
+  getEffectiveModsForSuite,
+  getManagedFoldersForSuite,
+  getPack,
+  getUiSuite,
+} from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
 import { EasyPzError, toError } from './errors.js'
 
@@ -23,9 +30,12 @@ const installRecordSchema = z
     workshopCollectionId: z.string().nullable().default(null),
     archiveSha256: z.string().min(1),
     catalogGeneratedAt: z.string().min(1),
+    packUpdatedAt: z.string().nullable().default(null),
+    uiSuiteId: z.string().min(1).default('viewpoint'),
     installedAt: z.string().min(1),
     managedFolders: z.array(z.string()),
     mods: z.array(installedModSchema).default([]),
+    allMods: z.array(installedModSchema).default([]),
   })
   .strict()
 
@@ -108,9 +118,12 @@ async function migrateLegacy(paths: AppPaths, catalog?: Catalog): Promise<AppSta
         workshopCollectionId: null,
         archiveSha256: installedPack.archive?.sha256 ?? legacyMarker,
         catalogGeneratedAt: catalog.generatedAt,
+        packUpdatedAt: installedPack.updatedAt,
+        uiSuiteId: getDefaultUiSuite(catalog)?.id ?? 'viewpoint',
         installedAt: new Date().toISOString(),
-        managedFolders: getManagedFolders(catalog, installedPack.id),
+        managedFolders: getManagedFoldersForSuite(catalog, installedPack.id, null),
         mods: [],
+        allMods: [],
       }
       state.activePackId = installedPack.id
     }
@@ -182,20 +195,29 @@ export function recordInstall(
   state: AppState,
   catalog: Catalog,
   packId: string,
-  options: { mods?: InstalledMod[] } = {},
+  options: { mods?: InstalledMod[]; allMods?: InstalledMod[]; uiSuiteId?: string | null } = {},
 ): AppState {
   const pack = getPack(catalog, packId)
   const now = new Date().toISOString()
+  const suiteId =
+    options.uiSuiteId ??
+    state.installs[packId]?.uiSuiteId ??
+    getDefaultUiSuite(catalog)?.id ??
+    'viewpoint'
 
-  const mods: InstalledMod[] =
+  const effective = getEffectiveModsForSuite(catalog, packId, suiteId)
+  const removed = new Set(getUiSuite(catalog, suiteId)?.remove ?? [])
+  const sourceMods =
     options.mods ??
-    getEffectiveMods(catalog, packId).map((mod) => ({
+    effective.map((mod) => ({
       id: mod.id,
       name: mod.name,
       folder: mod.folder,
       workshopId: mod.workshopId,
       serverOnly: mod.serverOnly,
     }))
+  const filtered = sourceMods.filter((mod) => !removed.has(mod.id))
+  const mods: InstalledMod[] = filtered.length > 0 ? filtered : sourceMods
 
   const managedFolders = [...new Set(mods.map((mod) => mod.folder))]
   const workshop = pack.source === 'workshop' ? pack.workshop : null
@@ -213,10 +235,13 @@ export function recordInstall(
           ? `workshop:${workshop.collectionId}`
           : (pack.archive?.sha256 ?? ''),
         catalogGeneratedAt: catalog.generatedAt,
+        packUpdatedAt: pack.updatedAt,
+        uiSuiteId: suiteId,
         installedAt: now,
         managedFolders:
-          managedFolders.length > 0 ? managedFolders : getManagedFolders(catalog, packId),
+          managedFolders.length > 0 ? managedFolders : effective.map((mod) => mod.folder),
         mods,
+        allMods: options.allMods ?? sourceMods,
       },
     },
     updatedAt: now,

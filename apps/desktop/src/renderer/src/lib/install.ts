@@ -4,6 +4,7 @@ export type StageName =
   | 'preflight'
   | 'download'
   | 'workshop'
+  | 'ui-suite'
   | 'verify'
   | 'extract'
   | 'apply'
@@ -17,6 +18,7 @@ export const STAGE_ORDER: StageName[] = [
   'preflight',
   'download',
   'workshop',
+  'ui-suite',
   'verify',
   'extract',
   'apply',
@@ -54,7 +56,7 @@ export interface InstallUiState {
   running: boolean
   packId: string | null
   stages: Partial<Record<StageName, StageState>>
-  progress: Partial<Record<'download' | 'workshop' | 'extract', InstallProgress>>
+  progress: Partial<Record<'download' | 'workshop' | 'ui-suite' | 'extract', InstallProgress>>
   workshopItem: WorkshopItemProgress | null
   currentMod: { index: number; total: number; name: string; action: string } | null
   logs: InstallLogLine[]

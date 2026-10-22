@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-22T17:22:50.150Z",
+  "generatedAt": "2026-10-22T19:08:43.853Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -3067,6 +3067,220 @@
         "totalMods": 198,
         "workshopCount": 198
       }
+    }
+  ],
+  "uiSuites": [
+    {
+      "id": "viewpoint",
+      "name": "Viewpoint UI",
+      "tagline": "The current Viewpoint interface",
+      "description": "The full Viewpoint Interface suite already used by the packs: first and third person interactions, the clean Viewpoint HUD, inventory, looting, crafting, building and vehicle screens. This is the default and the most tested option.",
+      "cover": "assets/ui-suites/viewpoint-ui.jpg",
+      "gallery": [],
+      "accent": "#38bdf8",
+      "order": 10,
+      "add": [],
+      "remove": [
+        "ViewpointDayZInventory",
+        "DayZ_HUD",
+        "ProjectTarkovFramework",
+        "ProjectTarkovHealth",
+        "ProjectTarkovHUD",
+        "ProjectTarkovLootInventory",
+        "ProjectTarkovMainMenu",
+        "ProjectTarkovMap",
+        "ProjectTarkovOverall",
+        "ProjectTarkovSkills",
+        "TarkovHUDAddons",
+        "ViewpointXTarkovHUD",
+        "INVENTORY_TETRIS"
+      ],
+      "removedItems": [],
+      "items": [],
+      "requires": [
+        "Viewpoint",
+        "ViewpointUI"
+      ],
+      "conflicts": [
+        "ViewpointDayZInventory",
+        "ProjectTarkovFramework"
+      ]
+    },
+    {
+      "id": "dayz",
+      "name": "DayZ UI",
+      "tagline": "DayZ HUD and inventory for Viewpoint",
+      "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed. Everyone on the server must use this same suite.",
+      "cover": "assets/ui-suites/dayz-ui.jpg",
+      "gallery": [
+        "assets/ui-suites/dayz-hud.jpg"
+      ],
+      "accent": "#d6b25e",
+      "order": 20,
+      "add": [
+        {
+          "id": "ViewpointDayZInventory",
+          "name": "Viewpoint DayZ",
+          "folder": "ViewpointDayZInventory",
+          "workshopId": "3816819422",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816819422",
+          "serverOnly": false
+        }
+      ],
+      "remove": [
+        "ViewpointUI",
+        "ViewpointVehicleTuningCompat",
+        "DayZ_HUD",
+        "ProjectTarkovFramework",
+        "ProjectTarkovHealth",
+        "ProjectTarkovHUD",
+        "ProjectTarkovLootInventory",
+        "ProjectTarkovMainMenu",
+        "ProjectTarkovMap",
+        "ProjectTarkovOverall",
+        "ProjectTarkovSkills",
+        "TarkovHUDAddons",
+        "ViewpointXTarkovHUD",
+        "INVENTORY_TETRIS"
+      ],
+      "removedItems": [
+        "3812616893",
+        "3815739336"
+      ],
+      "items": [
+        {
+          "id": "3816819422",
+          "name": "Viewpoint DayZ",
+          "sizeBytes": 51657811
+        }
+      ],
+      "requires": [
+        "Viewpoint",
+        "ZombieBuddy",
+        "ViewpointDayZInventory"
+      ],
+      "conflicts": [
+        "ViewpointUI",
+        "ProjectTarkovFramework"
+      ]
+    },
+    {
+      "id": "tarkov",
+      "name": "Tarkov UI",
+      "tagline": "Project Tarkov HUD, inventory and Viewpoint loot",
+      "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together. Everyone on the server must use this same suite.",
+      "cover": "assets/ui-suites/tarkov-ui.jpg",
+      "gallery": [
+        "assets/ui-suites/tarkov-loot.jpg"
+      ],
+      "accent": "#c7a76a",
+      "order": 30,
+      "add": [
+        {
+          "id": "ProjectTarkovFramework",
+          "name": "Project Tarkov - Framework",
+          "folder": "ProjectTarkov_Framework",
+          "workshopId": "3786513059",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3786513059",
+          "serverOnly": false
+        },
+        {
+          "id": "ProjectTarkovHealth",
+          "name": "Project Tarkov - Health",
+          "folder": "ProjectTarkov_Health",
+          "workshopId": "3786513059",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3786513059",
+          "serverOnly": false
+        },
+        {
+          "id": "ProjectTarkovHUD",
+          "name": "Project Tarkov - HUD",
+          "folder": "ProjectTarkov_HUD",
+          "workshopId": "3786513059",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3786513059",
+          "serverOnly": false
+        },
+        {
+          "id": "ProjectTarkovLootInventory",
+          "name": "Project Tarkov - Loot & Inventory",
+          "folder": "ProjectTarkov_LootInventory",
+          "workshopId": "3786513059",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3786513059",
+          "serverOnly": false
+        },
+        {
+          "id": "INVENTORY_TETRIS",
+          "name": "Inventory Tetris",
+          "folder": "InventoryTetris",
+          "workshopId": "3775513231",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3775513231",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointXTarkovHUD",
+          "name": "Viewpoint x tarkovHUD",
+          "folder": "Viewpoint x tarkovHUD v0.3.1",
+          "workshopId": "3814571205",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3814571205",
+          "serverOnly": false
+        },
+        {
+          "id": "TarkovHUDAddons",
+          "name": "Project Tarkov - HUD Addons",
+          "folder": "TarkovHUDAddons",
+          "workshopId": "3820130782",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820130782",
+          "serverOnly": false
+        }
+      ],
+      "remove": [
+        "ViewpointUI",
+        "ViewpointVehicleTuningCompat",
+        "ViewpointDayZInventory",
+        "DayZ_HUD"
+      ],
+      "removedItems": [
+        "3812616893",
+        "3815739336",
+        "3816819422"
+      ],
+      "items": [
+        {
+          "id": "3786513059",
+          "name": "Project Tarkov",
+          "sizeBytes": 8626534
+        },
+        {
+          "id": "3775513231",
+          "name": "Inventory Tetris",
+          "sizeBytes": 1701618
+        },
+        {
+          "id": "3814571205",
+          "name": "Viewpoint x tarkovHUD",
+          "sizeBytes": 613828
+        },
+        {
+          "id": "3820130782",
+          "name": "Project Tarkov - HUD Addons",
+          "sizeBytes": 36979
+        }
+      ],
+      "requires": [
+        "Viewpoint",
+        "ZombieBuddy",
+        "ProjectTarkovFramework",
+        "ProjectTarkovHealth",
+        "ProjectTarkovHUD",
+        "ProjectTarkovLootInventory",
+        "INVENTORY_TETRIS",
+        "ViewpointXTarkovHUD",
+        "TarkovHUDAddons"
+      ],
+      "conflicts": [
+        "ViewpointUI",
+        "ViewpointDayZInventory"
+      ]
     }
   ]
 }

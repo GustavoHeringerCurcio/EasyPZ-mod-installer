@@ -1,4 +1,4 @@
-import {
+﻿import {
   CheckCircle2,
   Circle,
   Download,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { CSSProperties } from 'react'
+import type { UiSuiteView } from '../../../shared/ipc'
 import type { InstallUiState, StageName } from '../lib/install'
 import { STAGE_ORDER } from '../lib/install'
 import { Badge, Button, Progress, Spinner } from './ui'
@@ -27,6 +28,7 @@ export function InstallOverlay({
   onRetry,
   onOpenGame,
   onOpenLogs,
+  uiSuite,
 }: {
   state: InstallUiState
   packName: string
@@ -37,6 +39,7 @@ export function InstallOverlay({
   onRetry: () => void
   onOpenGame: () => void
   onOpenLogs: () => void
+  uiSuite: UiSuiteView | null
 }) {
   const { t } = useTranslation()
   if (!state.visible) return null
@@ -93,6 +96,29 @@ export function InstallOverlay({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+          {uiSuite && !state.summary && !state.error ? (
+            <div className="mb-5 overflow-hidden rounded-2xl border border-line bg-panel-2/60">
+              <div className="relative h-32">
+                {uiSuite.coverDataUrl ? (
+                  <img src={uiSuite.coverDataUrl} alt="" className="h-full w-full object-cover" />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-panel-2 via-panel-2/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+                  <div>
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.15em] text-bone/65">
+                      {t('uiSuite.selectedHud')}
+                    </div>
+                    <div className="font-display text-lg font-bold text-bone">{uiSuite.name}</div>
+                    <div className="text-[11px] text-bone/70">{uiSuite.tagline}</div>
+                  </div>
+                  <Badge tone="muted" className="shrink-0 bg-ink/60">
+                    {t('uiSuite.serverWide')}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {state.error ? (
             <div className="space-y-4">
               <div className="flex gap-3 rounded-2xl border border-danger/25 bg-danger/[0.07] p-4">
@@ -255,7 +281,7 @@ export function InstallOverlay({
                           {formatBytes(workshopItem.totalBytes)}
                         </span>
                         <span>
-                          {formatSpeed(workshopItem.bytesPerSecond)} ·{' '}
+                          {formatSpeed(workshopItem.bytesPerSecond)} Â·{' '}
                           {formatEta(workshopItem.etaSeconds)}
                         </span>
                       </div>

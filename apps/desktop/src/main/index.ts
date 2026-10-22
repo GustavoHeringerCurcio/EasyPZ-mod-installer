@@ -8,6 +8,7 @@ import {
   applyGameConfig,
   applyHostForPack,
   applyPerformanceConfig,
+  applyUiSuite,
   deletePack,
   getAppPaths,
   getAvailablePackIds,
@@ -42,7 +43,7 @@ import type {
   Settings,
 } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
-import { getCatalogSource, loadCatalog, toCatalogView } from './catalog'
+import { clearCatalogCache, getCatalogSource, loadCatalog, toCatalogView } from './catalog'
 import { ensureLogsDir, log, logsDir } from './logger'
 import { isLanguage, readSettings, updateSettings } from './settings'
 
@@ -72,7 +73,11 @@ async function readPendingAction(): Promise<PendingAction | null> {
     const raw = await fs.readFile(pendingActionPath(), 'utf8')
     const parsed = JSON.parse(raw) as Partial<PendingAction>
     if (parsed.type === 'install' && typeof parsed.packId === 'string') {
-      return { type: 'install', packId: parsed.packId }
+      return {
+        type: 'install',
+        packId: parsed.packId,
+        uiSuiteId: typeof parsed.uiSuiteId === 'string' ? parsed.uiSuiteId : null,
+      }
     }
   } catch {
     // No pending action.
@@ -126,6 +131,7 @@ async function buildBootstrap(): Promise<Bootstrap> {
   const paths = getAppPaths()
   const settings = await readSettings()
   const catalog = await loadCatalog()
+  const catalogSource = getCatalogSource()
   const catalogView = await toCatalogView(catalog)
   const game = await getGameInfo(paths, { gamePathOverride: settings.gamePathOverride })
 
@@ -166,6 +172,8 @@ async function buildBootstrap(): Promise<Bootstrap> {
     appVersion: app.getVersion(),
     isPackaged: app.isPackaged,
     catalog: catalogView,
+    catalogSource: catalogSource.source,
+    catalogBaseUrl: catalogSource.baseUrl,
     game,
     state,
     availablePackIds,
@@ -202,8 +210,11 @@ function registerIpc(): void {
     }
   })
 
-  ipcMain.handle(IPC.startInstall, async (_event, packId: unknown) => {
+  ipcMain.handle(IPC.startInstall, async (_event, packId: unknown, uiSuiteId: unknown) => {
     if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
+    if (uiSuiteId !== undefined && uiSuiteId !== null && typeof uiSuiteId !== 'string') {
+      return fail(new Error('Invalid UI suite selection.'))
+    }
     if (activeInstall) {
       return {
         ok: false,
@@ -243,6 +254,7 @@ function registerIpc(): void {
       const summary = await installPack({
         catalog,
         packId: pack.id,
+        uiSuiteId: typeof uiSuiteId === 'string' ? uiSuiteId : null,
         paths,
         gamePathOverride: settings.gamePathOverride,
         heapMB: settings.heapMB,
@@ -280,6 +292,33 @@ function registerIpc(): void {
         onEvent: sendInstallEvent,
       })
       return { ok: true, data: result } satisfies OperationResult<PackToggleResult>
+    } catch (error) {
+      return fail(error)
+    }
+  })
+
+  ipcMain.handle(IPC.applyUiSuite, async (_event, packId: unknown, suiteId: unknown) => {
+    if (typeof packId !== 'string' || typeof suiteId !== 'string') {
+      return fail(new Error('Invalid UI suite selection.'))
+    }
+    if (activeInstall) {
+      return {
+        ok: false,
+        code: 'BUSY',
+        message: 'Wait for the installation to finish.',
+      } satisfies OperationResult<never>
+    }
+    try {
+      const settings = await readSettings()
+      await applyUiSuite({
+        catalog: await loadCatalogForOperation(),
+        packId,
+        suiteId,
+        paths: getAppPaths(),
+        gamePathOverride: settings.gamePathOverride,
+        onEvent: sendInstallEvent,
+      })
+      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
     } catch (error) {
       return fail(error)
     }
@@ -524,6 +563,16 @@ function registerIpc(): void {
     await ensureLogsDir()
     log.info('Opening logs folder')
     await shell.openPath(logsDir)
+  })
+
+  ipcMain.handle(IPC.refreshCatalog, async () => {
+    try {
+      clearCatalogCache()
+      log.info('Catalog cache cleared')
+      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+    } catch (error) {
+      return fail(error)
+    }
   })
 
   ipcMain.handle(IPC.clearCache, async () => {

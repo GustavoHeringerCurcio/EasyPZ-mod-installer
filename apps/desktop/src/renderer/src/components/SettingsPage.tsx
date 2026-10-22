@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import type { PerformanceConfigResult } from '@easypz/engine'
 import type { Bootstrap, Language, PerformancePreset } from '../../../shared/ipc'
 import { Badge, Button, Panel, SectionTitle } from './ui'
-import { cn, formatBytes } from '../lib/format'
+import { cn, formatBytes, formatDate } from '../lib/format'
 
 export function SettingsPage({
   bootstrap,
@@ -32,6 +32,7 @@ export function SettingsPage({
   onLanguage,
   onOpen,
   onOpenLogs,
+  onRefreshCatalog,
   onClearCache,
   onSaveHeap,
   onApplyFpsBoost,
@@ -42,6 +43,7 @@ export function SettingsPage({
   onLanguage: (language: Language) => void
   onOpen: (target: string | null) => void
   onOpenLogs: () => void
+  onRefreshCatalog: () => Promise<void>
   onClearCache: () => void
   onSaveHeap: (heapMB: number) => Promise<void>
   onApplyFpsBoost: (
@@ -429,6 +431,11 @@ export function SettingsPage({
               onClick={onOpenLogs}
             />
             <MaintenanceButton
+              icon={RefreshCw}
+              label={t('settings.refreshCatalog')}
+              onClick={() => void onRefreshCatalog()}
+            />
+            <MaintenanceButton
               icon={Archive}
               label={t('settings.openCache')}
               onClick={() => onOpen(paths.cache)}
@@ -480,6 +487,20 @@ export function SettingsPage({
               icon={Archive}
               label={t('settings.catalogLabel')}
               value={`${bootstrap.catalog.mode} · ${bootstrap.catalog.packs.length} packs`}
+            />
+            <FactRow
+              icon={Globe2}
+              label={t('settings.catalogSource')}
+              value={
+                bootstrap.catalogSource === 'remote'
+                  ? t('settings.catalogRemote')
+                  : t('settings.catalogBundled')
+              }
+            />
+            <FactRow
+              icon={RefreshCw}
+              label={t('settings.catalogUpdated')}
+              value={formatDate(bootstrap.catalog.generatedAt)}
             />
           </Panel>
         </section>

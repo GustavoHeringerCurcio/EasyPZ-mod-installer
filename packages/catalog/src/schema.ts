@@ -1,6 +1,7 @@
-import { z } from 'zod'
+﻿import { z } from 'zod'
 
-export const CATALOG_SCHEMA_VERSION = 1 as const
+export const CATALOG_SCHEMA_VERSION = 2 as const
+export const PACK_SCHEMA_VERSION = 1 as const
 
 const sha256Schema = z.string().regex(/^[a-f0-9]{64}$/, 'Expected a lowercase SHA256 hex digest')
 
@@ -66,7 +67,7 @@ export const workshopSchema = z
 
 export const packSchema = z
   .object({
-    schemaVersion: z.literal(CATALOG_SCHEMA_VERSION),
+    schemaVersion: z.literal(PACK_SCHEMA_VERSION),
     id: z.string().regex(/^[a-z0-9-]+$/),
     name: z.string().min(1),
     tagline: z.string().min(1),
@@ -118,12 +119,36 @@ export const indexedPackSchema = packSchema.omit({ archive: true, workshop: true
   stats: packStatsSchema,
 })
 
+export const uiSuiteSchema = z
+  .object({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+    name: z.string().min(1),
+    tagline: z.string().min(1),
+    description: z.string().min(1),
+    cover: z.string().min(1),
+    gallery: z.array(z.string()).default([]),
+    accent: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .nullable()
+      .default(null),
+    order: z.number().int().default(0),
+    add: z.array(modSchema).default([]),
+    remove: z.array(z.string()).default([]),
+    removedItems: z.array(z.string()).default([]),
+    items: z.array(workshopItemSchema).default([]),
+    requires: z.array(z.string()).default([]),
+    conflicts: z.array(z.string()).default([]),
+  })
+  .strict()
+
 export const catalogSchema = z
   .object({
     schemaVersion: z.literal(CATALOG_SCHEMA_VERSION),
     mode: z.enum(['alpha', 'public']),
     generatedAt: z.string().min(1),
     packs: z.array(indexedPackSchema).min(1),
+    uiSuites: z.array(uiSuiteSchema).default([]),
   })
   .strict()
 
@@ -135,6 +160,7 @@ export type PackDefinition = z.infer<typeof packSchema>
 export type IndexedPack = z.infer<typeof indexedPackSchema>
 export type Catalog = z.infer<typeof catalogSchema>
 export type PackStats = z.infer<typeof packStatsSchema>
+export type UiSuite = z.infer<typeof uiSuiteSchema>
 
 export function isWorkshopPack(pack: { source: string; workshop: unknown }): boolean {
   return pack.source === 'workshop' && pack.workshop !== null
@@ -238,4 +264,100 @@ export function getActiveModIds(catalog: Catalog, packId: string, server: boolea
     ids.add(mod.id)
   }
   return [...ids]
+}
+
+export interface UiSuiteEffectiveMod extends EffectiveMod {
+  source: 'pack' | 'suite'
+}
+
+export function getDefaultUiSuite(catalog: Catalog): UiSuite | null {
+  return catalog.uiSuites?.[0] ?? null
+}
+
+export function getUiSuite(catalog: Catalog, suiteId: string | null | undefined): UiSuite | null {
+  if (!suiteId) return getDefaultUiSuite(catalog)
+  return catalog.uiSuites?.find((suite) => suite.id === suiteId) ?? null
+}
+
+export function resolveUiSuiteId(catalog: Catalog, suiteId: string | null | undefined): string {
+  return getUiSuite(catalog, suiteId)?.id ?? ''
+}
+
+export function getEffectiveModsForSuite(
+  catalog: Catalog,
+  packId: string,
+  suiteId: string | null | undefined,
+): UiSuiteEffectiveMod[] {
+  const suite = getUiSuite(catalog, suiteId)
+  const removed = new Set(suite?.remove ?? [])
+  const result: UiSuiteEffectiveMod[] = []
+  const seen = new Set<string>()
+
+  const add = (mod: EffectiveMod, source: 'pack' | 'suite'): void => {
+    if (removed.has(mod.id)) return
+    const key = `${mod.workshopId}:${mod.folder}`
+    if (seen.has(key)) return
+    seen.add(key)
+    result.push({ ...mod, source })
+  }
+
+  for (const mod of getEffectiveMods(catalog, packId)) add(mod, 'pack')
+  for (const mod of suite?.add ?? []) {
+    add({ ...mod, group: 'UI Suite', packId }, 'suite')
+  }
+
+  return result
+}
+
+export function getActiveModIdsForSuite(
+  catalog: Catalog,
+  packId: string,
+  server: boolean,
+  suiteId: string | null | undefined,
+): string[] {
+  const ids = new Set<string>()
+  for (const mod of getEffectiveModsForSuite(catalog, packId, suiteId)) {
+    if (mod.serverOnly && !server) continue
+    ids.add(mod.id)
+  }
+  return [...ids]
+}
+
+export function getWorkshopIdsForSuite(
+  catalog: Catalog,
+  packId: string,
+  suiteId: string | null | undefined,
+): string[] {
+  const pack = getPack(catalog, packId)
+  const suite = getUiSuite(catalog, suiteId)
+  const ids = new Set<string>()
+  if (pack.source === 'workshop') {
+    for (const item of pack.workshop?.items ?? []) ids.add(item.id)
+    for (const id of suite?.removedItems ?? []) ids.delete(id)
+  }
+  for (const item of suite?.items ?? []) ids.add(item.id)
+  return [...ids]
+}
+
+export function getManagedFoldersForSuite(
+  catalog: Catalog,
+  packId: string,
+  suiteId: string | null | undefined,
+): string[] {
+  return [...new Set(getEffectiveModsForSuite(catalog, packId, suiteId).map((mod) => mod.folder))]
+}
+
+export function computeSuiteStats(
+  catalog: Catalog,
+  packId: string,
+  suiteId: string | null | undefined,
+): PackStats {
+  const mods = getEffectiveModsForSuite(catalog, packId, suiteId)
+  const serverMods = mods.filter((mod) => mod.serverOnly).length
+  return {
+    clientMods: mods.length - serverMods,
+    serverMods,
+    totalMods: mods.length,
+    workshopCount: getWorkshopIdsForSuite(catalog, packId, suiteId).length,
+  }
 }

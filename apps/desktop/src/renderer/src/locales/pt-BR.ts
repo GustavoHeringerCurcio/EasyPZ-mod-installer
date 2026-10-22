@@ -38,6 +38,8 @@ const ptBR = {
     recommended: 'Modpack base recomendado',
     morePacks: 'Mais modpacks',
     morePacksEmpty: 'Nenhum modpack adicional ainda.',
+    update: 'Atualizar',
+    updateAvailable: 'Atualização disponível',
   },
   pack: {
     back: 'Voltar ao catálogo',
@@ -78,6 +80,28 @@ const ptBR = {
     activeHint: 'Os mods estão ativos no Project Zomboid. Desativar mantém os arquivos guardados.',
     enableHint: 'Ative este pack para carregar os mods. Apenas um pack pode ficar ativo.',
     installHint: 'Instala mods, ZombieBuddy, configurações do launcher e a lista de mods ativa.',
+    update: 'Atualizar pack',
+    updateAvailable: 'Atualização disponível',
+    updateBody:
+      'O catálogo tem uma versão mais nova deste pack. Atualize para aplicar a nova lista de itens.',
+  },
+  uiSuite: {
+    installTitle: 'Escolha uma UI suite',
+    changeTitle: 'Trocar UI suite',
+    subtitle:
+      'A suite troca o HUD, o inventário, o loot e as dependências do Viewpoint. Todos os jogadores do servidor precisam usar a mesma suite.',
+    change: 'Trocar',
+    choose: 'Escolher',
+    serverWide: 'Servidor inteiro',
+    selected: 'Selecionada',
+    selectedHud: 'UI suite selecionada',
+    packDefault: 'Padrão do pack',
+    suiteMods: '{{count}} mods da suite',
+    syncWarning:
+      'Essa escolha vale para o servidor inteiro. Quem entrar no mesmo mundo precisa instalar exatamente esta suite, com todas as dependências.',
+    footer: 'O app cuida dos mods, ordem de load, dependências e sincronização do host.',
+    installAction: 'Instalar com esta suite',
+    applyAction: 'Aplicar suite',
   },
   install: {
     title: 'Instalando {{pack}}',
@@ -113,6 +137,7 @@ const ptBR = {
       preflight: 'Verificando jogo e disco',
       download: 'Baixando pack',
       workshop: 'Baixando da Steam Workshop',
+      'ui-suite': 'Instalando UI suite',
       verify: 'Verificando SHA256',
       extract: 'Extraindo arquivo',
       apply: 'Guardando mods',
@@ -138,6 +163,8 @@ const ptBR = {
     },
   },
   library: {
+    update: 'Atualizar pack',
+    updateAvailable: 'Atualização disponível',
     title: 'Sua biblioteca',
     subtitle: 'Gerencie os packs instalados neste PC.',
     empty: 'Nenhum pack instalado ainda.',
@@ -330,6 +357,8 @@ const ptBR = {
     fpsBoostApplied: 'Configurações de performance aplicadas. Reinicie o Project Zomboid.',
     defaultsRestored: 'Configurações padrão restauradas. Reinicie o Project Zomboid.',
     copied: 'Copiado para a área de transferência.',
+    uiSuiteChanged: 'UI suite aplicada.',
+    catalogRefreshed: 'Catálogo atualizado.',
   },
   common: {
     cancel: 'Cancelar',

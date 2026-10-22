@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import {
   ArrowLeft,
@@ -9,7 +9,9 @@ import {
   ExternalLink,
   Gamepad2,
   HardDrive,
+  Layers3,
   Power,
+  RefreshCw,
   Search,
   Server,
   ShieldAlert,
@@ -22,6 +24,7 @@ import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, SectionTitle, Stat } from './ui'
 import { cn, formatBytes, formatDate } from '../lib/format'
 import { packAccent } from '../lib/packTheme'
+import { packUpdateAvailable } from '../lib/packStatus'
 
 type Tab = 'overview' | 'mods' | 'requirements'
 
@@ -32,6 +35,7 @@ export function PackDetailPage({
   onInstall,
   onToggle,
   onRepair,
+  onChangeSuite,
   busy,
 }: {
   bootstrap: Bootstrap
@@ -40,6 +44,7 @@ export function PackDetailPage({
   onInstall: (packId: string) => void
   onToggle: (packId: string, enabled: boolean) => void
   onRepair: (packId: string) => void
+  onChangeSuite: (packId: string) => void
   busy: boolean
 }) {
   const { t } = useTranslation()
@@ -48,6 +53,7 @@ export function PackDetailPage({
 
   const available = bootstrap.availablePackIds.includes(pack.id)
   const active = bootstrap.state.activePackId === pack.id && available
+  const updateAvailable = packUpdateAvailable(bootstrap, pack.id)
   const accent = packAccent(pack)
   const groups = useMemo(
     () => getEffectiveGroups(bootstrap.catalog, pack.id),
@@ -58,6 +64,11 @@ export function PackDetailPage({
     [bootstrap.catalog, pack.id],
   )
   const isWorkshop = pack.source === 'workshop'
+  const installRecord = bootstrap.state.installs[pack.id]
+  const currentSuite =
+    bootstrap.catalog.uiSuites.find((suite) => suite.id === installRecord?.uiSuiteId) ??
+    bootstrap.catalog.uiSuites[0] ??
+    null
   const workshopItems = pack.workshop?.items ?? []
   const modCount = isWorkshop ? workshopItems.length : mods.length
   const downloadBytes = pack.archive?.sizeBytes ?? pack.workshop?.downloadBytes ?? 0
@@ -91,12 +102,14 @@ export function PackDetailPage({
     }))
     .filter((group) => group.mods.length > 0)
 
-  const actionLabel = !available
-    ? t('catalog.install')
-    : active
-      ? t('catalog.disable')
-      : t('catalog.enable')
-  const ActionIcon = available ? Power : Download
+  const actionLabel = updateAvailable
+    ? t('pack.update')
+    : !available
+      ? t('catalog.install')
+      : active
+        ? t('catalog.disable')
+        : t('catalog.enable')
+  const ActionIcon = updateAvailable ? RefreshCw : available ? Power : Download
 
   return (
     <div
@@ -125,6 +138,7 @@ export function PackDetailPage({
           <div className="absolute inset-x-0 bottom-0 p-7">
             <div className="flex flex-wrap items-center gap-2">
               {active ? <Badge tone="success">{t('pack.active')}</Badge> : null}
+              {updateAvailable ? <Badge tone="warn">{t('pack.updateAvailable')}</Badge> : null}
               {!active && available ? <Badge>{t('pack.installed')}</Badge> : null}
               <Badge tone="muted">
                 {t('pack.build')} {pack.gameBuild}
@@ -169,6 +183,14 @@ export function PackDetailPage({
               <section>
                 <SectionTitle>{t('pack.overview')}</SectionTitle>
                 <p className="mt-3 text-sm leading-7 text-muted">{pack.description}</p>
+                {updateAvailable ? (
+                  <div className="mt-4 flex gap-3 rounded-xl border border-warn/25 bg-warn/[0.06] px-4 py-3">
+                    <RefreshCw className="mt-0.5 size-4 shrink-0 text-warn" />
+                    <p className="text-[13px] leading-relaxed text-bone/85">
+                      {t('pack.updateBody')}
+                    </p>
+                  </div>
+                ) : null}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {pack.tags.map((tag) => (
                     <Badge key={tag} tone="muted">
@@ -242,7 +264,7 @@ export function PackDetailPage({
                             </div>
                             <div className="text-[11px] text-muted">
                               {t('pack.modCount', { count: group.mods.length })}
-                              {group.packId !== pack.id ? ` · ${t('pack.inherited')}` : ''}
+                              {group.packId !== pack.id ? ` Â· ${t('pack.inherited')}` : ''}
                             </div>
                           </div>
                           <Badge tone="muted">{group.mods.length}</Badge>
@@ -340,7 +362,7 @@ export function PackDetailPage({
                               {mod.name}
                             </div>
                             <div className="truncate font-mono text-[10px] text-muted">
-                              {mod.folder} · {mod.workshopId}
+                              {mod.folder} Â· {mod.workshopId}
                             </div>
                           </div>
                           {mod.serverOnly ? (
@@ -411,7 +433,44 @@ export function PackDetailPage({
           ) : null}
         </div>
 
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+        <aside className="space-y-3 lg:sticky lg:top-6 lg:self-start">
+          {currentSuite ? (
+            <Panel className="overflow-hidden">
+              <div className="relative h-24 overflow-hidden bg-panel-2">
+                {currentSuite.coverDataUrl ? (
+                  <img
+                    src={currentSuite.coverDataUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-panel via-panel/20 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3">
+                  <div className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-bone/70">
+                    <Layers3 className="size-3" />
+                    UI Suite
+                  </div>
+                  <div className="mt-0.5 font-display text-sm font-bold text-bone">
+                    {currentSuite.name}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 border-t border-line px-3 py-2.5">
+                <span className="text-[10px] leading-relaxed text-muted">
+                  {currentSuite.tagline}
+                </span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => (available ? onChangeSuite(pack.id) : onInstall(pack.id))}
+                  disabled={busy}
+                >
+                  {available ? t('uiSuite.change') : t('uiSuite.choose')}
+                </Button>
+              </div>
+            </Panel>
+          ) : null}
+
           <Panel className="overflow-hidden">
             <div className="h-0.5 w-full pack-accent-fill" />
             <div className="border-b border-line bg-panel-2/60 px-5 py-4">
@@ -445,13 +504,21 @@ export function PackDetailPage({
                 variant="light"
                 size="lg"
                 className="w-full"
-                onClick={() => (available ? onToggle(pack.id, !active) : onInstall(pack.id))}
+                onClick={() => {
+                  if (updateAvailable) {
+                    onInstall(pack.id)
+                  } else if (available) {
+                    onToggle(pack.id, !active)
+                  } else {
+                    onInstall(pack.id)
+                  }
+                }}
                 loading={busy}
               >
                 <ActionIcon className="size-4" />
                 {actionLabel}
               </Button>
-              {active ? (
+              {active && !updateAvailable ? (
                 <Button
                   variant="secondary"
                   size="md"

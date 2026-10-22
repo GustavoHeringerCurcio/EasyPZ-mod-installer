@@ -15,7 +15,13 @@ import {
 import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.js'
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
-import { parseSteamCmdDownloadedBytes, parseSteamCmdProgress } from './workshop.js'
+import {
+  findItemRoot,
+  getSteamClientContentRoot,
+  getStoreItemRoot,
+  parseSteamCmdDownloadedBytes,
+  parseSteamCmdProgress,
+} from './workshop.js'
 
 const temps: string[] = []
 
@@ -371,6 +377,24 @@ describe('workshop progress', () => {
       ),
     ).toBe(10000000)
     expect(parseSteamCmdDownloadedBytes('Downloading item 123 ...')).toBeNull()
+  })
+
+  it('ignores an empty store item and falls back to the Steam cache', async () => {
+    const root = await tempDir('workshop-root')
+    const paths = getAppPaths({
+      USERPROFILE: root,
+      LOCALAPPDATA: path.join(root, 'Local'),
+    })
+    const storeRoot = getStoreItemRoot(paths, '123')
+    await fs.mkdir(path.join(storeRoot, 'mods'), { recursive: true })
+
+    const steamRoot = path.join(root, 'steam-workshop')
+    const steamItem = getSteamClientContentRoot(steamRoot, '123')
+    const modDir = path.join(steamItem, 'mods', 'TestMod')
+    await fs.mkdir(modDir, { recursive: true })
+    await fs.writeFile(path.join(modDir, 'mod.info'), 'name=Test\nid=Test\n', 'utf8')
+
+    expect(await findItemRoot('123', steamRoot, paths)).toBe(steamItem)
   })
 })
 

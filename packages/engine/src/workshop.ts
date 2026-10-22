@@ -1,4 +1,4 @@
-import { execFile, spawn } from 'node:child_process'
+﻿import { execFile, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -7,7 +7,7 @@ import type { Catalog } from '@easypz/catalog'
 import { getPack } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
 import { storeModPath } from './paths.js'
-import { hasModInfo } from './archive.js'
+import { findFileRecursive, hasModInfo } from './archive.js'
 import type { EventSink } from './events.js'
 import { EasyPzError, cancelledError, toError } from './errors.js'
 import type { InstalledMod } from './state.js'
@@ -164,7 +164,7 @@ export async function ensureSteamCmd(
   return exe
 }
 
-async function runSteamCmdItem(
+export async function runSteamCmdItem(
   steamCmd: string,
   id: string,
   signal?: AbortSignal,
@@ -311,7 +311,8 @@ export async function discoverItemMods(
       if (!entry.isDirectory()) continue
       const folderPath = path.join(modsRoot, entry.name)
       if (!(await hasModInfo(folderPath))) continue
-      const infoFile = path.join(folderPath, 'mod.info')
+      const infoFile =
+        (await findFileRecursive(folderPath, 'mod.info')) ?? path.join(folderPath, 'mod.info')
       const info = await parseModInfo(infoFile, entry.name)
       mods.push({
         id: info.id,
@@ -340,20 +341,36 @@ export async function discoverItemMods(
   return mods
 }
 
-function findItemRoot(workshopId: string, workshopRoot: string, paths: AppPaths): string | null {
-  const storeRoot = getStoreItemRoot(paths, workshopId)
+async function hasDiscoverableMods(root: string): Promise<boolean> {
+  if (await hasModInfo(root)) return true
+  const modsRoot = path.join(root, 'mods')
+  try {
+    const entries = await fs.readdir(modsRoot, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      if (await hasModInfo(path.join(modsRoot, entry.name))) return true
+    }
+  } catch {
+    // No mods folder.
+  }
+  return false
+}
+
+export async function findItemRoot(
+  workshopId: string,
+  workshopRoot: string,
+  paths: AppPaths,
+): Promise<string | null> {
   const candidates = [
-    storeRoot,
+    getStoreItemRoot(paths, workshopId),
     getSteamClientContentRoot(workshopRoot, workshopId),
     getSteamCmdContentRoot(paths, workshopId),
   ]
-  return (
-    candidates.find(
-      (candidate) =>
-        existsSync(candidate) &&
-        (existsSync(path.join(candidate, 'mods')) || existsSync(path.join(candidate, 'mod.info'))),
-    ) ?? null
-  )
+  for (const candidate of candidates) {
+    if (!existsSync(candidate)) continue
+    if (await hasDiscoverableMods(candidate)) return candidate
+  }
+  return null
 }
 
 export interface WorkshopInstallResult {
@@ -387,9 +404,10 @@ export async function downloadWorkshopPack(options: {
   let downloadedBytes = 0
   let processed = 0
 
-  const storedCount = items.filter((item) =>
-    existsSync(path.join(getStoreItemRoot(paths, item.id), 'mods')),
-  ).length
+  let storedCount = 0
+  for (const item of items) {
+    if (await findItemRoot(item.id, workshopRoot, paths)) storedCount += 1
+  }
   const previousProgress = await readProgress(paths)
   if (
     storedCount > 0 ||
@@ -432,7 +450,7 @@ export async function downloadWorkshopPack(options: {
       type: 'stage',
       stage: 'workshop',
       status: 'start',
-      detail: `${processed}/${items.length} · ${name}`,
+      detail: `${processed}/${items.length} Â· ${name}`,
     })
     onEvent?.({
       type: 'progress',
@@ -454,7 +472,7 @@ export async function downloadWorkshopPack(options: {
   for (const item of items) {
     ensureNotCancelled(signal)
     const itemIndex = processed + 1
-    let root = findItemRoot(item.id, workshopRoot, paths)
+    let root = await findItemRoot(item.id, workshopRoot, paths)
     const wasCached = Boolean(root)
 
     onEvent?.({
@@ -492,7 +510,7 @@ export async function downloadWorkshopPack(options: {
           },
         })
       })
-      root = findItemRoot(item.id, workshopRoot, paths)
+      root = await findItemRoot(item.id, workshopRoot, paths)
       if (!root) {
         failedItems.push({
           id: item.id,

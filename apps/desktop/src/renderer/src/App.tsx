@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Loader2, ShieldCheck, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { PackHealth, PerformanceConfigResult } from '@easypz/engine'
@@ -7,6 +7,7 @@ import { Sidebar, type View } from './components/Sidebar'
 import { CatalogPage } from './components/CatalogPage'
 import { PackDetailPage } from './components/PackDetailPage'
 import { InstallOverlay } from './components/InstallOverlay'
+import { UiSuiteDialog } from './components/UiSuitePicker'
 import { LibraryPage } from './components/LibraryPage'
 import { SettingsPage } from './components/SettingsPage'
 import { LogsPage } from './components/LogsPage'
@@ -36,7 +37,16 @@ export default function App() {
   const [search, setSearch] = useState('')
   const [install, setInstall] = useState<InstallUiState>(emptyInstallState)
   const [canceling, setCanceling] = useState(false)
-  const [elevation, setElevation] = useState<{ packId: string } | null>(null)
+  const [elevation, setElevation] = useState<{ packId: string; uiSuiteId: string | null } | null>(
+    null,
+  )
+  const [suiteDialog, setSuiteDialog] = useState<{
+    packId: string
+    mode: 'install' | 'change'
+    value: string
+  } | null>(null)
+  const [installSuiteId, setInstallSuiteId] = useState<string | null>(null)
+  const [suiteBusy, setSuiteBusy] = useState(false)
   const [elevating, setElevating] = useState(false)
   const [toast, setToast] = useState<Toast | null>(null)
   const [sessionLogs, setSessionLogs] = useState<InstallLogLine[]>([])
@@ -103,15 +113,16 @@ export default function App() {
   }, [refreshBootstrap])
 
   const startInstall = useCallback(
-    async (packId: string) => {
+    async (packId: string, uiSuiteId?: string | null) => {
       setCanceling(false)
       setInstall(createInstallState(packId))
-      const result = await window.easypz.startInstall(packId)
+      setInstallSuiteId(uiSuiteId ?? null)
+      const result = await window.easypz.startInstall(packId, uiSuiteId)
 
       if (!result.ok) {
         if (result.needsElevation) {
           setInstall(emptyInstallState())
-          setElevation({ packId })
+          setElevation({ packId, uiSuiteId: uiSuiteId ?? null })
           return
         }
         setInstall((current) => failInstallState(current, result.code, result.message))
@@ -134,7 +145,7 @@ export default function App() {
     startedPending.current = true
     void (async () => {
       await window.easypz.consumePendingAction()
-      await startInstall(pending.packId)
+      await startInstall(pending.packId, pending.uiSuiteId)
     })()
   }, [bootstrap, startInstall])
 
@@ -153,6 +164,7 @@ export default function App() {
     const result = await window.easypz.restartAsAdmin({
       type: 'install',
       packId: elevation.packId,
+      uiSuiteId: elevation.uiSuiteId,
     })
     setElevating(false)
     if (!result.ok) showToast('error', result.message)
@@ -232,6 +244,16 @@ export default function App() {
     await window.easypz.openLogs()
   }, [])
 
+  const refreshCatalog = useCallback(async () => {
+    const result = await window.easypz.refreshCatalog()
+    if (result.ok) {
+      setBootstrap(result.data)
+      showToast('success', t('toast.catalogRefreshed'))
+    } else {
+      showToast('error', result.message)
+    }
+  }, [showToast, t])
+
   const openPath = useCallback(async (target: string | null) => {
     if (target) await window.easypz.openPath(target)
   }, [])
@@ -309,13 +331,8 @@ export default function App() {
     [bootstrap, packNameFor, performToggle, showToast, t],
   )
 
-  const requestInstall = useCallback(
-    (packId: string) => {
-      if (bootstrap?.game.gameRunning) {
-        showToast('info', t('catalog.gameRunningHint'))
-        return
-      }
-
+  const beginInstall = useCallback(
+    (packId: string, uiSuiteId: string | null) => {
       const activePackId = bootstrap?.state.activePackId ?? null
       if (activePackId && activePackId !== packId) {
         setConfirmRequest({
@@ -326,16 +343,66 @@ export default function App() {
           }),
           confirmLabel: t('confirm.installAction'),
           onConfirm: async () => {
-            await startInstall(packId)
+            await startInstall(packId, uiSuiteId)
           },
         })
         return
       }
 
-      void startInstall(packId)
+      void startInstall(packId, uiSuiteId)
     },
-    [bootstrap, packNameFor, showToast, startInstall, t],
+    [bootstrap, packNameFor, startInstall, t],
   )
+
+  const requestInstall = useCallback(
+    (packId: string) => {
+      if (bootstrap?.game.gameRunning) {
+        showToast('info', t('catalog.gameRunningHint'))
+        return
+      }
+      const value =
+        bootstrap?.state.installs[packId]?.uiSuiteId ?? bootstrap?.catalog.uiSuites[0]?.id ?? ''
+      setSuiteDialog({ packId, mode: 'install', value })
+    },
+    [bootstrap, showToast, t],
+  )
+
+  const requestChangeSuite = useCallback(
+    (packId: string) => {
+      if (bootstrap?.game.gameRunning) {
+        showToast('info', t('catalog.gameRunningHint'))
+        return
+      }
+      const value =
+        bootstrap?.state.installs[packId]?.uiSuiteId ?? bootstrap?.catalog.uiSuites[0]?.id ?? ''
+      setSuiteDialog({ packId, mode: 'change', value })
+    },
+    [bootstrap, showToast, t],
+  )
+
+  const confirmSuite = useCallback(async () => {
+    if (!suiteDialog) return
+    if (suiteDialog.mode === 'install') {
+      const next = suiteDialog
+      setSuiteDialog(null)
+      beginInstall(next.packId, next.value || null)
+      return
+    }
+
+    setSuiteBusy(true)
+    try {
+      const result = await window.easypz.applyUiSuite(suiteDialog.packId, suiteDialog.value)
+      if (!result.ok) {
+        showToast('error', result.message)
+        return
+      }
+      setBootstrap(result.data)
+      setSuiteDialog(null)
+      showToast('success', t('toast.uiSuiteChanged'))
+    } finally {
+      setSuiteBusy(false)
+    }
+  }, [beginInstall, showToast, suiteDialog, t])
 
   const repairPack = useCallback(
     async (packId: string) => {
@@ -523,6 +590,7 @@ export default function App() {
               onInstall={requestInstall}
               onToggle={requestToggle}
               onRepair={repairPack}
+              onChangeSuite={requestChangeSuite}
               busy={busyPackId === selectedPack.id || install.running}
             />
           ) : (
@@ -546,6 +614,7 @@ export default function App() {
               setSelectedPackId(null)
             }}
             onRepair={repairPack}
+            onUpdate={requestInstall}
             onToggle={requestToggle}
             onDelete={requestDelete}
             onVerify={verifyPack}
@@ -562,6 +631,7 @@ export default function App() {
             onLanguage={(language) => void changeLanguage(language)}
             onOpen={(target) => void openPath(target)}
             onOpenLogs={() => void openLogs()}
+            onRefreshCatalog={refreshCatalog}
             onClearCache={requestClearCache}
             onSaveHeap={saveHeapMB}
             onApplyFpsBoost={applyFpsBoost}
@@ -585,10 +655,11 @@ export default function App() {
         onClose={() => setInstall(emptyInstallState())}
         onCancel={() => void cancelInstall()}
         onRetry={() => {
-          if (install.packId) void startInstall(install.packId)
+          if (install.packId) void startInstall(install.packId, installSuiteId)
         }}
         onOpenGame={() => void openPath(bootstrap.paths.game)}
         onOpenLogs={() => void openLogs()}
+        uiSuite={bootstrap.catalog.uiSuites.find((suite) => suite.id === installSuiteId) ?? null}
       />
 
       {elevation ? (
@@ -624,6 +695,22 @@ export default function App() {
           </div>
         </div>
       ) : null}
+
+      <UiSuiteDialog
+        open={Boolean(suiteDialog)}
+        packName={suiteDialog ? packNameFor(suiteDialog.packId) : ''}
+        suites={bootstrap.catalog.uiSuites}
+        value={suiteDialog?.value ?? ''}
+        mode={suiteDialog?.mode ?? 'install'}
+        loading={suiteBusy}
+        onSelect={(value) =>
+          setSuiteDialog((current) => (current ? { ...current, value } : current))
+        }
+        onConfirm={() => void confirmSuite()}
+        onClose={() => {
+          if (!suiteBusy) setSuiteDialog(null)
+        }}
+      />
 
       {confirmRequest ? (
         <ConfirmDialog

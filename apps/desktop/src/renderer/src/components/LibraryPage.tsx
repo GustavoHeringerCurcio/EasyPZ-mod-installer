@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import {
   AlertTriangle,
   CheckCircle2,
+  Download,
   HardDrive,
   RefreshCw,
   Server,
@@ -16,12 +17,14 @@ import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, Switch } from './ui'
 import { formatDate } from '../lib/format'
 import { packAccent } from '../lib/packTheme'
+import { packUpdateAvailable } from '../lib/packStatus'
 
 export function LibraryPage({
   bootstrap,
   busyPackId,
   onBrowse,
   onRepair,
+  onUpdate,
   onToggle,
   onDelete,
   onVerify,
@@ -31,6 +34,7 @@ export function LibraryPage({
   busyPackId: string | null
   onBrowse: () => void
   onRepair: (packId: string) => void
+  onUpdate: (packId: string) => void
   onToggle: (packId: string, enabled: boolean) => void
   onDelete: (packId: string) => void
   onVerify: (packId: string) => Promise<PackHealth | null>
@@ -123,7 +127,11 @@ export function LibraryPage({
           const healthForPack = health[pack.id]
           const busy = busyPackId === pack.id
           const installRecord = bootstrap.state.installs[pack.id]
+          const updateAvailable = packUpdateAvailable(bootstrap, pack.id)
           const accent = packAccent(pack)
+          const suite = bootstrap.catalog.uiSuites.find(
+            (candidate) => candidate.id === installRecord?.uiSuiteId,
+          )
 
           return (
             <Panel
@@ -150,6 +158,10 @@ export function LibraryPage({
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="font-display text-xl font-bold text-bone">{pack.name}</h2>
                     {!active ? <Badge tone="muted">{t('library.stored')}</Badge> : null}
+                    {suite ? <Badge tone="muted">{suite.name}</Badge> : null}
+                    {updateAvailable ? (
+                      <Badge tone="warn">{t('library.updateAvailable')}</Badge>
+                    ) : null}
                   </div>
                   <p className="mt-0.5 text-xs text-muted">{pack.tagline}</p>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted">
@@ -215,7 +227,17 @@ export function LibraryPage({
                       showLabel={false}
                       onChange={(enabled) => onToggle(pack.id, enabled)}
                     />
-                    {active ? (
+                    {updateAvailable ? (
+                      <Button
+                        size="sm"
+                        variant="light"
+                        onClick={() => onUpdate(pack.id)}
+                        disabled={busy}
+                      >
+                        <Download className="size-3.5" />
+                        {t('library.update')}
+                      </Button>
+                    ) : active ? (
                       <Button
                         size="sm"
                         variant="secondary"

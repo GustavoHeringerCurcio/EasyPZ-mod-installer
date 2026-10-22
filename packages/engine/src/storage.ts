@@ -1,7 +1,12 @@
 ﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Catalog } from '@easypz/catalog'
-import { getEffectiveMods, getPack } from '@easypz/catalog'
+import {
+  getDefaultUiSuite,
+  getEffectiveMods,
+  getEffectiveModsForSuite,
+  getPack,
+} from '@easypz/catalog'
 import { loadState, type AppState, type InstalledMod } from './state.js'
 import type { AppPaths } from './paths.js'
 import { activeModPath, storeModPath } from './paths.js'
@@ -184,11 +189,11 @@ export async function getPackStorageMods(
   state?: AppState,
 ): Promise<StorageMod[]> {
   const pack = getPack(catalog, packId)
-  if (pack.source === 'workshop') {
-    const currentState = state ?? (await loadState(paths, { catalog, migrate: true }))
-    return currentState.installs[packId]?.mods ?? []
-  }
-  return getEffectiveMods(catalog, packId)
+  const currentState = state ?? (await loadState(paths, { catalog, migrate: true }))
+  const install = currentState.installs[packId]
+  if (install) return install.mods
+  if (pack.source === 'workshop') return []
+  return getEffectiveModsForSuite(catalog, packId, getDefaultUiSuite(catalog)?.id ?? null)
 }
 
 export async function isPackAvailable(
@@ -365,7 +370,11 @@ export async function deletePackStorage(options: {
 }): Promise<{ removed: number; keptShared: number }> {
   const { catalog, packId, paths, otherAvailablePackIds, state } = options
   const currentState = state ?? (await loadState(paths, { catalog, migrate: true }))
-  const targetMods = await getPackStorageMods(catalog, packId, paths, currentState)
+  const install = currentState.installs[packId]
+  const targetMods =
+    install && install.allMods.length > 0
+      ? install.allMods
+      : await getPackStorageMods(catalog, packId, paths, currentState)
   const otherKeys = new Set<string>()
   for (const otherId of otherAvailablePackIds) {
     if (otherId === packId) continue

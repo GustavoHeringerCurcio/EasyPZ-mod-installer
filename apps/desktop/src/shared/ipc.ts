@@ -1,4 +1,4 @@
-import type { Catalog, IndexedPack } from '@easypz/catalog'
+﻿import type { Catalog, IndexedPack, UiSuite } from '@easypz/catalog'
 import type {
   AppState,
   DeletePackResult,
@@ -32,14 +32,21 @@ export interface Settings {
 export interface PendingAction {
   type: 'install'
   packId: string
+  uiSuiteId?: string | null
 }
 
 export interface PackView extends IndexedPack {
   coverDataUrl: string | null
 }
 
-export interface CatalogView extends Omit<Catalog, 'packs'> {
+export interface UiSuiteView extends UiSuite {
+  coverDataUrl: string | null
+  galleryDataUrls: string[]
+}
+
+export interface CatalogView extends Omit<Catalog, 'packs' | 'uiSuites'> {
   packs: PackView[]
+  uiSuites: UiSuiteView[]
 }
 
 export interface AppPathView {
@@ -56,6 +63,8 @@ export interface Bootstrap {
   appVersion: string
   isPackaged: boolean
   catalog: CatalogView
+  catalogSource: 'remote' | 'bundled'
+  catalogBaseUrl: string | null
   game: GameInfo
   state: AppState
   availablePackIds: string[]
@@ -80,13 +89,17 @@ export type OperationResult<T = void> =
 
 export interface EasyPzApi {
   getBootstrap: () => Promise<Bootstrap>
-  startInstall: (packId: string) => Promise<OperationResult<InstallSummary>>
+  startInstall: (
+    packId: string,
+    uiSuiteId?: string | null,
+  ) => Promise<OperationResult<InstallSummary>>
   cancelInstall: () => Promise<void>
   setPackEnabled: (packId: string, enabled: boolean) => Promise<OperationResult<PackToggleResult>>
   repairPack: (packId: string) => Promise<OperationResult<PackToggleResult>>
   deletePack: (packId: string) => Promise<OperationResult<DeletePackResult>>
   verify: (packId: string) => Promise<OperationResult<PackHealth>>
   applyHost: (packId: string) => Promise<OperationResult<HostApplyResult>>
+  applyUiSuite: (packId: string, uiSuiteId: string) => Promise<OperationResult<Bootstrap>>
   setGamePath: (gamePath: string | null) => Promise<OperationResult<Bootstrap>>
   pickGamePath: () => Promise<string | null>
   setLanguage: (language: Language) => Promise<OperationResult<Bootstrap>>
@@ -97,6 +110,7 @@ export interface EasyPzApi {
   ) => Promise<OperationResult<FpsBoostApplyResult>>
   openPath: (target: string) => Promise<void>
   openLogs: () => Promise<void>
+  refreshCatalog: () => Promise<OperationResult<Bootstrap>>
   clearCache: () => Promise<OperationResult<Bootstrap>>
   restartAsAdmin: (pending: PendingAction | null) => Promise<OperationResult<never>>
   consumePendingAction: () => Promise<PendingAction | null>
@@ -112,6 +126,7 @@ export const IPC = {
   deletePack: 'pack:delete',
   verify: 'pack:verify',
   applyHost: 'host:apply',
+  applyUiSuite: 'pack:applyUiSuite',
   setGamePath: 'settings:setGamePath',
   pickGamePath: 'settings:pickGamePath',
   setLanguage: 'settings:setLanguage',
@@ -119,6 +134,7 @@ export const IPC = {
   applyFpsBoost: 'settings:applyFpsBoost',
   openPath: 'app:openPath',
   openLogs: 'app:openLogs',
+  refreshCatalog: 'app:refreshCatalog',
   clearCache: 'app:clearCache',
   restartAsAdmin: 'app:restartAsAdmin',
   consumePendingAction: 'app:consumePendingAction',

@@ -1,12 +1,14 @@
-import { describe, expect, it } from 'vitest'
+﻿import { describe, expect, it } from 'vitest'
 import { buildCatalog } from './build.js'
 import {
   catalogSchema,
   getActiveModIds,
   getEffectiveMods,
+  getEffectiveModsForSuite,
   getManagedFolders,
   getPack,
   getWorkshopIds,
+  getWorkshopIdsForSuite,
   packSchema,
 } from './schema.js'
 
@@ -52,6 +54,25 @@ describe('catalog', () => {
     expect(ultra.workshop?.items.at(-1)?.id).toBe('3713362869')
   })
 
+  it('resolves UI suites and strips conflicting mods', async () => {
+    const catalog = await buildCatalog({ mode: 'alpha', write: false })
+
+    const dayz = getEffectiveModsForSuite(catalog, 'medium', 'dayz')
+    expect(dayz.some((mod) => mod.id === 'ViewpointDayZInventory')).toBe(true)
+    expect(dayz.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
+    expect(dayz.some((mod) => mod.id === 'ViewpointVehicleTuningCompat')).toBe(false)
+
+    const tarkov = getEffectiveModsForSuite(catalog, 'advanced', 'tarkov')
+    expect(tarkov.some((mod) => mod.id === 'ProjectTarkovHUD')).toBe(true)
+    expect(tarkov.some((mod) => mod.id === 'ProjectTarkovLootInventory')).toBe(true)
+    expect(tarkov.some((mod) => mod.id === 'INVENTORY_TETRIS')).toBe(true)
+    expect(tarkov.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
+
+    const ultraDayZItems = getWorkshopIdsForSuite(catalog, 'ultra', 'dayz')
+    expect(ultraDayZItems).toContain('3816819422')
+    expect(ultraDayZItems).not.toContain('3812616893')
+    expect(ultraDayZItems).not.toContain('3815739336')
+  })
   it('points alpha archives at the legacy mirror and public archives at this repo', async () => {
     const alpha = await buildCatalog({ mode: 'alpha', write: false })
     const published = await buildCatalog({ mode: 'public', write: false })

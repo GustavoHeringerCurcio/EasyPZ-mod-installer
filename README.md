@@ -15,6 +15,7 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 - Download progress, checksum verification, extraction progress, cancellation, and actionable errors.
 - Switching moves only EasyPZ-managed mod folders; unmanaged mods and `default.txt` entries are preserved.
 - Library health checks, toggles, delete, repair, and explicit host sync.
+- Catalog source/version display and manual refresh; installed packs show **Update available** when the catalog changes, with an **Update pack** action instead of Repair.
 - Legacy migration: reuses the old profile, marker, and archive cache when the hash matches.
 - **FPS Boost** section in Settings: an independent game RAM slider, Recommended/Light one-click presets, restore defaults, and an explicit change preview.
 - English by default, Portuguese (BR) toggle.

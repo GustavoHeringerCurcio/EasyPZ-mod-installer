@@ -248,6 +248,7 @@ describe('pack storage', () => {
       workshopCollectionId: '555',
       archiveSha256: 'workshop:555',
       catalogGeneratedAt: catalog.generatedAt,
+      packUpdatedAt: null,
       installedAt: new Date().toISOString(),
       managedFolders: ['ModW1', 'ModW2'],
       mods: [

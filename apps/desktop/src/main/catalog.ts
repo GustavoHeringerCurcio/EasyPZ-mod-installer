@@ -1,4 +1,4 @@
-import fs from 'node:fs/promises'
+﻿import fs from 'node:fs/promises'
 import path from 'node:path'
 import { app } from 'electron'
 import { catalogSchema, type Catalog } from '@easypz/catalog'
@@ -27,7 +27,9 @@ async function readBundledCatalog(): Promise<Catalog> {
 }
 
 async function fetchRemoteCatalog(url: string): Promise<{ catalog: Catalog; baseUrl: string }> {
-  const response = await fetch(url, {
+  const requestUrl = new URL(url)
+  requestUrl.searchParams.set('t', Date.now().toString())
+  const response = await fetch(requestUrl, {
     headers: { 'User-Agent': `EasyPZ-Mod-Installer/${app.getVersion()}` },
     signal: AbortSignal.timeout(8000),
   })
@@ -65,6 +67,10 @@ export async function loadCatalog(): Promise<Catalog> {
 
 export function getCatalogSource(): { baseUrl: string | null; source: 'remote' | 'bundled' } {
   return { baseUrl: activeBaseUrl, source: activeSource }
+}
+
+export function clearCatalogCache(): void {
+  cached = null
 }
 
 function mimeFor(file: string): string {
@@ -112,11 +118,21 @@ export async function toCatalogView(catalog: Catalog): Promise<CatalogView> {
       coverDataUrl: await readCover(pack.cover),
     })),
   )
+  const uiSuites = await Promise.all(
+    catalog.uiSuites.map(async (suite) => ({
+      ...suite,
+      coverDataUrl: await readCover(suite.cover),
+      galleryDataUrls: (await Promise.all(suite.gallery.map((asset) => readCover(asset)))).filter(
+        (asset): asset is string => Boolean(asset),
+      ),
+    })),
+  )
 
   return {
     schemaVersion: catalog.schemaVersion,
     mode: catalog.mode,
     generatedAt: catalog.generatedAt,
     packs,
+    uiSuites,
   }
 }
