@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   AlertTriangle,
   Archive,
@@ -6,6 +7,7 @@ import {
   FileText,
   FolderOpen,
   Gamepad2,
+  Gauge,
   Globe2,
   HardDrive,
   RefreshCw,
@@ -13,6 +15,7 @@ import {
   ShieldCheck,
   Trash2,
   Wrench,
+  Zap,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Bootstrap, Language } from '../../../shared/ipc'
@@ -27,6 +30,8 @@ export function SettingsPage({
   onOpen,
   onOpenLogs,
   onClearCache,
+  onSaveHeap,
+  onApplyFpsBoost,
 }: {
   bootstrap: Bootstrap
   onPickGamePath: () => Promise<void>
@@ -35,10 +40,47 @@ export function SettingsPage({
   onOpen: (target: string | null) => void
   onOpenLogs: () => void
   onClearCache: () => void
+  onSaveHeap: (heapMB: number) => Promise<void>
+  onApplyFpsBoost: (heapMB: number) => Promise<void>
 }) {
   const { t } = useTranslation()
   const game = bootstrap.game
   const paths = bootstrap.paths
+  const minHeapMB = 3072
+  const maxHeapMB = Math.max(
+    minHeapMB,
+    Math.min(16384, Math.floor(game.totalRamMB / 2 / 512) * 512),
+  )
+  const currentHeapMB = bootstrap.settings.heapMB ?? game.currentHeapMB ?? game.recommendedHeapMB
+  const [heapDraft, setHeapDraft] = useState(() =>
+    Math.min(maxHeapMB, Math.max(minHeapMB, currentHeapMB)),
+  )
+  const [heapBusy, setHeapBusy] = useState(false)
+  const [fpsBusy, setFpsBusy] = useState(false)
+
+  useEffect(() => {
+    setHeapDraft(Math.min(maxHeapMB, Math.max(minHeapMB, currentHeapMB)))
+  }, [currentHeapMB, maxHeapMB])
+
+  const canApply = game.found && !game.gameRunning && !heapBusy && !fpsBusy
+
+  const saveHeap = async (): Promise<void> => {
+    setHeapBusy(true)
+    try {
+      await onSaveHeap(heapDraft)
+    } finally {
+      setHeapBusy(false)
+    }
+  }
+
+  const applyFpsBoost = async (): Promise<void> => {
+    setFpsBusy(true)
+    try {
+      await onApplyFpsBoost(heapDraft)
+    } finally {
+      setFpsBusy(false)
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-4xl px-8 py-8">
@@ -100,7 +142,7 @@ export function SettingsPage({
               <InfoCell
                 icon={HardDrive}
                 label={t('settings.heap')}
-                value={`${game.recommendedHeapMB} MB`}
+                value={`${game.currentHeapMB ?? game.recommendedHeapMB} MB`}
               />
               <InfoCell icon={Gamepad2} label={t('pack.build')} value={game.gameVersion ?? '—'} />
             </div>
@@ -111,6 +153,88 @@ export function SettingsPage({
                 {game.detectionError}
               </div>
             ) : null}
+          </Panel>
+        </section>
+
+        <section>
+          <SectionTitle aside={<Badge tone="brand">FPS BOOST</Badge>}>
+            {t('settings.fpsBoost')}
+          </SectionTitle>
+          <Panel className="mt-3 overflow-hidden">
+            <div className="h-0.5 w-full bg-brand" />
+            <div className="space-y-5 p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-sm font-medium text-bone">
+                    <Gauge className="size-4 text-brand" />
+                    {t('settings.heapSlider')}
+                  </div>
+                  <p className="mt-1 max-w-xl text-[11px] leading-relaxed text-muted">
+                    {t('settings.heapSliderHint')}
+                  </p>
+                </div>
+                <div className="shrink-0 text-left sm:text-right">
+                  <div className="font-display text-2xl font-bold text-bone">
+                    {(heapDraft / 1024).toFixed(1)} GB
+                  </div>
+                  <div className="text-[10px] text-muted">
+                    {t('settings.heapRecommended', {
+                      gb: (game.recommendedHeapMB / 1024).toFixed(0),
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <input
+                  type="range"
+                  min={minHeapMB}
+                  max={maxHeapMB}
+                  step={512}
+                  value={heapDraft}
+                  disabled={!canApply}
+                  onChange={(event) => setHeapDraft(Number(event.target.value))}
+                  className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-brand disabled:cursor-not-allowed disabled:opacity-45"
+                  aria-label={t('settings.heapSlider')}
+                />
+                <div className="mt-1.5 flex justify-between text-[10px] text-muted">
+                  <span>3 GB</span>
+                  <span>{Math.round(maxHeapMB / 1024)} GB</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  size="md"
+                  onClick={() => void saveHeap()}
+                  loading={heapBusy}
+                  disabled={!canApply}
+                >
+                  <HardDrive className="size-4" />
+                  {t('settings.saveHeap')}
+                </Button>
+                <Button
+                  size="md"
+                  variant="light"
+                  onClick={() => void applyFpsBoost()}
+                  loading={fpsBusy}
+                  disabled={!canApply}
+                >
+                  <Zap className="size-4" />
+                  {t('settings.applyFpsBoost')}
+                </Button>
+              </div>
+
+              <p className="rounded-xl border border-line bg-panel-2/60 px-3 py-2 text-[11px] leading-relaxed text-muted">
+                {t('settings.fpsBoostHint')}
+              </p>
+              {game.gameRunning ? (
+                <p className="flex items-start gap-2 text-[11px] leading-relaxed text-warn">
+                  <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+                  {t('settings.gameMustBeClosed')}
+                </p>
+              ) : null}
+            </div>
           </Panel>
         </section>
 

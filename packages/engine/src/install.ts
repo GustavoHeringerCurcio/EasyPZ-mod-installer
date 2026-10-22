@@ -21,6 +21,7 @@ export interface InstallOptions {
   packId: string
   paths: AppPaths
   gamePathOverride?: string | null
+  heapMB?: number | null
   forceRedownload?: boolean
   skipZombieBuddy?: boolean
   skipActivate?: boolean
@@ -200,10 +201,10 @@ async function installWorkshopPack(args: {
   await applyGameConfig({
     pzPath,
     zomboidDir: paths.zomboidDir,
-    heapMB: game.recommendedHeapMB,
+    heapMB: options.heapMB ?? game.recommendedHeapMB,
     zombieBuddyInstalled: await isZombieBuddyInstalled(pzPath),
   })
-  stageEvent(onEvent, 'configure', 'done', `Heap ${game.recommendedHeapMB} MB`)
+  stageEvent(onEvent, 'configure', 'done', `Heap ${options.heapMB ?? game.recommendedHeapMB} MB`)
 
   ensureNotCancelled(signal)
 
@@ -438,10 +439,10 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
     await applyGameConfig({
       pzPath,
       zomboidDir: paths.zomboidDir,
-      heapMB: game.recommendedHeapMB,
+      heapMB: options.heapMB ?? game.recommendedHeapMB,
       zombieBuddyInstalled,
     })
-    stageEvent(onEvent, 'configure', 'done', `Heap ${game.recommendedHeapMB} MB`)
+    stageEvent(onEvent, 'configure', 'done', `Heap ${options.heapMB ?? game.recommendedHeapMB} MB`)
 
     ensureNotCancelled(signal)
 

@@ -2,6 +2,24 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { EasyPzError, toError } from './errors.js'
 
+export const MIN_HEAP_MB = 3072
+export const MAX_HEAP_MB = 16384
+
+export function maxHeapMB(totalRamMB: number): number {
+  if (!Number.isFinite(totalRamMB) || totalRamMB <= 0) return MAX_HEAP_MB
+  const half = Math.floor(totalRamMB / 2)
+  const capped = Math.min(MAX_HEAP_MB, Math.max(MIN_HEAP_MB, half))
+  return Math.floor(capped / 512) * 512
+}
+
+export function normalizeHeapMB(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null
+  const numeric = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numeric)) return null
+  const rounded = Math.round(numeric / 512) * 512
+  return Math.max(MIN_HEAP_MB, Math.min(MAX_HEAP_MB, rounded))
+}
+
 export interface GameConfigResult {
   jsonPatched: boolean
   batPatched: boolean
@@ -15,13 +33,14 @@ export async function applyGameConfig(options: {
   heapMB: number
   zombieBuddyInstalled: boolean
 }): Promise<GameConfigResult> {
-  const { pzPath, zomboidDir, heapMB, zombieBuddyInstalled } = options
-  const xmx = `-Xmx${heapMB}m`
+  const { pzPath, zomboidDir, zombieBuddyInstalled } = options
+  const heap = normalizeHeapMB(options.heapMB) ?? options.heapMB
+  const xmx = `-Xmx${heap}m`
   const result: GameConfigResult = {
     jsonPatched: false,
     batPatched: false,
     optionsPatched: false,
-    heapMB,
+    heapMB: heap,
   }
 
   const jsonPath = path.join(pzPath, 'ProjectZomboid64.json')
@@ -99,4 +118,130 @@ export async function applyGameConfig(options: {
   }
 
   return result
+}
+
+const FPS_BOOST_PROPERTIES: Record<string, string> = {
+  'memory.floorMiB': '768',
+  'pack.trueweathers.occlusion': 'false',
+  'pack.trueweathers.reflections': 'low',
+  'pack.trueweathers.shadowCascades': '2',
+  'pack.trueweathers.shadowResolution': '1024',
+  'pack.trueweathers.sunShafts': 'false',
+  'pack.trueweathers.rainDensity': '50',
+  'pack.trueweathers.wetWalls': 'false',
+  'pack.trueweathers.renderScale': '90',
+}
+
+const FPS_BOOST_OPTIONS: Record<string, string> = {
+  bloodDecals: '6',
+  maxActiveRagdolls: '12',
+  maxVehicleTextureSize: '1',
+}
+
+const FPS_BOOST_MOD_OPTIONS: Record<string, string> = {
+  'combobox|ViewpointTrueWeathers|quality': '2',
+  'combobox|ViewpointTrueWeathers|precipitation': '2',
+}
+
+export interface PerformanceConfigResult extends GameConfigResult {
+  propertiesPatched: boolean
+  modOptionsPatched: boolean
+  backupDir: string | null
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function setIniValue(raw: string, key: string, value: string): string {
+  const eol = raw.includes('\r\n') ? '\r\n' : '\n'
+  const pattern = new RegExp(`^${escapeRegExp(key)}=.*$`, 'm')
+  if (pattern.test(raw)) return raw.replace(pattern, `${key}=${value}`)
+  const base = raw.length > 0 ? raw.replace(/\s+$/, '') : ''
+  return `${base}${base ? eol : ''}${key}=${value}${eol}`
+}
+
+function setPipeValue(raw: string, prefix: string, value: string): string {
+  const eol = raw.includes('\r\n') ? '\r\n' : '\n'
+  const pattern = new RegExp(`^${escapeRegExp(prefix)}\\|.*$`, 'm')
+  if (pattern.test(raw)) return raw.replace(pattern, `${prefix}|${value}`)
+  const base = raw.length > 0 ? raw.replace(/\s+$/, '') : ''
+  return `${base}${base ? eol : ''}${prefix}|${value}${eol}`
+}
+
+async function readOptional(file: string): Promise<string | null> {
+  try {
+    return await fs.readFile(file, 'utf8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
+}
+
+export async function applyPerformanceConfig(options: {
+  pzPath: string
+  zomboidDir: string
+  backupDir: string | null
+  heapMB: number
+  zombieBuddyInstalled: boolean
+}): Promise<PerformanceConfigResult> {
+  const { pzPath, zomboidDir, zombieBuddyInstalled } = options
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+  const backupTarget = options.backupDir
+    ? path.join(options.backupDir, `easyPZ-fps-boost-${stamp}`)
+    : null
+
+  if (backupTarget) await fs.mkdir(backupTarget, { recursive: true })
+
+  const backup = async (source: string): Promise<void> => {
+    if (!backupTarget) return
+    try {
+      await fs.copyFile(source, path.join(backupTarget, path.basename(source)))
+    } catch {
+      // The file does not exist yet; nothing to back up.
+    }
+  }
+
+  const propertiesPath = path.join(zomboidDir, 'viewpoint-live.properties')
+  await backup(propertiesPath)
+  let properties = (await readOptional(propertiesPath)) ?? ''
+  for (const [key, value] of Object.entries(FPS_BOOST_PROPERTIES)) {
+    properties = setIniValue(properties, key, value)
+  }
+  await fs.writeFile(propertiesPath, properties, 'utf8')
+
+  const optionsPath = path.join(zomboidDir, 'options.ini')
+  await backup(optionsPath)
+  let ini = (await readOptional(optionsPath)) ?? ''
+  for (const [key, value] of Object.entries(FPS_BOOST_OPTIONS)) {
+    ini = setIniValue(ini, key, value)
+  }
+  await fs.writeFile(optionsPath, ini, 'ascii')
+
+  const modOptionsPath = path.join(zomboidDir, 'Lua', 'ModOptions.ini')
+  let modOptionsPatched = false
+  const modOptions = await readOptional(modOptionsPath)
+  if (modOptions !== null) {
+    await backup(modOptionsPath)
+    let next = modOptions
+    for (const [key, value] of Object.entries(FPS_BOOST_MOD_OPTIONS)) {
+      next = setPipeValue(next, key, value)
+    }
+    await fs.writeFile(modOptionsPath, next, 'utf8')
+    modOptionsPatched = true
+  }
+
+  const gameConfig = await applyGameConfig({
+    pzPath,
+    zomboidDir,
+    heapMB: options.heapMB,
+    zombieBuddyInstalled,
+  })
+
+  return {
+    ...gameConfig,
+    propertiesPatched: true,
+    modOptionsPatched,
+    backupDir: backupTarget,
+  }
 }

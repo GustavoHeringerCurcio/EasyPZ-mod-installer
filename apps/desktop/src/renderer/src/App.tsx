@@ -176,6 +176,32 @@ export default function App() {
     [i18n, showToast],
   )
 
+  const saveHeapMB = useCallback(
+    async (heapMB: number) => {
+      const result = await window.easypz.setHeapMB(heapMB)
+      if (result.ok) {
+        setBootstrap(result.data)
+        showToast('success', t('toast.heapSaved', { gb: (heapMB / 1024).toFixed(1) }))
+      } else {
+        showToast('error', result.message)
+      }
+    },
+    [showToast, t],
+  )
+
+  const applyFpsBoost = useCallback(
+    async (heapMB: number) => {
+      const result = await window.easypz.applyFpsBoost(heapMB)
+      if (result.ok) {
+        setBootstrap(result.data)
+        showToast('success', t('toast.fpsBoostApplied'))
+      } else {
+        showToast('error', result.message)
+      }
+    },
+    [showToast, t],
+  )
+
   const pickGamePath = useCallback(async () => {
     const picked = await window.easypz.pickGamePath()
     if (!picked) return
@@ -533,6 +559,8 @@ export default function App() {
             onOpen={(target) => void openPath(target)}
             onOpenLogs={() => void openLogs()}
             onClearCache={requestClearCache}
+            onSaveHeap={saveHeapMB}
+            onApplyFpsBoost={applyFpsBoost}
           />
         ) : null}
 

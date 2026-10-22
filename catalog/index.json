@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mode": "alpha",
-  "generatedAt": "2026-10-21T05:42:41.674Z",
+  "generatedAt": "2026-10-22T16:41:18.026Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -649,7 +649,7 @@
       "id": "ultra",
       "name": "Ultra",
       "tagline": "The complete co-op Viewpoint base",
-      "description": "The complete co-op Viewpoint base: Advanced plus horses, weather, maps, missions, events, 3D world detail, and a curated vehicle fleet. Built from a pinned Workshop item list.",
+      "description": "The complete co-op Viewpoint base: Advanced plus horses, weather, maps, missions, events, 3D world detail, and a curated vehicle fleet. Built from a pinned Workshop item list. Includes the EasyPZ FPS Boost profile.",
       "cover": "packs/ultra/cover.jpg",
       "gallery": [],
       "accent": "#f5b301",
@@ -665,6 +665,7 @@
         "maps",
         "missions",
         "weather",
+        "fps-boost",
         "new-save",
         "workshop"
       ],
@@ -674,7 +675,7 @@
       "archive": null,
       "workshop": {
         "collectionId": "0",
-        "downloadBytes": 3513104431,
+        "downloadBytes": 3077217481,
         "items": [
           {
             "id": "3619862853",
@@ -1013,12 +1014,6 @@
             "group": "Horses, weather, and utility"
           },
           {
-            "id": "3816856700",
-            "name": "Yeah it's water bitch-(fix-update)",
-            "sizeBytes": 6151240,
-            "group": "Horses, weather, and utility"
-          },
-          {
             "id": "3815245833",
             "name": "Visible Corpses in Trailers [B42]",
             "sizeBytes": 3911813,
@@ -1046,12 +1041,6 @@
             "id": "3820772682",
             "name": "Viewpoint Terrain Lights Fix [B42]",
             "sizeBytes": 434852,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3822754688",
-            "name": "Immersive Physics & Weather (Project Viewpoint)",
-            "sizeBytes": 678886,
             "group": "Horses, weather, and utility"
           },
           {
@@ -1161,12 +1150,6 @@
             "name": "Viewpoint - Forage 3D",
             "sizeBytes": 239589,
             "group": "3D world"
-          },
-          {
-            "id": "3820279516",
-            "name": "Viewpoint Directional Melee",
-            "sizeBytes": 136228,
-            "group": "Gameplay"
           },
           {
             "id": "3820063546",
@@ -1286,12 +1269,6 @@
             "id": "2962175696",
             "name": "'92 Ford Crown Victoria",
             "sizeBytes": 20320227,
-            "group": "Vehicles"
-          },
-          {
-            "id": "2971246021",
-            "name": "'99 Ford Crown Victoria Police Interceptor",
-            "sizeBytes": 9881697,
             "group": "Vehicles"
           },
           {
@@ -1445,12 +1422,6 @@
             "group": "Missions, events, transport, UI"
           },
           {
-            "id": "3818733381",
-            "name": "The Only Cure+ (Field Surgery)",
-            "sizeBytes": 419038899,
-            "group": "Missions, events, transport, UI"
-          },
-          {
             "id": "3386906181",
             "name": "[B42+] Sandbox Options",
             "sizeBytes": 9300440,
@@ -1520,10 +1491,11 @@
       },
       "groups": [],
       "warnings": [
-        "This package downloads 139 items from Steam Workshop and can take a long time.",
+        "This package downloads 134 items from Steam Workshop and can take a long time.",
         "Start a new save. Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash add map cells and are not safe to remove mid-save.",
         "Big Bear Lake is an alpha map. Some depth-map and first-person Viewpoint visuals may be unfinished.",
-        "Immersive Physics & Weather replaces Immersive Snow to avoid two competing 3D snow systems. Disable experimental vehicle soft-body physics if vehicles misbehave.",
+        "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability.",
+        "FPS Boost is available in EasyPZ Settings: it applies the Viewpoint floor atlas, lighter True Weathers, blood/ragdoll and vehicle texture limits without removing visual mods.",
         "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items and maps.",
         "Workshop updates can change this pack at any time. Update all clients and the server together.",
         "Faster Reading is placed last in the item list for load order. If books are still slow, verify it is enabled and check console.txt for Lua errors.",
@@ -1534,12 +1506,12 @@
         "This catalog entry uses public Steam Workshop item IDs; it is not claimed as original work.",
         "Not affiliated with The Indie Stone."
       ],
-      "updatedAt": "2026-10-21",
+      "updatedAt": "2026-10-22",
       "stats": {
-        "clientMods": 139,
+        "clientMods": 134,
         "serverMods": 0,
-        "totalMods": 139,
-        "workshopCount": 139
+        "totalMods": 134,
+        "workshopCount": 134
       }
     },
     {

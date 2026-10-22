@@ -11,6 +11,7 @@ export interface GameInfo {
   gameVersion: string | null
   totalRamMB: number
   recommendedHeapMB: number
+  currentHeapMB: number | null
   freeDiskGB: number | null
   gameRunning: boolean
   elevated: boolean
@@ -192,6 +193,25 @@ async function readGameVersion(paths: AppPaths): Promise<string | null> {
   }
 }
 
+async function readCurrentHeapMB(pzPath: string): Promise<number | null> {
+  try {
+    const raw = await fs.readFile(path.join(pzPath, 'ProjectZomboid64.json'), 'utf8')
+    const json = JSON.parse(raw) as { vmArgs?: unknown }
+    const args = Array.isArray(json.vmArgs) ? json.vmArgs : []
+    for (const arg of args) {
+      if (typeof arg !== 'string') continue
+      const match = /^-Xmx(\d+)([mMgG])$/.exec(arg)
+      if (!match) continue
+      const value = Number(match[1])
+      if (!Number.isFinite(value)) continue
+      return match[2]?.toLowerCase() === 'g' ? value * 1024 : value
+    }
+  } catch {
+    // No launcher JSON yet.
+  }
+  return null
+}
+
 async function freeDiskGB(target: string): Promise<number | null> {
   try {
     const stats = await fs.statfs(target)
@@ -213,6 +233,7 @@ export async function getGameInfo(
     gameVersion: await readGameVersion(paths),
     totalRamMB,
     recommendedHeapMB: recommendedHeapMB(totalRamMB),
+    currentHeapMB: null,
     freeDiskGB: await freeDiskGB(paths.userProfile),
     gameRunning: await isGameRunning(),
     elevated: await isElevated(),
@@ -249,6 +270,7 @@ export async function getGameInfo(
 
     base.found = true
     base.pzPath = pzPath
+    base.currentHeapMB = await readCurrentHeapMB(pzPath)
     base.workshopRoot = workshopRoot
     base.canWriteGame =
       (await canWritePath(pzPath)) &&

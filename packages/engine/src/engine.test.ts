@@ -6,7 +6,12 @@ import type { Catalog } from '@easypz/catalog'
 import { buildDefaultTxt, writeDefaultTxt } from './activation.js'
 import { applyMods, removeModsNotInPack } from './apply.js'
 import { assertTarComplete } from './archive.js'
-import { applyGameConfig } from './gameConfig.js'
+import {
+  applyGameConfig,
+  applyPerformanceConfig,
+  maxHeapMB,
+  normalizeHeapMB,
+} from './gameConfig.js'
 import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.js'
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
@@ -215,6 +220,76 @@ describe('game configuration', () => {
     expect(bat).toContain('SET _JAVA_OPTIONS=-agentlib:zbNative')
     expect(bat).toContain('-Xmx8192m')
     expect(ini).toContain('textureCompression=true')
+  })
+
+  it('clamps game heap values to safe bounds', () => {
+    expect(normalizeHeapMB(null)).toBeNull()
+    expect(normalizeHeapMB(2048)).toBe(3072)
+    expect(normalizeHeapMB(9000)).toBe(9216)
+    expect(normalizeHeapMB(999999)).toBe(16384)
+    expect(maxHeapMB(32768)).toBe(16384)
+    expect(maxHeapMB(16384)).toBe(8192)
+  })
+
+  it('applies the FPS Boost profile and backs up the edited config', async () => {
+    const root = await tempDir('fps')
+    const pzPath = path.join(root, 'ProjectZomboid')
+    const zomboidDir = path.join(root, 'Zomboid')
+    const backupDir = path.join(root, 'backups')
+    await fs.mkdir(path.join(pzPath), { recursive: true })
+    await fs.mkdir(path.join(zomboidDir, 'Lua'), { recursive: true })
+
+    await fs.writeFile(
+      path.join(pzPath, 'ProjectZomboid64.json'),
+      JSON.stringify({ vmArgs: ['-Xmx3g'] }),
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(pzPath, 'ProjectZomboid64.bat'),
+      'SET _JAVA_OPTIONS=\njava -Xmx3g -jar game.jar\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'viewpoint-live.properties'),
+      'memory.floorMiB=512\npack.trueweathers.occlusion=true\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'options.ini'),
+      'bloodDecals=10\nmaxActiveRagdolls=20\nmaxVehicleTextureSize=2\ntextureCompression=false\n',
+      'utf8',
+    )
+    await fs.writeFile(
+      path.join(zomboidDir, 'Lua', 'ModOptions.ini'),
+      'combobox|ViewpointTrueWeathers|quality|3\ncombobox|ViewpointTrueWeathers|precipitation|3\n',
+      'utf8',
+    )
+
+    const result = await applyPerformanceConfig({
+      pzPath,
+      zomboidDir,
+      backupDir,
+      heapMB: 8192,
+      zombieBuddyInstalled: true,
+    })
+
+    const properties = await fs.readFile(path.join(zomboidDir, 'viewpoint-live.properties'), 'utf8')
+    const ini = await fs.readFile(path.join(zomboidDir, 'options.ini'), 'utf8')
+    const modOptions = await fs.readFile(path.join(zomboidDir, 'Lua', 'ModOptions.ini'), 'utf8')
+    const json = JSON.parse(await fs.readFile(path.join(pzPath, 'ProjectZomboid64.json'), 'utf8'))
+
+    expect(properties).toContain('memory.floorMiB=768')
+    expect(properties).toContain('pack.trueweathers.occlusion=false')
+    expect(ini).toContain('bloodDecals=6')
+    expect(ini).toContain('maxActiveRagdolls=12')
+    expect(ini).toContain('maxVehicleTextureSize=1')
+    expect(ini).toContain('textureCompression=true')
+    expect(modOptions).toContain('combobox|ViewpointTrueWeathers|quality|2')
+    expect(modOptions).toContain('combobox|ViewpointTrueWeathers|precipitation|2')
+    expect(json.vmArgs).toContain('-Xmx8192m')
+    expect(result.modOptionsPatched).toBe(true)
+    expect(result.backupDir).not.toBeNull()
+    await expect(fs.access(result.backupDir!)).resolves.toBeUndefined()
   })
 })
 

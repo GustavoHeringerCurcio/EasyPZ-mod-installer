@@ -1,12 +1,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { app } from 'electron'
+import { normalizeHeapMB } from '@easypz/engine'
 import type { Language, Settings } from '../shared/ipc'
 
 const defaults: Settings = {
   language: 'en',
   gamePathOverride: null,
   updateChannel: 'off',
+  heapMB: null,
 }
 
 function settingsPath(): string {
@@ -24,6 +26,7 @@ export async function readSettings(): Promise<Settings> {
           ? parsed.gamePathOverride
           : null,
       updateChannel: parsed.updateChannel === 'latest' ? 'latest' : 'off',
+      heapMB: typeof parsed.heapMB === 'number' ? normalizeHeapMB(parsed.heapMB) : null,
     }
   } catch {
     return { ...defaults }

@@ -171,7 +171,7 @@ const en = {
   },
   settings: {
     title: 'Settings',
-    subtitle: 'Detection, language, and maintenance.',
+    subtitle: 'Detection, performance, language, and maintenance.',
     game: 'Project Zomboid',
     detected: 'Detected',
     notFound: 'Not detected',
@@ -182,7 +182,17 @@ const en = {
     detection: 'Detection details',
     steamLibs: 'Steam libraries',
     ram: 'System RAM',
-    heap: 'Recommended game heap',
+    heap: 'Game heap',
+    heapSlider: 'Game RAM (heap)',
+    heapSliderHint:
+      'Writes -Xmx to ProjectZomboid64.json and the .bat launcher. Minimum 3 GB; the recommended value is based on your system RAM.',
+    heapRecommended: 'Recommended {{gb}} GB',
+    saveHeap: 'Save RAM',
+    applyFpsBoost: 'Apply FPS Boost',
+    fpsBoost: 'FPS Boost',
+    fpsBoostHint:
+      'Applies the Viewpoint floor atlas, True Weathers, blood, ragdoll and vehicle texture limits without removing your visual mods. A backup of the edited config files is kept in the Zomboid backups folder.',
+    gameMustBeClosed: 'Close Project Zomboid before changing RAM or applying FPS Boost.',
     language: 'Language',
     languageHint: 'English is the default. Portuguese is available for this alpha.',
     maintenance: 'Maintenance',
@@ -284,6 +294,8 @@ const en = {
     hostMissing: 'servertest.ini was not found.',
     gameUpdated: 'Game folder updated.',
     cacheCleared: 'Download cache cleared.',
+    heapSaved: 'Game RAM set to {{gb}} GB.',
+    fpsBoostApplied: 'FPS Boost applied. Restart Project Zomboid.',
     copied: 'Copied to clipboard.',
   },
   common: {

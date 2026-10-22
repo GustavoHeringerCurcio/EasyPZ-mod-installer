@@ -5,7 +5,9 @@ import { promisify } from 'node:util'
 import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } from 'electron'
 import {
   EasyPzError,
+  applyGameConfig,
   applyHostForPack,
+  applyPerformanceConfig,
   deletePack,
   getAppPaths,
   getAvailablePackIds,
@@ -16,7 +18,10 @@ import {
   hostIniPath,
   installPack,
   isEasyPzError,
+  isZombieBuddyInstalled,
   loadState,
+  maxHeapMB,
+  normalizeHeapMB,
   reconcileActivePack,
   recoverStorageJournal,
   repairPack,
@@ -233,6 +238,7 @@ function registerIpc(): void {
         packId: pack.id,
         paths,
         gamePathOverride: settings.gamePathOverride,
+        heapMB: settings.heapMB,
         signal: controller.signal,
         onEvent: sendInstallEvent,
       })
@@ -288,6 +294,7 @@ function registerIpc(): void {
         packId,
         paths: getAppPaths(),
         gamePathOverride: settings.gamePathOverride,
+        heapMB: settings.heapMB,
         onEvent: sendInstallEvent,
       })
       return { ok: true, data: result } satisfies OperationResult<PackToggleResult>
@@ -393,6 +400,99 @@ function registerIpc(): void {
     try {
       const settings: Settings = await updateSettings({ language })
       log.info(`Language set to ${settings.language}`)
+      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+    } catch (error) {
+      return fail(error)
+    }
+  })
+
+  ipcMain.handle(IPC.setHeapMB, async (_event, heapMB: unknown) => {
+    if (typeof heapMB !== 'number') return fail(new Error('Invalid game RAM value.'))
+    try {
+      const paths = getAppPaths()
+      const settings = await readSettings()
+      const game = await getGameInfo(paths, { gamePathOverride: settings.gamePathOverride })
+      if (!game.found || !game.pzPath) {
+        throw new EasyPzError(
+          'GAME_NOT_FOUND',
+          game.detectionError ??
+            'Project Zomboid was not found. Install it through Steam or choose the game folder in Settings.',
+        )
+      }
+      if (game.gameRunning) {
+        throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before changing the game RAM.')
+      }
+      if (!game.elevated && !game.canWriteGame) {
+        return {
+          ok: false,
+          code: 'ELEVATION_REQUIRED',
+          message: 'Administrator access is required to write to the Project Zomboid folder.',
+          needsElevation: true,
+        } satisfies OperationResult<never>
+      }
+
+      const requested = normalizeHeapMB(heapMB)
+      if (requested === null) return fail(new Error('Invalid game RAM value.'))
+      const heap = Math.min(requested, maxHeapMB(game.totalRamMB))
+
+      await applyGameConfig({
+        pzPath: game.pzPath,
+        zomboidDir: paths.zomboidDir,
+        heapMB: heap,
+        zombieBuddyInstalled: await isZombieBuddyInstalled(game.pzPath),
+      })
+      await updateSettings({ heapMB: heap })
+      log.info(`Game heap set to ${heap} MB`)
+      return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+    } catch (error) {
+      return fail(error)
+    }
+  })
+
+  ipcMain.handle(IPC.applyFpsBoost, async (_event, heapMB: unknown) => {
+    if (typeof heapMB !== 'number') return fail(new Error('Invalid game RAM value.'))
+    try {
+      const paths = getAppPaths()
+      const settings = await readSettings()
+      const game = await getGameInfo(paths, { gamePathOverride: settings.gamePathOverride })
+      if (!game.found || !game.pzPath) {
+        throw new EasyPzError(
+          'GAME_NOT_FOUND',
+          game.detectionError ??
+            'Project Zomboid was not found. Install it through Steam or choose the game folder in Settings.',
+        )
+      }
+      if (game.gameRunning) {
+        throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before applying FPS Boost.')
+      }
+      if (!game.elevated && !game.canWriteGame) {
+        return {
+          ok: false,
+          code: 'ELEVATION_REQUIRED',
+          message: 'Administrator access is required to write to the Project Zomboid folder.',
+          needsElevation: true,
+        } satisfies OperationResult<never>
+      }
+
+      const candidate =
+        normalizeHeapMB(heapMB) ??
+        normalizeHeapMB(settings.heapMB) ??
+        normalizeHeapMB(game.currentHeapMB) ??
+        normalizeHeapMB(game.recommendedHeapMB) ??
+        game.recommendedHeapMB
+      const heap = Math.min(candidate, maxHeapMB(game.totalRamMB))
+
+      const result = await applyPerformanceConfig({
+        pzPath: game.pzPath,
+        zomboidDir: paths.zomboidDir,
+        backupDir: paths.backupDir,
+        heapMB: heap,
+        zombieBuddyInstalled: await isZombieBuddyInstalled(game.pzPath),
+      })
+      await updateSettings({ heapMB: heap })
+      log.info(
+        `FPS Boost applied: heap=${result.heapMB} MB, backup=${result.backupDir ?? 'none'}, modOptions=${result.modOptionsPatched}`,
+      )
       return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
     } catch (error) {
       return fail(error)

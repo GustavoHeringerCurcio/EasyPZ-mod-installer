@@ -17,6 +17,7 @@ export interface Settings {
   language: Language
   gamePathOverride: string | null
   updateChannel: 'off' | 'latest'
+  heapMB: number | null
 }
 
 export interface PendingAction {
@@ -80,6 +81,8 @@ export interface EasyPzApi {
   setGamePath: (gamePath: string | null) => Promise<OperationResult<Bootstrap>>
   pickGamePath: () => Promise<string | null>
   setLanguage: (language: Language) => Promise<OperationResult<Bootstrap>>
+  setHeapMB: (heapMB: number) => Promise<OperationResult<Bootstrap>>
+  applyFpsBoost: (heapMB: number) => Promise<OperationResult<Bootstrap>>
   openPath: (target: string) => Promise<void>
   openLogs: () => Promise<void>
   clearCache: () => Promise<OperationResult<Bootstrap>>
@@ -100,6 +103,8 @@ export const IPC = {
   setGamePath: 'settings:setGamePath',
   pickGamePath: 'settings:pickGamePath',
   setLanguage: 'settings:setLanguage',
+  setHeapMB: 'settings:setHeapMB',
+  applyFpsBoost: 'settings:applyFpsBoost',
   openPath: 'app:openPath',
   openLogs: 'app:openLogs',
   clearCache: 'app:clearCache',

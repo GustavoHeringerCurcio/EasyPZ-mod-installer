@@ -218,6 +218,7 @@ export async function repairPack(options: {
   packId: string
   paths: AppPaths
   gamePathOverride?: string | null
+  heapMB?: number | null
   onEvent?: EventSink
 }): Promise<PackToggleResult> {
   const { catalog, packId, paths, gamePathOverride, onEvent } = options
@@ -240,7 +241,7 @@ export async function repairPack(options: {
     await applyGameConfig({
       pzPath: game.pzPath,
       zomboidDir: paths.zomboidDir,
-      heapMB: game.recommendedHeapMB,
+      heapMB: options.heapMB ?? game.recommendedHeapMB,
       zombieBuddyInstalled: await isZombieBuddyInstalled(game.pzPath),
     })
   }

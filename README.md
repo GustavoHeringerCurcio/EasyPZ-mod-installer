@@ -15,6 +15,7 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 - Switching moves only EasyPZ-managed mod folders; unmanaged mods and `default.txt` entries are preserved.
 - Library health checks, toggles, delete, repair, and explicit host sync.
 - Legacy migration: reuses the old profile, marker, and archive cache when the hash matches.
+- **FPS Boost** section in Settings: a game RAM slider and a one-click performance profile for Viewpoint, True Weathers, blood, ragdolls and vehicle textures.
 - English by default, Portuguese (BR) toggle.
 - Remote-catalog-ready architecture; the alpha build uses a bundled catalog because the repository is private.
 
@@ -25,10 +26,26 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 | **Essentials**                   |                  6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
 | **Medium**                       |                 38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
 | **Advanced**                     |                 45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
+| **Ultra**                        | 134 Workshop items |  ~3.1 GB | Advanced plus horses, maps, 3D world, and curated vehicles |
 | **Project Viewpoint Collection** |  90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD      |
 | **Project Viewpoint - Addons**   | 198 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons            |
 
 Essentials is standalone. Medium and Advanced are additive to each other, but Essentials is a smaller independent starter pack.
+
+## FPS Boost
+
+Settings now includes an **FPS Boost** section for every pack:
+
+- **Game RAM slider** writes `-Xmx` to `ProjectZomboid64.json` and `ProjectZomboid64.bat` when saved. The slider starts from the current game heap, uses the detected recommended value, and enforces a 3 GB minimum.
+- **Apply FPS Boost** writes the same performance profile used by Ultra:
+  - Viewpoint floor atlas 768 MB
+  - lighter True Weathers occlusion, reflections, shadows, sun shafts, rain and wet walls
+  - blood decals 6, active ragdolls 12, vehicle texture size 1
+  - True Weathers quality and precipitation 2
+- Existing `viewpoint-live.properties`, `options.ini`, and `Lua\ModOptions.ini` are backed up to `Zomboid\backups\easyPZ-fps-boost-<timestamp>` before they are changed.
+- The game must be closed. Visual mods, maps, and vehicles stay installed; FPS Boost only lowers resource-heavy settings.
+
+Ultra intentionally excludes Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather, and the 99 CVPI for stability.
 
 ## How activation works
 

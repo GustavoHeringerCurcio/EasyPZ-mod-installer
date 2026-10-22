@@ -172,7 +172,7 @@ const ptBR = {
   },
   settings: {
     title: 'Configurações',
-    subtitle: 'Detecção, idioma e manutenção.',
+    subtitle: 'Detecção, desempenho, idioma e manutenção.',
     game: 'Project Zomboid',
     detected: 'Detectado',
     notFound: 'Não detectado',
@@ -183,7 +183,17 @@ const ptBR = {
     detection: 'Detalhes da detecção',
     steamLibs: 'Bibliotecas Steam',
     ram: 'RAM do sistema',
-    heap: 'Heap recomendado do jogo',
+    heap: 'Heap do jogo',
+    heapSlider: 'RAM do jogo (heap)',
+    heapSliderHint:
+      'Grava -Xmx no ProjectZomboid64.json e no launcher .bat. Mínimo de 3 GB; o valor recomendado depende da RAM do sistema.',
+    heapRecommended: 'Recomendado {{gb}} GB',
+    saveHeap: 'Salvar RAM',
+    applyFpsBoost: 'Aplicar FPS Boost',
+    fpsBoost: 'FPS Boost',
+    fpsBoostHint:
+      'Aplica limites do atlas de piso do Viewpoint, True Weathers, sangue, ragdolls e texturas de veículos sem remover seus mods visuais. Um backup dos arquivos editados fica na pasta de backups do Zomboid.',
+    gameMustBeClosed: 'Feche o Project Zomboid antes de alterar a RAM ou aplicar o FPS Boost.',
     language: 'Idioma',
     languageHint: 'Inglês é o padrão. Português está disponível nesta alpha.',
     maintenance: 'Manutenção',
@@ -280,6 +290,8 @@ const ptBR = {
     hostMissing: 'servertest.ini não foi encontrado.',
     gameUpdated: 'Pasta do jogo atualizada.',
     cacheCleared: 'Cache de download limpo.',
+    heapSaved: 'RAM do jogo definida para {{gb}} GB.',
+    fpsBoostApplied: 'FPS Boost aplicado. Reinicie o Project Zomboid.',
     copied: 'Copiado para a área de transferência.',
   },
   common: {
