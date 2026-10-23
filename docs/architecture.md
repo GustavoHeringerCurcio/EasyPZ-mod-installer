@@ -112,9 +112,9 @@ Packs with `source: "workshop"` do not use an archive. The catalog pins the publ
 
 1. Ensure SteamCMD exists at `%LOCALAPPDATA%\EasyPZ\steamcmd`.
 2. For each item, check the Steam client Workshop folder first.
-3. Download missing items with SteamCMD in small batches.
-4. Discover each item’s `mods/<folder>` content and parse `mod.info`.
-5. Copy mods into the EasyPZ store.
+3. Pre-download small missing items in batches through one SteamCMD process, then fetch large items individually. A stalled batch is retried item by item so one bad download cannot block the rest.
+4. Discover each item's `mods/<folder>` content and parse `mod.info`.
+5. Copy mods into the EasyPZ store and keep the SteamCMD copy as a depot cache. Depot 108600 is shared by every Workshop item; deleting one item's cache makes later items fail with missing depot files.
 6. Record the discovered mod IDs/folders in the install record.
 7. Activate normally using the recorded IDs.
 

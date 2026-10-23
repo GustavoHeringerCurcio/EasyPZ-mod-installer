@@ -36,6 +36,20 @@ export function getStoreItemRoot(paths: AppPaths, workshopId: string): string {
   return path.join(paths.storeDir, APP_ID, workshopId)
 }
 
+/**
+ * SteamCMD tracks every Workshop item in a shared depot state file. If that
+ * state points at files that were moved or deleted outside SteamCMD, later
+ * downloads fail with "Missing game files". Removing the state file makes
+ * SteamCMD rebuild it from the items it is asked to download.
+ */
+async function resetSteamCmdWorkshopState(paths: AppPaths): Promise<void> {
+  const workshopDir = path.join(getSteamCmdDir(paths), 'steamapps', 'workshop')
+  const stateFile = path.join(workshopDir, `appworkshop_${APP_ID}.acf`)
+  const downloadsDir = path.join(workshopDir, 'downloads', APP_ID)
+  await fs.rm(stateFile, { force: true }).catch(() => undefined)
+  await fs.rm(downloadsDir, { recursive: true, force: true }).catch(() => undefined)
+}
+
 function getProgressPath(paths: AppPaths): string {
   return path.join(paths.stateDir, 'workshop-progress.json')
 }
@@ -164,19 +178,70 @@ export async function ensureSteamCmd(
   return exe
 }
 
-export async function runSteamCmdItem(
-  steamCmd: string,
-  id: string,
-  signal?: AbortSignal,
-  onProgress?: (progress: {
-    percent: number
-    transferredBytes: number
-    totalBytes: number
-    bytesPerSecond?: number
-    etaSeconds?: number
-  }) => void,
-): Promise<{ code: number; output: string; timedOut: boolean; downloadedBytes: number | null }> {
-  const args = ['+login', 'anonymous', '+workshop_download_item', APP_ID, id, '+quit']
+const STEAMCMD_IDLE_TIMEOUT_MS = 5 * 60 * 1000
+const STEAMCMD_TOTAL_TIMEOUT_MS = 30 * 60 * 1000
+const WORKSHOP_BATCH_SIZE = 8
+const WORKSHOP_BATCH_MAX_ITEM_BYTES = 25 * 1024 * 1024
+
+/**
+ * SteamCMD prints a lot of status noise while it works. Only meaningful
+ * progress or phase lines count as activity, so a process that is alive but
+ * no longer transferring data can still hit the idle timeout.
+ */
+function isSteamCmdActivityLine(line: string): boolean {
+  return /progress:|update state|committing|preallocating|staging|downloading|verifying|success\. downloaded/i.test(
+    line,
+  )
+}
+
+function summarizeSteamCmdOutput(output: string): string {
+  const lines = output
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+  return lines.slice(-4).join(' | ').slice(-400)
+}
+
+export interface SteamCmdItemProgress {
+  id: string
+  percent: number
+  transferredBytes: number
+  totalBytes: number
+  bytesPerSecond?: number
+  etaSeconds?: number
+}
+
+export interface SteamCmdItemsResult {
+  code: number
+  output: string
+  timedOut: boolean
+  downloadedBytes: number | null
+  failedIds: string[]
+}
+
+/**
+ * Runs one SteamCMD process for one or more Workshop items. Batching several
+ * items avoids paying SteamCMD's login/validation startup cost for every mod.
+ */
+export async function runSteamCmdItems(options: {
+  steamCmd: string
+  ids: string[]
+  signal?: AbortSignal
+  onItemStart?: (id: string) => void
+  onProgress?: (progress: SteamCmdItemProgress) => void
+}): Promise<SteamCmdItemsResult> {
+  const { steamCmd, ids, signal, onItemStart, onProgress } = options
+  if (ids.length === 0) {
+    return { code: 0, output: '', timedOut: false, downloadedBytes: null, failedIds: [] }
+  }
+
+  const args = [
+    '+login',
+    'anonymous',
+    ...ids.flatMap((id) => ['+workshop_download_item', APP_ID, id]),
+    '+quit',
+  ]
+  const idSet = new Set(ids)
 
   return new Promise((resolve, reject) => {
     const child = spawn(steamCmd, args, {
@@ -192,13 +257,28 @@ export async function runSteamCmdItem(
     const startedAt = Date.now()
     let lastBytes = 0
     let lastTick = startedAt
+    let currentId = ids[0]!
+    let downloadedBytes = 0
+    const completedIds = new Set<string>()
+    const failedIds = new Set<string>()
+
+    const nextPendingId = (): string | null =>
+      ids.find((id) => !completedIds.has(id) && !failedIds.has(id)) ?? null
+
+    const setCurrentId = (id: string | null): void => {
+      if (!id || id === currentId) return
+      currentId = id
+      onItemStart?.(id)
+    }
+
+    onItemStart?.(currentId)
 
     const resetIdle = (): void => {
       if (idleTimer) clearTimeout(idleTimer)
       idleTimer = setTimeout(() => {
         child.kill()
         finish(-1, true)
-      }, 120_000)
+      }, STEAMCMD_IDLE_TIMEOUT_MS)
     }
 
     const append = (chunk: Buffer): void => {
@@ -209,7 +289,32 @@ export async function runSteamCmdItem(
       lineBuffer += text
       const lines = lineBuffer.split(/\r|\n/)
       lineBuffer = lines.pop() ?? ''
+      let sawActivity = false
       for (const line of lines) {
+        if (isSteamCmdActivityLine(line)) sawActivity = true
+
+        const startMatch = /Downloading item (\d+)/i.exec(line)
+        if (startMatch && idSet.has(startMatch[1]!)) setCurrentId(startMatch[1]!)
+
+        const successMatch = /Success\. Downloaded item (\d+)/i.exec(line)
+        if (successMatch && idSet.has(successMatch[1]!)) {
+          const id = successMatch[1]!
+          completedIds.add(id)
+          const bytes = parseSteamCmdDownloadedBytes(line)
+          if (bytes !== null) downloadedBytes += bytes
+          setCurrentId(nextPendingId())
+        }
+
+        const failureMatch =
+          /(?:ERROR! Download item|Download item) (\d+)[^\r\n]*(?:failed|result : Failure)/i.exec(
+            line,
+          )
+        if (failureMatch && idSet.has(failureMatch[1]!)) {
+          const id = failureMatch[1]!
+          failedIds.add(id)
+          setCurrentId(nextPendingId())
+        }
+
         const progress = parseSteamCmdProgress(line)
         if (!progress) continue
         const now = Date.now()
@@ -223,21 +328,18 @@ export async function runSteamCmdItem(
           progress.totalBytes > 0 && bytesPerSecond > 0
             ? Math.max(0, (progress.totalBytes - progress.transferredBytes) / bytesPerSecond)
             : undefined
-        onProgress?.({ ...progress, bytesPerSecond, etaSeconds })
+        onProgress?.({ id: currentId, ...progress, bytesPerSecond, etaSeconds })
         lastBytes = progress.transferredBytes
         lastTick = now
       }
 
-      resetIdle()
+      if (sawActivity) resetIdle()
     }
 
-    const totalTimer = setTimeout(
-      () => {
-        child.kill()
-        finish(-1, true)
-      },
-      10 * 60 * 1000,
-    )
+    const totalTimer = setTimeout(() => {
+      child.kill()
+      finish(-1, true)
+    }, STEAMCMD_TOTAL_TIMEOUT_MS)
 
     const finish = (code: number, timedOut = false, error?: Error): void => {
       if (settled) return
@@ -251,7 +353,9 @@ export async function runSteamCmdItem(
           code,
           output,
           timedOut,
-          downloadedBytes: parseSteamCmdDownloadedBytes(output),
+          downloadedBytes:
+            downloadedBytes > 0 ? downloadedBytes : parseSteamCmdDownloadedBytes(output),
+          failedIds: [...failedIds],
         })
     }
     const onAbort = (): void => {
@@ -267,6 +371,35 @@ export async function runSteamCmdItem(
     child.on('error', (error) => finish(-1, false, error))
     child.on('close', (code) => finish(code ?? -1))
   })
+}
+
+export async function runSteamCmdItem(
+  steamCmd: string,
+  id: string,
+  signal?: AbortSignal,
+  onProgress?: (progress: {
+    percent: number
+    transferredBytes: number
+    totalBytes: number
+    bytesPerSecond?: number
+    etaSeconds?: number
+  }) => void,
+): Promise<{ code: number; output: string; timedOut: boolean; downloadedBytes: number | null }> {
+  const result = await runSteamCmdItems({
+    steamCmd,
+    ids: [id],
+    signal,
+    onProgress: (progress) => {
+      const { id: _id, ...rest } = progress
+      onProgress?.(rest)
+    },
+  })
+  return {
+    code: result.code,
+    output: result.output,
+    timedOut: result.timedOut,
+    downloadedBytes: result.downloadedBytes,
+  }
 }
 
 interface DiscoveredMod {
@@ -450,7 +583,7 @@ export async function downloadWorkshopPack(options: {
       type: 'stage',
       stage: 'workshop',
       status: 'start',
-      detail: `${processed}/${items.length} Â· ${name}`,
+      detail: `${processed}/${items.length} - ${name}`,
     })
     onEvent?.({
       type: 'progress',
@@ -469,11 +602,126 @@ export async function downloadWorkshopPack(options: {
     })
   }
 
+  const emitCurrentItem = (
+    itemIndex: number,
+    name: string,
+    options: { updateOverall?: boolean } = {},
+  ): void => {
+    onEvent?.({
+      type: 'stage',
+      stage: 'workshop',
+      status: 'start',
+      detail: `${itemIndex}/${items.length} - ${name}`,
+    })
+    if (options.updateOverall === false) return
+    onEvent?.({
+      type: 'progress',
+      stage: 'workshop',
+      percent: (processed / items.length) * 100,
+      transferred: processed,
+      total: items.length,
+      downloaded: Math.max(0, downloadedItems - cachedItems),
+      cached: cachedItems,
+      failed: failedItems.length,
+    })
+  }
+
+  const prefetchedIds = new Set<string>()
+  let prefetchedBytes = 0
+  const batchCandidates: Array<{ item: (typeof items)[number]; index: number }> = []
+  for (const [index, item] of items.entries()) {
+    if ((item.sizeBytes ?? 0) > WORKSHOP_BATCH_MAX_ITEM_BYTES) continue
+    if (await findItemRoot(item.id, workshopRoot, paths)) continue
+    batchCandidates.push({ item, index: index + 1 })
+  }
+
+  if (batchCandidates.length > 0) {
+    onEvent?.({
+      type: 'log',
+      level: 'info',
+      message: `Pre-downloading ${batchCandidates.length} small Workshop items in batches of ${WORKSHOP_BATCH_SIZE} to reduce SteamCMD startup overhead.`,
+    })
+
+    for (let offset = 0; offset < batchCandidates.length; offset += WORKSHOP_BATCH_SIZE) {
+      ensureNotCancelled(signal)
+      const batch = batchCandidates.slice(offset, offset + WORKSHOP_BATCH_SIZE)
+      const byId = new Map(batch.map((entry) => [entry.item.id, entry]))
+      const runBatch = (): Promise<SteamCmdItemsResult> =>
+        runSteamCmdItems({
+          steamCmd,
+          ids: batch.map((entry) => entry.item.id),
+          signal,
+          onItemStart: (id) => {
+            const entry = byId.get(id)
+            if (!entry) return
+            emitCurrentItem(entry.index, entry.item.name, { updateOverall: false })
+            onEvent?.({
+              type: 'workshop-item',
+              item: {
+                index: entry.index,
+                total: items.length,
+                name: entry.item.name,
+                status: 'starting',
+                percent: null,
+                totalBytes: entry.item.sizeBytes,
+              },
+            })
+          },
+          onProgress: (progress) => {
+            const entry = byId.get(progress.id)
+            if (!entry) return
+            onEvent?.({
+              type: 'workshop-item',
+              item: {
+                index: entry.index,
+                total: items.length,
+                name: entry.item.name,
+                status: 'downloading',
+                percent: progress.percent,
+                transferredBytes: progress.transferredBytes,
+                totalBytes: progress.totalBytes,
+                bytesPerSecond: progress.bytesPerSecond,
+                etaSeconds: progress.etaSeconds,
+              },
+            })
+          },
+        })
+
+      let result = await runBatch()
+      if (result.output.includes('Missing game files')) {
+        onEvent?.({
+          type: 'log',
+          level: 'warn',
+          message:
+            'SteamCMD reported missing depot files. Resetting its Workshop state and retrying this batch.',
+        })
+        await resetSteamCmdWorkshopState(paths)
+        result = await runBatch()
+      }
+
+      if (result.timedOut) {
+        onEvent?.({
+          type: 'log',
+          level: 'warn',
+          message: `SteamCMD timed out while pre-downloading a batch; the remaining items will be retried one at a time.`,
+        })
+      }
+
+      for (const entry of batch) {
+        if (await findItemRoot(entry.item.id, workshopRoot, paths)) {
+          prefetchedIds.add(entry.item.id)
+          prefetchedBytes += entry.item.sizeBytes ?? 0
+        }
+      }
+    }
+  }
+
   for (const item of items) {
     ensureNotCancelled(signal)
     const itemIndex = processed + 1
     let root = await findItemRoot(item.id, workshopRoot, paths)
-    const wasCached = Boolean(root)
+    const wasCached = Boolean(root) && !prefetchedIds.has(item.id)
+    emitCurrentItem(itemIndex, item.name)
 
     onEvent?.({
       type: 'workshop-item',
@@ -494,30 +742,47 @@ export async function downloadWorkshopPack(options: {
         level: 'info',
         message: `Downloading Workshop item ${itemIndex}/${items.length}: ${item.name}`,
       })
-      const result = await runSteamCmdItem(steamCmd, item.id, signal, (progress) => {
-        onEvent?.({
-          type: 'workshop-item',
-          item: {
-            index: itemIndex,
-            total: items.length,
-            name: item.name,
-            status: 'downloading',
-            percent: progress.percent,
-            transferredBytes: progress.transferredBytes,
-            totalBytes: progress.totalBytes,
-            bytesPerSecond: progress.bytesPerSecond,
-            etaSeconds: progress.etaSeconds,
-          },
+      const downloadItem = () =>
+        runSteamCmdItem(steamCmd, item.id, signal, (progress) => {
+          onEvent?.({
+            type: 'workshop-item',
+            item: {
+              index: itemIndex,
+              total: items.length,
+              name: item.name,
+              status: 'downloading',
+              percent: progress.percent,
+              transferredBytes: progress.transferredBytes,
+              totalBytes: progress.totalBytes,
+              bytesPerSecond: progress.bytesPerSecond,
+              etaSeconds: progress.etaSeconds,
+            },
+          })
         })
-      })
+      let result = await downloadItem()
       root = await findItemRoot(item.id, workshopRoot, paths)
+      if (!root && result.output.includes('Missing game files')) {
+        onEvent?.({
+          type: 'log',
+          level: 'warn',
+          message: `SteamCMD reported missing depot files for ${item.name}. Resetting its Workshop state and retrying.`,
+        })
+        await resetSteamCmdWorkshopState(paths)
+        result = await downloadItem()
+        root = await findItemRoot(item.id, workshopRoot, paths)
+      }
       if (!root) {
-        failedItems.push({
-          id: item.id,
-          name: item.name,
-          reason: result.timedOut
-            ? 'SteamCMD timed out or stalled on this item.'
-            : `SteamCMD failed with code ${result.code}.`,
+        const reason = result.timedOut
+          ? 'SteamCMD timed out or stalled on this item.'
+          : `SteamCMD failed with code ${result.code}.`
+        const detail = summarizeSteamCmdOutput(result.output)
+        failedItems.push({ id: item.id, name: item.name, reason })
+        onEvent?.({
+          type: 'log',
+          level: 'warn',
+          message: `Workshop item ${itemIndex}/${items.length} failed: ${item.name} - ${reason}${
+            detail ? ` SteamCMD said: ${detail}` : ''
+          }`,
         })
         onEvent?.({
           type: 'workshop-item',
@@ -586,10 +851,9 @@ export async function downloadWorkshopPack(options: {
         completedIds.add(item.id)
         await writeProgress(paths, packId, collection.collectionId, [...completedIds])
 
-        const steamCmdContent = getSteamCmdContentRoot(paths, item.id)
-        if (path.resolve(root) === path.resolve(steamCmdContent)) {
-          await fs.rm(root, { recursive: true, force: true }).catch(() => undefined)
-        }
+        // Keep the SteamCMD copy. Depot 108600 is shared by every Workshop
+        // item, so deleting one item's content makes later items fail with
+        // "Missing game files" and forces expensive re-validation.
       }
     } catch (error) {
       failedItems.push({ id: item.id, name: item.name, reason: toError(error).message })
@@ -642,6 +906,8 @@ export async function downloadWorkshopPack(options: {
   }
 
   await clearProgress(paths)
+
+  downloadedBytes += prefetchedBytes
 
   onEvent?.({
     type: 'log',

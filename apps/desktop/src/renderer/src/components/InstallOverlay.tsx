@@ -281,7 +281,7 @@ export function InstallOverlay({
                           {formatBytes(workshopItem.totalBytes)}
                         </span>
                         <span>
-                          {formatSpeed(workshopItem.bytesPerSecond)} Â·{' '}
+                          {formatSpeed(workshopItem.bytesPerSecond)} -{' '}
                           {formatEta(workshopItem.etaSeconds)}
                         </span>
                       </div>
