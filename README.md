@@ -28,7 +28,7 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 | **Essentials**                   |                  6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
 | **Medium**                       |                 38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
 | **Advanced**                     |                 45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
-| **Ultra**                        | 134 Workshop items |  ~3.1 GB | Advanced plus horses, maps, 3D world, and curated vehicles |
+| **Ultra**                        | 140 Workshop items |  ~3.1 GB | Advanced plus horses, maps, 3D world, and curated vehicles |
 | **Project Viewpoint Collection** |  90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD      |
 | **Project Viewpoint - Addons**   | 198 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons            |
 
@@ -45,7 +45,7 @@ Settings now includes an **FPS Boost** section for every pack:
 - The expanded “See exactly what changes” list shows the settings and files before applying.
 - No backup is created for FPS Boost. The game must be closed. Visual mods, maps, and vehicles stay installed; FPS Boost only lowers resource-heavy settings.
 
-Ultra intentionally excludes Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather, and the 99 CVPI for stability.
+Ultra intentionally excludes Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather, and the 99 CVPI for stability. Expanded Helicopter Events is Build 41 only and is not included.
 
 ## How activation works
 

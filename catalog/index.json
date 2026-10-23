@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-23T01:22:34.989Z",
+  "generatedAt": "2026-10-23T01:36:40.338Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -675,7 +675,7 @@
       "archive": null,
       "workshop": {
         "collectionId": "0",
-        "downloadBytes": 3077217481,
+        "downloadBytes": 3081875661,
         "items": [
           {
             "id": "3619862853",
@@ -795,6 +795,18 @@
             "id": "3615135168",
             "name": "Zombie Virus Vaccine [B42.14 to B42.20 - SP/MP]",
             "sizeBytes": 83594074,
+            "group": "Survival and QoL"
+          },
+          {
+            "id": "3387110070",
+            "name": "They Knew [B42]",
+            "sizeBytes": 265499,
+            "group": "Survival and QoL"
+          },
+          {
+            "id": "3750289416",
+            "name": "They Knew [B42] - 42.19 Fix",
+            "sizeBytes": 33518,
             "group": "Survival and QoL"
           },
           {
@@ -921,6 +933,18 @@
             "id": "3802372726",
             "name": "True Swimming",
             "sizeBytes": 2652103,
+            "group": "Survival and QoL"
+          },
+          {
+            "id": "3750253491",
+            "name": "Common Sense [B42.20+]",
+            "sizeBytes": 883491,
+            "group": "Survival and QoL"
+          },
+          {
+            "id": "2544353492",
+            "name": "Has Been Read",
+            "sizeBytes": 1322250,
             "group": "Survival and QoL"
           },
           {
@@ -1206,6 +1230,12 @@
             "group": "Gameplay"
           },
           {
+            "id": "3742518185",
+            "name": "Zombie Camouflage - Build 42",
+            "sizeBytes": 655551,
+            "group": "Gameplay"
+          },
+          {
             "id": "3026723485",
             "name": "'67 Shelby GT500 + Eleanor",
             "sizeBytes": 18168337,
@@ -1416,6 +1446,12 @@
             "group": "Vehicles"
           },
           {
+            "id": "3635856965",
+            "name": "Better Auto Mechanics [B42.20.4+ MP+SP]",
+            "sizeBytes": 1497871,
+            "group": "Vehicles"
+          },
+          {
             "id": "3821554678",
             "name": "Brief Sprinters",
             "sizeBytes": 52546,
@@ -1491,10 +1527,14 @@
       },
       "groups": [],
       "warnings": [
-        "This package downloads 134 items from Steam Workshop and can take a long time.",
+        "This package downloads 140 items from Steam Workshop and can take a long time.",
         "Start a new save. Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash add map cells and are not safe to remove mid-save.",
         "Big Bear Lake is an alpha map. Some depth-map and first-person Viewpoint visuals may be unfinished.",
-        "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability.",
+        "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability. Expanded Helicopter Events is Build 41 only and is not included.",
+        "They Knew [B42] must load before its 42.19 Fix patch. Do not enable They Knew Continued or other They Knew patches at the same time.",
+        "Zombie Camouflage is a stealth mechanic. Viewpoint Tension and Threat Detector may still warn about zombies that cannot see you, and multiplayer requires the mod's own setup steps.",
+        "Common Sense adds its own ammo counter. Viewpoint Interface already shows firearm rounds, so disable one if the HUD is cluttered.",
+        "Has Been Read may lose map read status after reconnecting on B42.20 multiplayer; this does not affect revealed map areas.",
         "FPS Boost is available in EasyPZ Settings: it applies the Viewpoint floor atlas, lighter True Weathers, blood/ragdoll and vehicle texture limits without removing visual mods.",
         "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items and maps.",
         "Workshop updates can change this pack at any time. Update all clients and the server together.",
@@ -1508,10 +1548,10 @@
       ],
       "updatedAt": "2026-10-22",
       "stats": {
-        "clientMods": 134,
+        "clientMods": 140,
         "serverMods": 0,
-        "totalMods": 134,
-        "workshopCount": 134
+        "totalMods": 140,
+        "workshopCount": 140
       }
     },
     {
