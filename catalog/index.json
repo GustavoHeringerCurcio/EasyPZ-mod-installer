@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-23T03:34:39.335Z",
+  "generatedAt": "2026-10-23T04:58:25.844Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -675,7 +675,7 @@
       "archive": null,
       "workshop": {
         "collectionId": "0",
-        "downloadBytes": 2727822959,
+        "downloadBytes": 2517167619,
         "items": [
           {
             "id": "3619862853",
@@ -825,12 +825,6 @@
             "id": "3775549570",
             "name": "Alice's Weapon Sling",
             "sizeBytes": 1399513,
-            "group": "Survival and QoL"
-          },
-          {
-            "id": "2503622437",
-            "name": "Skill Recovery Journal",
-            "sizeBytes": 4460232,
             "group": "Survival and QoL"
           },
           {
@@ -1095,12 +1089,6 @@
             "id": "3818605688",
             "name": "Any Wall Flags 3D - Project Viewpoint [B42]",
             "sizeBytes": 26769811,
-            "group": "3D world"
-          },
-          {
-            "id": "3815931973",
-            "name": "Project Viewpoint: KK's Shelves in 3D",
-            "sizeBytes": 184844234,
             "group": "3D world"
           },
           {
@@ -1422,12 +1410,6 @@
             "group": "Missions, events, transport, UI"
           },
           {
-            "id": "3456675747",
-            "name": "[B42.20+ MP] Skateboard!",
-            "sizeBytes": 21350874,
-            "group": "Missions, events, transport, UI"
-          },
-          {
             "id": "3816324722",
             "name": "Attachments UI [B42]",
             "sizeBytes": 980910,
@@ -1467,8 +1449,8 @@
       },
       "groups": [],
       "warnings": [
-        "This package downloads 130 items from Steam Workshop and can take a long time.",
-        "Start a new save. This version removes the custom maps Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash; saves created with them may lose map cells.",
+        "This package downloads 127 items from Steam Workshop and can take a long time.",
+        "Start a new save. This version removes the custom maps Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash, plus Skateboard, Skill Recovery Journal, and KK's Shelves in 3D.",
         "Spawn Selector was removed. Starting locations now use vanilla spawns or map-provided spawn points.",
         "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability. Expanded Helicopter Events is Build 41 only and is not included.",
         "They Knew [B42] must load before its 42.19 Fix patch. Do not enable They Knew Continued or other They Knew patches at the same time.",
@@ -1489,12 +1471,12 @@
         "This catalog entry uses public Steam Workshop item IDs; it is not claimed as original work.",
         "Not affiliated with The Indie Stone."
       ],
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-25",
       "stats": {
-        "clientMods": 130,
+        "clientMods": 127,
         "serverMods": 0,
-        "totalMods": 130,
-        "workshopCount": 130
+        "totalMods": 127,
+        "workshopCount": 127
       }
     },
     {
