@@ -272,7 +272,7 @@ export interface UiSuiteEffectiveMod extends EffectiveMod {
 }
 
 export function getDefaultUiSuite(catalog: Catalog): UiSuite | null {
-  return catalog.uiSuites?.[0] ?? null
+  return catalog.uiSuites?.find((suite) => suite.recommended) ?? catalog.uiSuites?.[0] ?? null
 }
 
 export function getUiSuite(catalog: Catalog, suiteId: string | null | undefined): UiSuite | null {

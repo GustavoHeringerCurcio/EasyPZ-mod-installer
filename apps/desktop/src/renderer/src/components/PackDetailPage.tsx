@@ -23,6 +23,7 @@ import { getEffectiveGroups, getEffectiveMods } from '@easypz/catalog'
 import type { Bootstrap, PackView } from '../../../shared/ipc'
 import { Badge, Button, Panel, SectionTitle, Stat } from './ui'
 import { cn, formatBytes, formatDate } from '../lib/format'
+import { pickDefaultSuite } from '../lib/uiSuite'
 import { packAccent } from '../lib/packTheme'
 import { packUpdateAvailable } from '../lib/packStatus'
 
@@ -67,7 +68,7 @@ export function PackDetailPage({
   const installRecord = bootstrap.state.installs[pack.id]
   const currentSuite =
     bootstrap.catalog.uiSuites.find((suite) => suite.id === installRecord?.uiSuiteId) ??
-    bootstrap.catalog.uiSuites[0] ??
+    pickDefaultSuite(bootstrap.catalog.uiSuites) ??
     null
   const workshopItems = pack.workshop?.items ?? []
   const modCount = isWorkshop ? workshopItems.length : mods.length

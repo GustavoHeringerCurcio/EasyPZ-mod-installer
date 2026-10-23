@@ -22,6 +22,7 @@ import {
   type InstallUiState,
 } from './lib/install'
 import { cn } from './lib/format'
+import { pickDefaultSuite } from './lib/uiSuite'
 import { packAccent } from './lib/packTheme'
 import logo from './assets/logo.png'
 
@@ -370,7 +371,9 @@ export default function App() {
         return
       }
       const value =
-        bootstrap?.state.installs[packId]?.uiSuiteId ?? bootstrap?.catalog.uiSuites[0]?.id ?? ''
+        bootstrap?.state.installs[packId]?.uiSuiteId ??
+        (bootstrap ? pickDefaultSuite(bootstrap.catalog.uiSuites)?.id : null) ??
+        ''
       setSuiteDialog({ packId, mode: 'install', value })
     },
     [bootstrap, showToast, t],
@@ -383,7 +386,9 @@ export default function App() {
         return
       }
       const value =
-        bootstrap?.state.installs[packId]?.uiSuiteId ?? bootstrap?.catalog.uiSuites[0]?.id ?? ''
+        bootstrap?.state.installs[packId]?.uiSuiteId ??
+        (bootstrap ? pickDefaultSuite(bootstrap.catalog.uiSuites)?.id : null) ??
+        ''
       setSuiteDialog({ packId, mode: 'change', value })
     },
     [bootstrap, showToast, t],
