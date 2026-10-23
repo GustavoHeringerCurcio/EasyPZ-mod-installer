@@ -10,6 +10,7 @@ import {
   Gamepad2,
   HardDrive,
   Layers3,
+  Lock,
   Power,
   RefreshCw,
   Search,
@@ -21,35 +22,43 @@ import {
 import { useTranslation } from 'react-i18next'
 import { getEffectiveGroups, getEffectiveMods } from '@easypz/catalog'
 import type { Bootstrap, PackView } from '../../../shared/ipc'
-import { Badge, Button, Panel, SectionTitle, Stat } from './ui'
+import { Badge, Button, Panel, SectionTitle, Stat, Switch } from './ui'
 import { cn, formatBytes, formatDate } from '../lib/format'
+import { isCoreModId } from '../lib/modSafety'
 import { pickDefaultSuite } from '../lib/uiSuite'
 import { packAccent } from '../lib/packTheme'
 import { packUpdateAvailable } from '../lib/packStatus'
 
-type Tab = 'overview' | 'mods' | 'requirements'
+export type PackTab = 'overview' | 'mods' | 'requirements'
 
 export function PackDetailPage({
   bootstrap,
   pack,
+  tab,
+  onTabChange,
   onBack,
   onInstall,
   onToggle,
   onRepair,
   onChangeSuite,
+  onSetModEnabled,
+  modBusyId,
   busy,
 }: {
   bootstrap: Bootstrap
   pack: PackView
+  tab: PackTab
+  onTabChange: (tab: PackTab) => void
   onBack: () => void
   onInstall: (packId: string) => void
   onToggle: (packId: string, enabled: boolean) => void
   onRepair: (packId: string) => void
   onChangeSuite: (packId: string) => void
+  onSetModEnabled: (packId: string, modId: string, enabled: boolean) => void
+  modBusyId: string | null
   busy: boolean
 }) {
   const { t } = useTranslation()
-  const [tab, setTab] = useState<Tab>('overview')
   const [modSearch, setModSearch] = useState('')
 
   const available = bootstrap.availablePackIds.includes(pack.id)
@@ -66,6 +75,8 @@ export function PackDetailPage({
   )
   const isWorkshop = pack.source === 'workshop'
   const installRecord = bootstrap.state.installs[pack.id]
+  const disabledModIds = new Set(installRecord?.disabledModIds ?? [])
+  const installedModIds = new Set(installRecord?.mods.map((mod) => mod.id) ?? [])
   const currentSuite =
     bootstrap.catalog.uiSuites.find((suite) => suite.id === installRecord?.uiSuiteId) ??
     pickDefaultSuite(bootstrap.catalog.uiSuites) ??
@@ -102,6 +113,19 @@ export function PackDetailPage({
       ),
     }))
     .filter((group) => group.mods.length > 0)
+
+  const matchesSearch = (mod: { name: string; folder: string }): boolean =>
+    !normalized ||
+    mod.name.toLowerCase().includes(normalized) ||
+    mod.folder.toLowerCase().includes(normalized)
+  const filteredInstalledMods = (installRecord?.mods ?? []).filter(matchesSearch)
+  const catalogModIds = new Set(mods.map((mod) => mod.id))
+  const filteredExtraMods = (installRecord?.mods ?? [])
+    .filter((mod) => !catalogModIds.has(mod.id))
+    .filter(matchesSearch)
+  const switchDisabled = busy || bootstrap.game.gameRunning || modBusyId !== null
+  const clientMods = (installRecord?.mods ?? []).filter((mod) => !mod.serverOnly)
+  const enabledModCount = clientMods.filter((mod) => !disabledModIds.has(mod.id)).length
 
   const actionLabel = updateAvailable
     ? t('pack.update')
@@ -162,11 +186,11 @@ export function PackDetailPage({
                 ['overview', t('pack.overview')],
                 ['mods', `${t('pack.mods')} (${modCount})`],
                 ['requirements', t('pack.requirements')],
-              ] as Array<[Tab, string]>
+              ] as Array<[PackTab, string]>
             ).map(([id, label]) => (
               <button
                 key={id}
-                onClick={() => setTab(id)}
+                onClick={() => onTabChange(id)}
                 className={cn(
                   '-mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors',
                   tab === id
@@ -297,97 +321,144 @@ export function PackDetailPage({
                 />
               </div>
 
+              {installRecord ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-panel-2/50 px-4 py-3">
+                  <span className="text-[11px] text-muted">
+                    {t('pack.modsEnabled', {
+                      enabled: enabledModCount,
+                      total: clientMods.length,
+                    })}
+                  </span>
+                  {bootstrap.game.gameRunning ? (
+                    <span className="text-[11px] text-warn">{t('pack.closeGameToToggle')}</span>
+                  ) : null}
+                </div>
+              ) : null}
+
               {isWorkshop ? (
-                <div className="space-y-6">
-                  {filteredWorkshopGroups.map((group) => (
-                    <section key={group.name}>
+                installRecord && installRecord.mods.length > 0 ? (
+                  <section>
+                    <div className="mb-3 flex items-center gap-3">
+                      <h3 className="font-display text-sm font-semibold text-bone">
+                        {t('pack.installedMods')}
+                      </h3>
+                      <Badge tone="muted">{filteredInstalledMods.length}</Badge>
+                      <div className="h-px flex-1 bg-line" />
+                    </div>
+                    <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                      {filteredInstalledMods.map((mod) => (
+                        <ModRow
+                          key={`${mod.workshopId}-${mod.folder}`}
+                          mod={mod}
+                          disabled={disabledModIds.has(mod.id)}
+                          core={isCoreModId(mod.id)}
+                          canToggle
+                          toggleDisabled={switchDisabled}
+                          onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ) : (
+                  <div className="space-y-6">
+                    {filteredWorkshopGroups.map((group) => (
+                      <section key={group.name}>
+                        <div className="mb-3 flex items-center gap-3">
+                          <h3 className="font-display text-sm font-semibold text-bone">
+                            {group.name}
+                          </h3>
+                          <Badge tone="muted">{group.items.length}</Badge>
+                          <div className="h-px flex-1 bg-line" />
+                        </div>
+                        <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                          {group.items.map((item) => (
+                            <a
+                              key={item.id}
+                              href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
+                            >
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+                                <Sparkles className="size-3.5 text-bone/70" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-[13px] font-medium text-bone">
+                                  {item.name}
+                                </div>
+                                <div className="truncate font-mono text-[10px] text-muted">
+                                  {item.id}
+                                </div>
+                              </div>
+                              <ExternalLink className="size-3.5 shrink-0 text-muted" />
+                            </a>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                )
+              ) : (
+                <>
+                  {filteredGroups.map((group) => (
+                    <section key={`${group.packId}-${group.name}`}>
                       <div className="mb-3 flex items-center gap-3">
                         <h3 className="font-display text-sm font-semibold text-bone">
                           {group.name}
                         </h3>
-                        <Badge tone="muted">{group.items.length}</Badge>
+                        {group.packId !== pack.id ? (
+                          <Badge tone="muted">{t('pack.inherited')}</Badge>
+                        ) : null}
                         <div className="h-px flex-1 bg-line" />
                       </div>
                       <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                        {group.items.map((item) => (
-                          <a
-                            key={item.id}
-                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
-                          >
-                            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
-                              <Sparkles className="size-3.5 text-bone/70" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="truncate text-[13px] font-medium text-bone">
-                                {item.name}
-                              </div>
-                              <div className="truncate font-mono text-[10px] text-muted">
-                                {item.id}
-                              </div>
-                            </div>
-                            <ExternalLink className="size-3.5 shrink-0 text-muted" />
-                          </a>
+                        {group.mods.map((mod) => (
+                          <ModRow
+                            key={`${mod.workshopId}-${mod.folder}`}
+                            mod={mod}
+                            disabled={disabledModIds.has(mod.id)}
+                            core={isCoreModId(mod.id)}
+                            canToggle={installedModIds.has(mod.id)}
+                            toggleDisabled={switchDisabled}
+                            onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
+                          />
                         ))}
                       </div>
                     </section>
                   ))}
-                </div>
-              ) : (
-                filteredGroups.map((group) => (
-                  <section key={`${group.packId}-${group.name}`}>
-                    <div className="mb-3 flex items-center gap-3">
-                      <h3 className="font-display text-sm font-semibold text-bone">{group.name}</h3>
-                      {group.packId !== pack.id ? (
-                        <Badge tone="muted">{t('pack.inherited')}</Badge>
-                      ) : null}
-                      <div className="h-px flex-1 bg-line" />
-                    </div>
-                    <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                      {group.mods.map((mod) => (
-                        <div
-                          key={`${mod.workshopId}-${mod.folder}`}
-                          className="flex items-center gap-4 bg-panel-2/35 px-4 py-3"
-                        >
-                          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
-                            {mod.serverOnly ? (
-                              <Server className="size-3.5 text-muted" />
-                            ) : (
-                              <Sparkles className="size-3.5 text-bone/70" />
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-[13px] font-medium text-bone">
-                              {mod.name}
-                            </div>
-                            <div className="truncate font-mono text-[10px] text-muted">
-                              {mod.folder} Â· {mod.workshopId}
-                            </div>
-                          </div>
-                          {mod.serverOnly ? (
-                            <Badge tone="muted">{t('pack.serverOnly')}</Badge>
-                          ) : null}
-                          {mod.workshopUrl ? (
-                            <a
-                              href={mod.workshopUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              title={t('pack.openWorkshop')}
-                              className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-bone"
-                            >
-                              <ExternalLink className="size-3.5" />
-                            </a>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                ))
+
+                  {filteredExtraMods.length > 0 ? (
+                    <section>
+                      <div className="mb-3 flex items-center gap-3">
+                        <h3 className="font-display text-sm font-semibold text-bone">
+                          {t('pack.suiteMods')}
+                        </h3>
+                        <Badge tone="muted">{filteredExtraMods.length}</Badge>
+                        <div className="h-px flex-1 bg-line" />
+                      </div>
+                      <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                        {filteredExtraMods.map((mod) => (
+                          <ModRow
+                            key={`${mod.workshopId}-${mod.folder}`}
+                            mod={mod}
+                            disabled={disabledModIds.has(mod.id)}
+                            core={isCoreModId(mod.id)}
+                            canToggle
+                            toggleDisabled={switchDisabled}
+                            onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
+                </>
               )}
 
-              {(isWorkshop ? filteredWorkshopItems.length : filteredGroups.length) === 0 ? (
+              {(isWorkshop
+                ? installRecord
+                  ? filteredInstalledMods.length
+                  : filteredWorkshopItems.length
+                : filteredGroups.length + filteredExtraMods.length) === 0 ? (
                 <Panel className="p-8 text-center text-sm text-muted">{t('pack.noMods')}</Panel>
               ) : null}
             </div>
@@ -542,6 +613,81 @@ export function PackDetailPage({
           </Panel>
         </aside>
       </div>
+    </div>
+  )
+}
+
+function ModRow({
+  mod,
+  disabled,
+  core,
+  canToggle,
+  toggleDisabled,
+  onToggle,
+}: {
+  mod: {
+    id: string
+    name: string
+    folder: string
+    workshopId: string
+    serverOnly: boolean
+    workshopUrl?: string
+  }
+  disabled: boolean
+  core: boolean
+  canToggle: boolean
+  toggleDisabled: boolean
+  onToggle: (enabled: boolean) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div
+      className={cn('flex items-center gap-4 bg-panel-2/35 px-4 py-3', disabled && 'opacity-60')}
+    >
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+        {mod.serverOnly ? (
+          <Server className="size-3.5 text-muted" />
+        ) : (
+          <Sparkles className="size-3.5 text-bone/70" />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[13px] font-medium text-bone">{mod.name}</div>
+        <div className="truncate font-mono text-[10px] text-muted">
+          {mod.folder} Â· {mod.workshopId}
+        </div>
+      </div>
+      {core ? (
+        <span title={t('pack.coreHint')} className="shrink-0">
+          <Badge tone="warn">
+            <Lock className="mr-1 size-3" />
+            {t('pack.coreMod')}
+          </Badge>
+        </span>
+      ) : null}
+      {disabled ? <Badge tone="muted">{t('catalog.off')}</Badge> : null}
+      {mod.serverOnly ? <Badge tone="muted">{t('pack.serverOnly')}</Badge> : null}
+      {mod.workshopUrl ? (
+        <a
+          href={mod.workshopUrl}
+          target="_blank"
+          rel="noreferrer"
+          title={t('pack.openWorkshop')}
+          className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-bone"
+        >
+          <ExternalLink className="size-3.5" />
+        </a>
+      ) : null}
+      {canToggle ? (
+        <Switch
+          checked={!disabled}
+          disabled={toggleDisabled}
+          label={mod.name}
+          showLabel={false}
+          onChange={onToggle}
+        />
+      ) : null}
     </div>
   )
 }

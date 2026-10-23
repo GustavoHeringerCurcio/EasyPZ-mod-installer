@@ -18,6 +18,7 @@ export interface VerifyRow {
   installed: boolean
   stored: boolean
   active: boolean
+  enabled: boolean
   modInfo: boolean
 }
 
@@ -27,6 +28,7 @@ export interface PackHealth {
   missing: VerifyRow[]
   installedCount: number
   activeCount: number
+  enabledCount: number
   totalCount: number
   defaultTxtCount: number
   hostModCount: number | null
@@ -48,8 +50,10 @@ export async function verifyMods(options: {
   paths: AppPaths
   pzPath: string | null
   hostIniPath: string
+  disabledModIds?: Iterable<string>
 }): Promise<PackHealth> {
   const { packId, mods, paths, pzPath, hostIniPath } = options
+  const disabled = new Set(options.disabledModIds ?? [])
 
   const rows: VerifyRow[] = []
   for (const mod of mods) {
@@ -66,6 +70,7 @@ export async function verifyMods(options: {
       installed,
       stored,
       active,
+      enabled: !disabled.has(mod.id),
       modInfo: installed,
     })
   }
@@ -79,6 +84,7 @@ export async function verifyMods(options: {
     missing,
     installedCount: rows.length - missing.length,
     activeCount: rows.filter((row) => row.active).length,
+    enabledCount: rows.filter((row) => row.active && row.enabled).length,
     totalCount: rows.length,
     defaultTxtCount: await countActiveMods(modsDir(paths)),
     hostModCount: hostMods ? hostMods.length : null,

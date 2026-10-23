@@ -5,7 +5,7 @@ import type { PackHealth, PerformanceConfigResult } from '@easypz/engine'
 import type { Bootstrap, Language, PerformancePreset } from '../../shared/ipc'
 import { Sidebar, type View } from './components/Sidebar'
 import { CatalogPage } from './components/CatalogPage'
-import { PackDetailPage } from './components/PackDetailPage'
+import { PackDetailPage, type PackTab } from './components/PackDetailPage'
 import { InstallOverlay } from './components/InstallOverlay'
 import { UiSuiteDialog } from './components/UiSuitePicker'
 import { LibraryPage } from './components/LibraryPage'
@@ -22,6 +22,7 @@ import {
   type InstallUiState,
 } from './lib/install'
 import { cn } from './lib/format'
+import { isCoreModId } from './lib/modSafety'
 import { pickDefaultSuite } from './lib/uiSuite'
 import { packAccent } from './lib/packTheme'
 import logo from './assets/logo.png'
@@ -36,6 +37,8 @@ export default function App() {
   const [bootError, setBootError] = useState<string | null>(null)
   const [view, setView] = useState<View>('catalog')
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null)
+  const [packTab, setPackTab] = useState<PackTab>('overview')
+  const [modBusyId, setModBusyId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [install, setInstall] = useState<InstallUiState>(emptyInstallState)
   const [canceling, setCanceling] = useState(false)
@@ -341,6 +344,62 @@ export default function App() {
     [bootstrap, packNameFor, performToggle, showToast, t],
   )
 
+  const performSetModEnabled = useCallback(
+    async (packId: string, modId: string, enabled: boolean) => {
+      setModBusyId(modId)
+      try {
+        const result = await window.easypz.setModEnabled(packId, modId, enabled)
+        if (!result.ok) {
+          showToast('error', result.message)
+          return
+        }
+        setBootstrap(result.data)
+        const modName =
+          bootstrap?.state.installs[packId]?.mods.find((mod) => mod.id === modId)?.name ?? modId
+        showToast(
+          'success',
+          t(enabled ? 'toast.modEnabled' : 'toast.modDisabled', { mod: modName }),
+        )
+      } finally {
+        setModBusyId(null)
+      }
+    },
+    [bootstrap, showToast, t],
+  )
+
+  const requestSetModEnabled = useCallback(
+    (packId: string, modId: string, enabled: boolean) => {
+      if (bootstrap?.game.gameRunning) {
+        showToast('info', t('catalog.gameRunningHint'))
+        return
+      }
+
+      if (!enabled && isCoreModId(modId)) {
+        const modName =
+          bootstrap?.state.installs[packId]?.mods.find((mod) => mod.id === modId)?.name ?? modId
+        setConfirmRequest({
+          title: t('confirm.modDisableTitle', { mod: modName }),
+          body: t('confirm.modDisableBody', { mod: modName }),
+          confirmLabel: t('confirm.modDisableAction'),
+          destructive: true,
+          onConfirm: async () => {
+            await performSetModEnabled(packId, modId, false)
+          },
+        })
+        return
+      }
+
+      void performSetModEnabled(packId, modId, enabled)
+    },
+    [bootstrap, performSetModEnabled, showToast, t],
+  )
+
+  const manageMods = useCallback((packId: string) => {
+    setView('catalog')
+    setSelectedPackId(packId)
+    setPackTab('mods')
+  }, [])
+
   const beginInstall = useCallback(
     (packId: string, uiSuiteId: string | null) => {
       const activePackId = bootstrap?.state.activePackId ?? null
@@ -601,7 +660,10 @@ export default function App() {
         view={view}
         onChange={(next) => {
           setView(next)
-          if (next !== 'catalog') setSelectedPackId(null)
+          if (next !== 'catalog') {
+            setSelectedPackId(null)
+            setPackTab('overview')
+          }
         }}
         installedCount={bootstrap.availablePackIds.length}
         appVersion={bootstrap.appVersion}
@@ -616,11 +678,18 @@ export default function App() {
             <PackDetailPage
               bootstrap={bootstrap}
               pack={selectedPack}
-              onBack={() => setSelectedPackId(null)}
+              tab={packTab}
+              onTabChange={setPackTab}
+              onBack={() => {
+                setSelectedPackId(null)
+                setPackTab('overview')
+              }}
               onInstall={requestInstall}
               onToggle={requestToggle}
               onRepair={repairPack}
               onChangeSuite={requestChangeSuite}
+              onSetModEnabled={requestSetModEnabled}
+              modBusyId={modBusyId}
               busy={busyPackId === selectedPack.id || install.running}
             />
           ) : (
@@ -628,7 +697,10 @@ export default function App() {
               bootstrap={bootstrap}
               search={search}
               onSearch={setSearch}
-              onSelectPack={(packId) => setSelectedPackId(packId)}
+              onSelectPack={(packId) => {
+                setSelectedPackId(packId)
+                setPackTab('overview')
+              }}
               onInstall={requestInstall}
               onToggle={requestToggle}
               busyPackId={busyPackId ?? (install.running ? install.packId : null)}
@@ -649,6 +721,7 @@ export default function App() {
             onDelete={requestDelete}
             onVerify={verifyPack}
             onHost={requestHostSync}
+            onManageMods={manageMods}
             busyPackId={busyPackId}
             deleteProgress={deleteProgress}
           />

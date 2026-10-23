@@ -19,13 +19,15 @@ import { isZombieBuddyInstalled } from './zombiebuddy.js'
 import { verifyMods, type PackHealth } from './verify.js'
 import { ensureUiSuiteMods } from './uiSuite.js'
 import type { EventSink } from './events.js'
-import { EasyPzError } from './errors.js'
+import { EasyPzError, cancelledError } from './errors.js'
 import {
   clearPackInstall,
+  getDisabledModIds,
   loadState,
   recordInstall,
   saveState,
   setActivePack,
+  setPackDisabledModIds,
   type AppState,
 } from './state.js'
 import {
@@ -35,6 +37,7 @@ import {
   deletePackStorage,
   detectActivePackId,
   getPackStorageMods,
+  modIsActive,
   runMoveTransaction,
 } from './storage.js'
 
@@ -81,7 +84,10 @@ export async function setPackEnabled(options: {
   const previousPackId = state.activePackId
   const allIds = allPackClientIds(catalog, state)
   const targetMods = await getPackStorageMods(catalog, packId, paths, state)
-  const targetIds = targetMods.filter((mod) => !mod.serverOnly).map((mod) => mod.id)
+  const disabled = getDisabledModIds(state, packId)
+  const targetIds = targetMods
+    .filter((mod) => !mod.serverOnly && !disabled.has(mod.id))
+    .map((mod) => mod.id)
   const duplicateRoot = path.join(paths.backupDir, 'easypz-duplicates')
 
   if (enabled) {
@@ -157,6 +163,93 @@ export async function setPackEnabled(options: {
   })
 
   return { activePackId: null, modCount: 0, previousPackId }
+}
+
+export interface ModToggleResult {
+  packId: string
+  modId: string
+  enabled: boolean
+  activePackId: string | null
+  enabledClientCount: number
+}
+
+/**
+ * Enables or disables a single mod inside an installed pack.
+ *
+ * The mod folder is never moved. For an active pack the mod ID is added to or
+ * removed from `default.txt`, which is what Project Zomboid uses to decide
+ * whether a mod loads. Inactive packs store the preference only.
+ */
+export async function setModEnabled(options: {
+  catalog: Catalog
+  packId: string
+  modId: string
+  enabled: boolean
+  paths: AppPaths
+  signal?: AbortSignal
+  onEvent?: EventSink
+  skipGameCheck?: boolean
+}): Promise<ModToggleResult> {
+  const { catalog, packId, modId, enabled, paths, signal, onEvent, skipGameCheck } = options
+
+  if (!skipGameCheck && (await isGameRunning())) {
+    throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before changing mods.')
+  }
+
+  const state = await loadState(paths, { catalog, migrate: true })
+  const install = state.installs[packId]
+  if (!install) {
+    throw new EasyPzError('MISSING_MODS', 'Install the pack before changing its mods.')
+  }
+
+  const mod = install.mods.find((candidate) => candidate.id === modId)
+  if (!mod) {
+    throw new EasyPzError('MISSING_MODS', `${modId} is not part of this pack.`)
+  }
+
+  const isActive = state.activePackId === packId
+  if (enabled && isActive && !mod.serverOnly && !(await modIsActive(paths, mod.folder))) {
+    throw new EasyPzError(
+      'MISSING_MODS',
+      `${mod.name} files are missing. Repair the pack before enabling it.`,
+    )
+  }
+
+  const disabled = getDisabledModIds(state, packId)
+  if (enabled) disabled.delete(modId)
+  else disabled.add(modId)
+
+  if (isActive && !mod.serverOnly) {
+    if (signal?.aborted) throw cancelledError()
+    await updateDefaultTxt({
+      addIds: enabled ? [modId] : [],
+      removeIds: enabled ? [] : [modId],
+      modsDir: modsDir(paths),
+      backupDir: paths.backupDir,
+    })
+  }
+
+  await saveState(paths, setPackDisabledModIds(state, packId, [...disabled]))
+
+  const enabledClientCount = install.mods.filter(
+    (candidate) => !candidate.serverOnly && !disabled.has(candidate.id),
+  ).length
+
+  onEvent?.({
+    type: 'log',
+    level: 'info',
+    message: `${enabled ? 'Enabled' : 'Disabled'} ${mod.name} in ${getPack(catalog, packId).name}${
+      isActive ? '' : ' (applies when the pack is enabled)'
+    }.`,
+  })
+
+  return {
+    packId,
+    modId,
+    enabled,
+    activePackId: state.activePackId,
+    enabledClientCount,
+  }
 }
 
 function suiteAddIds(catalog: Catalog): Set<string> {
@@ -439,18 +532,35 @@ export async function applyHostForPack(options: {
   packId: string
   paths: AppPaths
   onEvent?: EventSink
+  skipGameCheck?: boolean
 }): Promise<HostApplyResult> {
   const { catalog, packId, paths, onEvent } = options
-  if (await isGameRunning()) {
+  if (!options.skipGameCheck && (await isGameRunning())) {
     throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before updating the host.')
   }
 
   const state = await loadState(paths, { catalog, migrate: true })
-  const pack = getPack(catalog, packId)
-  const suiteId = resolveUiSuiteId(catalog, state.installs[packId]?.uiSuiteId)
-  const mods = await getPackStorageMods(catalog, packId, paths, state)
+  const install = state.installs[packId]
+  const suiteId = resolveUiSuiteId(catalog, install?.uiSuiteId)
+  const disabled = getDisabledModIds(state, packId)
+  const mods = (await getPackStorageMods(catalog, packId, paths, state)).filter(
+    (mod) => !disabled.has(mod.id),
+  )
   const modIds = sortModIdsForLoadOrder(mods.map((mod) => mod.id))
-  const workshopIds = getWorkshopIdsForSuite(catalog, packId, suiteId)
+  const installedMods = install?.allMods.length ? install.allMods : (install?.mods ?? [])
+  const workshopAvailability = new Map<string, boolean>()
+  for (const mod of installedMods) {
+    const enabled = workshopAvailability.get(mod.workshopId) ?? false
+    workshopAvailability.set(mod.workshopId, enabled || !disabled.has(mod.id))
+  }
+  const disabledWorkshopIds = new Set(
+    [...workshopAvailability]
+      .filter(([, hasEnabledMod]) => !hasEnabledMod)
+      .map(([workshopId]) => workshopId),
+  )
+  const workshopIds = getWorkshopIdsForSuite(catalog, packId, suiteId).filter(
+    (id) => !disabledWorkshopIds.has(id),
+  )
   const result = await applyHostIni({
     iniPath: hostIniPath(paths),
     modIds,
@@ -482,6 +592,7 @@ export async function getPackHealth(options: {
   const pack = getPack(options.catalog, options.packId)
 
   const suiteId = resolveUiSuiteId(options.catalog, state.installs[pack.id]?.uiSuiteId)
+  const disabledModIds = getDisabledModIds(state, pack.id)
   const installed = state.installs[pack.id]?.mods
   const mods = (
     installed ??
@@ -503,6 +614,7 @@ export async function getPackHealth(options: {
     paths: options.paths,
     pzPath: game.pzPath,
     hostIniPath: hostIniPath(options.paths),
+    disabledModIds,
   })
 }
 
@@ -517,7 +629,10 @@ export async function reconcileActivePack(options: {
   const activeMods = activePackId
     ? await getPackStorageMods(catalog, activePackId, paths, state)
     : []
-  const addIds = activeMods.filter((mod) => !mod.serverOnly).map((mod) => mod.id)
+  const disabled = activePackId ? getDisabledModIds(state, activePackId) : new Set<string>()
+  const addIds = activeMods
+    .filter((mod) => !mod.serverOnly && !disabled.has(mod.id))
+    .map((mod) => mod.id)
 
   await updateDefaultTxt({
     addIds,

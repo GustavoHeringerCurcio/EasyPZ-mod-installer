@@ -76,6 +76,12 @@
     inherited: 'from Medium',
     installedBadge: 'Installed',
     modCount: '{{count}} mods',
+    installedMods: 'Installed mods',
+    suiteMods: 'UI suite mods',
+    modsEnabled: '{{enabled}} of {{total}} client mods enabled',
+    closeGameToToggle: 'Close Project Zomboid to change mods.',
+    coreMod: 'Core mod',
+    coreHint: 'Disabling this core mod can prevent Viewpoint add-ons from loading.',
     free: 'free',
     activeHint: 'Mods are active in Project Zomboid. Disabling keeps them stored on disk.',
     enableHint: 'Enable this pack to load its mods. Only one pack can be active.',
@@ -199,6 +205,8 @@
     hostNotConfigured: 'No host found',
     setup: 'Setup',
     modsCount: '{{installed}}/{{total}} mods',
+    enabledMods: '{{enabled}}/{{total}} enabled',
+    manageMods: 'Manage mods',
     activeCount: '{{count}} active now',
     deleteMods: 'Delete mods',
     deleting: 'Deleting {{done}} / {{total}} mods',
@@ -323,6 +331,10 @@
     clearCacheBody:
       'This deletes downloaded pack archives and extracted files. Installed packs, mods, saves, and settings are not touched.',
     clearCacheAction: 'Clear cache',
+    modDisableTitle: 'Disable {{mod}}?',
+    modDisableBody:
+      '{{mod}} is a core Viewpoint dependency. Other mods may fail to load or the pack may behave unexpectedly. Its files stay installed and you can enable it again at any time.',
+    modDisableAction: 'Disable anyway',
   },
   elevation: {
     title: 'Administrator access required',
@@ -373,6 +385,8 @@
     defaultsRestored: 'Default performance settings restored. Restart Project Zomboid.',
     copied: 'Copied to clipboard.',
     uiSuiteChanged: 'UI suite applied.',
+    modEnabled: '{{mod}} enabled.',
+    modDisabled: '{{mod}} disabled. Its files stay installed.',
   },
   common: {
     cancel: 'Cancel',

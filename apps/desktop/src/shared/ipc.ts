@@ -95,6 +95,11 @@ export interface EasyPzApi {
   ) => Promise<OperationResult<InstallSummary>>
   cancelInstall: () => Promise<void>
   setPackEnabled: (packId: string, enabled: boolean) => Promise<OperationResult<PackToggleResult>>
+  setModEnabled: (
+    packId: string,
+    modId: string,
+    enabled: boolean,
+  ) => Promise<OperationResult<Bootstrap>>
   repairPack: (packId: string) => Promise<OperationResult<PackToggleResult>>
   deletePack: (packId: string) => Promise<OperationResult<DeletePackResult>>
   verify: (packId: string) => Promise<OperationResult<PackHealth>>
@@ -122,6 +127,7 @@ export const IPC = {
   startInstall: 'install:start',
   cancelInstall: 'install:cancel',
   setPackEnabled: 'pack:setEnabled',
+  setModEnabled: 'pack:setModEnabled',
   repairPack: 'pack:repair',
   deletePack: 'pack:delete',
   verify: 'pack:verify',

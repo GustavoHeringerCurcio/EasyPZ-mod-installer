@@ -28,6 +28,7 @@ import {
   repairPack,
   saveState,
   setGamePathOverride,
+  setModEnabled,
   setPackEnabled,
   type DeletePackResult,
   type EngineEvent,
@@ -55,9 +56,10 @@ const execFileAsync = promisify(execFile)
 let mainWindow: BrowserWindow | null = null
 let activeInstall: AbortController | null = null
 let activeDelete = false
+let activeModToggle = false
 
 function operationBusy(): boolean {
-  return activeInstall !== null || activeDelete
+  return activeInstall !== null || activeDelete || activeModToggle
 }
 
 function pendingActionPath(): string {
@@ -160,8 +162,14 @@ async function buildBootstrap(): Promise<Bootstrap> {
     }
   }
   const availablePackIds = await getAvailablePackIds(catalog, paths, state)
+  const activeMods = state.activePackId
+    ? await getPackStorageMods(catalog, state.activePackId, paths, state)
+    : []
+  const disabledModIds = new Set(
+    state.activePackId ? (state.installs[state.activePackId]?.disabledModIds ?? []) : [],
+  )
   const hostExpectedIds = state.activePackId
-    ? (await getPackStorageMods(catalog, state.activePackId, paths, state)).map((mod) => mod.id)
+    ? activeMods.filter((mod) => !disabledModIds.has(mod.id)).map((mod) => mod.id)
     : null
   const host = await getHostStatus(hostIniPath(paths), hostExpectedIds)
   const legacyDetected =
@@ -301,6 +309,40 @@ function registerIpc(): void {
       return fail(error)
     }
   })
+
+  ipcMain.handle(
+    IPC.setModEnabled,
+    async (_event, packId: unknown, modId: unknown, enabled: unknown) => {
+      if (typeof packId !== 'string') return fail(new Error('Invalid pack selection.'))
+      if (typeof modId !== 'string' || modId.length === 0) {
+        return fail(new Error('Invalid mod selection.'))
+      }
+      if (typeof enabled !== 'boolean') return fail(new Error('Invalid mod state.'))
+      if (operationBusy()) {
+        return {
+          ok: false,
+          code: 'BUSY',
+          message: 'Wait for the current operation to finish.',
+        } satisfies OperationResult<never>
+      }
+      try {
+        activeModToggle = true
+        await setModEnabled({
+          catalog: await loadCatalogForOperation(),
+          packId,
+          modId,
+          enabled,
+          paths: getAppPaths(),
+          onEvent: sendInstallEvent,
+        })
+        return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
+      } catch (error) {
+        return fail(error)
+      } finally {
+        activeModToggle = false
+      }
+    },
+  )
 
   ipcMain.handle(IPC.applyUiSuite, async (_event, packId: unknown, suiteId: unknown) => {
     if (typeof packId !== 'string' || typeof suiteId !== 'string') {

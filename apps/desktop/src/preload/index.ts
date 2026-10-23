@@ -10,6 +10,8 @@ const api: EasyPzApi = {
   cancelInstall: () => ipcRenderer.invoke(IPC.cancelInstall),
   setPackEnabled: (packId: string, enabled: boolean) =>
     ipcRenderer.invoke(IPC.setPackEnabled, packId, enabled),
+  setModEnabled: (packId: string, modId: string, enabled: boolean) =>
+    ipcRenderer.invoke(IPC.setModEnabled, packId, modId, enabled),
   repairPack: (packId: string) => ipcRenderer.invoke(IPC.repairPack, packId),
   deletePack: (packId: string) => ipcRenderer.invoke(IPC.deletePack, packId),
   verify: (packId: string) => ipcRenderer.invoke(IPC.verify, packId),

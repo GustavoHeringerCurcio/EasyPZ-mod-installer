@@ -34,6 +34,7 @@ const installRecordSchema = z
     uiSuiteId: z.string().min(1).default('viewpoint'),
     installedAt: z.string().min(1),
     managedFolders: z.array(z.string()),
+    disabledModIds: z.array(z.string()).default([]),
     mods: z.array(installedModSchema).default([]),
     allMods: z.array(installedModSchema).default([]),
   })
@@ -122,6 +123,7 @@ async function migrateLegacy(paths: AppPaths, catalog?: Catalog): Promise<AppSta
         uiSuiteId: getDefaultUiSuite(catalog)?.id ?? 'viewpoint',
         installedAt: new Date().toISOString(),
         managedFolders: getManagedFoldersForSuite(catalog, installedPack.id, null),
+        disabledModIds: [],
         mods: [],
         allMods: [],
       }
@@ -195,7 +197,12 @@ export function recordInstall(
   state: AppState,
   catalog: Catalog,
   packId: string,
-  options: { mods?: InstalledMod[]; allMods?: InstalledMod[]; uiSuiteId?: string | null } = {},
+  options: {
+    mods?: InstalledMod[]
+    allMods?: InstalledMod[]
+    uiSuiteId?: string | null
+    disabledModIds?: string[]
+  } = {},
 ): AppState {
   const pack = getPack(catalog, packId)
   const now = new Date().toISOString()
@@ -219,6 +226,10 @@ export function recordInstall(
   const filtered = sourceMods.filter((mod) => !removed.has(mod.id))
   const mods: InstalledMod[] = filtered.length > 0 ? filtered : sourceMods
 
+  const availableIds = new Set(mods.map((mod) => mod.id))
+  const disabledSource = options.disabledModIds ?? state.installs[packId]?.disabledModIds ?? []
+  const disabledModIds = [...new Set(disabledSource)].filter((id) => availableIds.has(id))
+
   const managedFolders = [...new Set(mods.map((mod) => mod.folder))]
   const workshop = pack.source === 'workshop' ? pack.workshop : null
 
@@ -240,6 +251,7 @@ export function recordInstall(
         installedAt: now,
         managedFolders:
           managedFolders.length > 0 ? managedFolders : effective.map((mod) => mod.folder),
+        disabledModIds,
         mods,
         allMods: options.allMods ?? sourceMods,
       },
@@ -259,6 +271,35 @@ export function clearPackInstall(state: AppState, packId: string): AppState {
     ...state,
     installs,
     activePackId: state.activePackId === packId ? null : state.activePackId,
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+export function getDisabledModIds(state: AppState, packId: string): Set<string> {
+  return new Set(state.installs[packId]?.disabledModIds ?? [])
+}
+
+export function isModDisabled(state: AppState, packId: string, modId: string): boolean {
+  return getDisabledModIds(state, packId).has(modId)
+}
+
+export function setPackDisabledModIds(
+  state: AppState,
+  packId: string,
+  disabledModIds: string[],
+): AppState {
+  const install = state.installs[packId]
+  if (!install) return state
+
+  const available = new Set(install.mods.map((mod) => mod.id))
+  const next = [...new Set(disabledModIds)].filter((id) => available.has(id))
+
+  return {
+    ...state,
+    installs: {
+      ...state.installs,
+      [packId]: { ...install, disabledModIds: next },
+    },
     updatedAt: new Date().toISOString(),
   }
 }

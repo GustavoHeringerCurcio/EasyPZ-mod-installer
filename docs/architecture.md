@@ -72,7 +72,8 @@ Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warnin
       "archiveSha256": "…",
       "catalogGeneratedAt": "…",
       "installedAt": "…",
-      "managedFolders": ["Viewpoint", "TrueSwimming"]
+      "managedFolders": ["Viewpoint", "TrueSwimming"],
+      "disabledModIds": []
     }
   },
   "gamePathOverride": null,
@@ -93,6 +94,17 @@ Events are emitted as a discriminated union (`stage`, `progress`, `mod`, `warnin
 - Moves are journaled to `%USERPROFILE%\Zomboid\EasyPZ\move-journal.json`. On startup, an interrupted move is completed and the active pack is reconciled from the physical folder state.
 - Shared mods are stored once under their workshop/folder key.
 - Deleting a pack removes only store folders not referenced by another available pack.
+
+## Per-mod toggles
+
+Each install record keeps `disabledModIds`. Toggling a mod never moves its folder:
+
+- **Active pack:** the mod ID is added to or removed from `default.txt`. Project Zomboid only loads IDs listed there, so the folder stays in `Zomboid\mods` but the mod does not load.
+- **Inactive pack:** only the install record changes. The preference is applied the next time the pack is activated.
+- **Pack switch:** each pack keeps its own disabled set. Activation re-adds only that pack's enabled IDs.
+- **Install, repair, and UI-suite changes:** existing disabled IDs are preserved when the mod is still part of the pack; stale IDs are dropped.
+- **Host sync:** `Mods=` and `WorkshopItems=` exclude disabled mods, so the Library out-of-sync banner reacts to per-mod changes.
+- **Core mods:** `ZombieBuddy` and `Viewpoint` stay toggleable, but the UI warns before disabling them because Viewpoint add-ons depend on them.
 
 ## Workshop collection packs
 

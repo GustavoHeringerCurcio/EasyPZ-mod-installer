@@ -5,8 +5,22 @@ import { afterEach, describe, expect, it } from 'vitest'
 import type { Catalog, IndexedPack } from '@easypz/catalog'
 import { buildDefaultTxt, parseDefaultModIds } from './activation.js'
 import { hasModInfo } from './archive.js'
-import { getAppPaths, activeModPath, defaultTxtPath, modsDir, storeModPath } from './paths.js'
-import { deletePack, setPackEnabled } from './operations.js'
+import { readHostMods } from './host.js'
+import {
+  getAppPaths,
+  activeModPath,
+  defaultTxtPath,
+  hostIniPath,
+  modsDir,
+  storeModPath,
+} from './paths.js'
+import {
+  applyHostForPack,
+  deletePack,
+  reconcileActivePack,
+  setModEnabled,
+  setPackEnabled,
+} from './operations.js'
 import { createEmptyState, loadState, recordInstall, saveState, setActivePack } from './state.js'
 import { getAvailablePackIds, recoverStorageJournal } from './storage.js'
 
@@ -104,6 +118,28 @@ function makeCatalog(): Catalog {
         'medium',
         3,
       ),
+      {
+        ...makePack(
+          'server-pack',
+          [
+            {
+              name: 'Server',
+              mods: [
+                {
+                  id: 'ModServer',
+                  name: 'Mod Server',
+                  folder: 'ModServer',
+                  workshopId: '333',
+                  serverOnly: true,
+                },
+              ],
+            },
+          ],
+          null,
+          0,
+        ),
+        stats: { clientMods: 0, serverMods: 1, totalMods: 1, workshopCount: 1 },
+      },
       {
         ...makePack('viewpoint-collection', [], null, 2),
         name: 'Project Viewpoint Collection',
@@ -361,5 +397,220 @@ describe('pack storage', () => {
     expect(recovered).toBe(1)
     expect(await hasModInfo(to)).toBe(true)
     expect(await hasModInfo(from)).toBe(false)
+  })
+
+  it('toggles a client mod through default.txt without moving its folder', async () => {
+    const { paths, catalog } = await setup()
+    await saveState(paths, recordInstall(createEmptyState(), catalog, 'medium'))
+    await setPackEnabled({
+      catalog,
+      packId: 'medium',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+
+    const disabled = await setModEnabled({
+      catalog,
+      packId: 'medium',
+      modId: 'ModA',
+      enabled: false,
+      paths,
+      skipGameCheck: true,
+    })
+
+    expect(disabled.enabled).toBe(false)
+    expect(disabled.enabledClientCount).toBe(1)
+    expect(await hasModInfo(activeModPath(paths, 'ModA'))).toBe(true)
+
+    let ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('UserMod')
+    expect(ids).toContain('ModShared')
+    expect(ids).not.toContain('ModA')
+    expect((await loadState(paths, { catalog })).installs.medium?.disabledModIds).toEqual(['ModA'])
+
+    await setModEnabled({
+      catalog,
+      packId: 'medium',
+      modId: 'ModA',
+      enabled: true,
+      paths,
+      skipGameCheck: true,
+    })
+
+    ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('ModA')
+    expect((await loadState(paths, { catalog })).installs.medium?.disabledModIds).toEqual([])
+  })
+
+  it('stores a disabled mod for an inactive pack and applies it on enable', async () => {
+    const { paths, catalog } = await setup()
+    await saveState(paths, recordInstall(createEmptyState(), catalog, 'medium'))
+
+    await setModEnabled({
+      catalog,
+      packId: 'medium',
+      modId: 'ModA',
+      enabled: false,
+      paths,
+      skipGameCheck: true,
+    })
+
+    let ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toEqual(['UserMod'])
+
+    await setPackEnabled({
+      catalog,
+      packId: 'medium',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+
+    ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('ModShared')
+    expect(ids).not.toContain('ModA')
+  })
+
+  it('keeps disabled mods independent for each pack across switches', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '222', 'ModC'))
+
+    let state = recordInstall(createEmptyState(), catalog, 'medium')
+    state = recordInstall(state, catalog, 'advanced')
+    await saveState(paths, state)
+
+    await setModEnabled({
+      catalog,
+      packId: 'medium',
+      modId: 'ModA',
+      enabled: false,
+      paths,
+      skipGameCheck: true,
+    })
+
+    await setPackEnabled({
+      catalog,
+      packId: 'advanced',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+    let ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('ModA')
+
+    await setModEnabled({
+      catalog,
+      packId: 'advanced',
+      modId: 'ModA',
+      enabled: false,
+      paths,
+      skipGameCheck: true,
+    })
+
+    await setPackEnabled({
+      catalog,
+      packId: 'medium',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+    ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).not.toContain('ModA')
+  })
+
+  it('keeps server-only mods out of default.txt and filters the host list', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '333', 'ModServer'))
+    await saveState(paths, recordInstall(createEmptyState(), catalog, 'server-pack'))
+    await setPackEnabled({
+      catalog,
+      packId: 'server-pack',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+
+    let ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toEqual(['UserMod'])
+
+    await fs.mkdir(path.dirname(hostIniPath(paths)), { recursive: true })
+    await fs.writeFile(hostIniPath(paths), 'ServerName=Test\r\n', 'utf8')
+
+    await setModEnabled({
+      catalog,
+      packId: 'server-pack',
+      modId: 'ModServer',
+      enabled: false,
+      paths,
+      skipGameCheck: true,
+    })
+
+    await applyHostForPack({
+      catalog,
+      packId: 'server-pack',
+      paths,
+      skipGameCheck: true,
+    })
+
+    expect(await readHostMods(hostIniPath(paths))).toEqual([])
+    expect((await loadState(paths, { catalog })).installs['server-pack']?.disabledModIds).toEqual([
+      'ModServer',
+    ])
+    ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toEqual(['UserMod'])
+  })
+
+  it('does not re-enable disabled mods during active-pack recovery', async () => {
+    const { paths, catalog } = await setup()
+    await saveState(
+      paths,
+      recordInstall(createEmptyState(), catalog, 'medium', {
+        disabledModIds: ['ModA'],
+      }),
+    )
+    await setPackEnabled({
+      catalog,
+      packId: 'medium',
+      paths,
+      enabled: true,
+      skipGameCheck: true,
+    })
+
+    await fs.writeFile(
+      defaultTxtPath(paths),
+      buildDefaultTxt(['UserMod', 'ModA', 'ModShared']),
+      'ascii',
+    )
+
+    const state = await reconcileActivePack({ catalog, paths })
+    expect(state.activePackId).toBe('medium')
+
+    const ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('ModShared')
+    expect(ids).not.toContain('ModA')
+  })
+
+  it('preserves disabled mods across a UI suite reinstall', async () => {
+    const { paths, catalog } = await setup()
+    const state = recordInstall(createEmptyState(), catalog, 'medium', {
+      disabledModIds: ['ModA'],
+    })
+    await saveState(paths, state)
+
+    const updated = recordInstall(state, catalog, 'medium', {
+      mods: [
+        { id: 'ModA', name: 'Mod A', folder: 'ModA', workshopId: '111', serverOnly: false },
+        {
+          id: 'ModShared',
+          name: 'Shared',
+          folder: 'ModShared',
+          workshopId: '999',
+          serverOnly: false,
+        },
+      ],
+    })
+
+    expect(updated.installs.medium?.disabledModIds).toEqual(['ModA'])
   })
 })

@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Server,
   ShieldCheck,
+  SlidersHorizontal,
   Trash2,
   Wrench,
 } from 'lucide-react'
@@ -30,6 +31,7 @@ export function LibraryPage({
   onDelete,
   onVerify,
   onHost,
+  onManageMods,
 }: {
   bootstrap: Bootstrap
   busyPackId: string | null
@@ -41,6 +43,7 @@ export function LibraryPage({
   onDelete: (packId: string) => void
   onVerify: (packId: string) => Promise<PackHealth | null>
   onHost: (packId: string) => void
+  onManageMods: (packId: string) => void
 }) {
   const { t } = useTranslation()
   const [verifyBusy, setVerifyBusy] = useState<string | null>(null)
@@ -132,6 +135,9 @@ export function LibraryPage({
           const progressPercent =
             progress && progress.total > 0 ? (progress.index / progress.total) * 100 : 0
           const installRecord = bootstrap.state.installs[pack.id]
+          const disabledModIds = new Set(installRecord?.disabledModIds ?? [])
+          const clientMods = (installRecord?.mods ?? []).filter((mod) => !mod.serverOnly)
+          const enabledModCount = clientMods.filter((mod) => !disabledModIds.has(mod.id)).length
           const updateAvailable = packUpdateAvailable(bootstrap, pack.id)
           const accent = packAccent(pack)
           const suite = bootstrap.catalog.uiSuites.find(
@@ -176,6 +182,14 @@ export function LibraryPage({
                     </span>
                     {installRecord ? (
                       <span>
+                        {t('library.enabledMods', {
+                          enabled: enabledModCount,
+                          total: clientMods.length,
+                        })}
+                      </span>
+                    ) : null}
+                    {installRecord ? (
+                      <span>
                         {t('library.lastInstalled', {
                           date: formatDate(installRecord.installedAt),
                         })}
@@ -206,7 +220,7 @@ export function LibraryPage({
                           })}
                         </span>
                         <span>
-                          {t('library.activeCount', { count: healthForPack.activeCount })}
+                          {t('library.activeCount', { count: healthForPack.enabledCount })}
                         </span>
                         <span>
                           {t('library.defaultTxt')}: {healthForPack.defaultTxtCount}
@@ -281,6 +295,17 @@ export function LibraryPage({
                       >
                         <Wrench className="size-3.5" />
                         {t('library.repair')}
+                      </Button>
+                    ) : null}
+                    {installRecord ? (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => onManageMods(pack.id)}
+                        disabled={anyBusy}
+                      >
+                        <SlidersHorizontal className="size-3.5" />
+                        {t('library.manageMods')}
                       </Button>
                     ) : null}
                     <Button

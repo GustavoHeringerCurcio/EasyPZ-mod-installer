@@ -12,6 +12,7 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 - One-click install of the complete pack: mods, ZombieBuddy, launcher heap/agent configuration, and activation.
 - Live Workshop progress for SteamCDN packs: current item, byte progress when SteamCMD reports it, speed/ETA, and cached/downloaded/failed counts.
 - One active pack at a time. Inactive packs stay installed in EasyPZ storage and can be toggled on instantly.
+- Toggle individual mods on or off from a pack's **Mods** tab. Disabled mods stay installed but are removed from `default.txt`, so the rest of the pack keeps working.
 - Download progress, checksum verification, extraction progress, cancellation, and actionable errors.
 - Switching moves only EasyPZ-managed mod folders; unmanaged mods and `default.txt` entries are preserved.
 - Library health checks, toggles, delete, repair, and explicit host sync.
