@@ -24,14 +24,14 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 
 ## Packs
 
-| Pack                             |        Client mods | Download | Notes                                                      |
-| -------------------------------- | -----------------: | -------: | ---------------------------------------------------------- |
-| **Essentials**                   |                  6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix |
-| **Medium**                       |                 38 |  ~1.1 GB | Balanced Viewpoint pack                                    |
-| **Advanced**                     |                 45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming               |
-| **Ultra**                        | 140 Workshop items |  ~3.1 GB | Advanced plus horses, maps, 3D world, and curated vehicles |
-| **Project Viewpoint Collection** |  90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD      |
-| **Project Viewpoint - Addons**   | 198 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons            |
+| Pack                             |        Client mods | Download | Notes                                                                                        |
+| -------------------------------- | -----------------: | -------: | -------------------------------------------------------------------------------------------- |
+| **Essentials**                   |                  6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix                                   |
+| **Medium**                       |                 38 |  ~1.1 GB | Balanced Viewpoint pack                                                                      |
+| **Advanced**                     |                 45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming                                                 |
+| **Ultra**                        | 130 Workshop items |  ~2.7 GB | Advanced plus horses, 3D world, missions, bows/crossbows, and curated vehicles (vanilla map) |
+| **Project Viewpoint Collection** |  90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD                                        |
+| **Project Viewpoint - Addons**   | 198 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons                                              |
 
 Essentials is standalone. Medium and Advanced are additive to each other, but Essentials is a smaller independent starter pack.
 

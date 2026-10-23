@@ -3,7 +3,7 @@
   "id": "ultra",
   "name": "Ultra",
   "tagline": "The complete co-op Viewpoint base",
-  "description": "The complete co-op Viewpoint base: Advanced plus horses, weather, maps, missions, events, 3D world detail, and a curated vehicle fleet. Built from a pinned Workshop item list. Includes the EasyPZ FPS Boost profile.",
+  "description": "The complete co-op Viewpoint base: Advanced plus horses, weather, missions, events, 3D world detail, a curated vehicle fleet, and bows/crossbows. Built from a pinned Workshop item list and runs on the vanilla map. Includes the EasyPZ FPS Boost profile.",
   "cover": "packs/ultra/cover.jpg",
   "gallery": [],
   "accent": "#f5b301",
@@ -16,7 +16,7 @@
     "co-op",
     "vehicles",
     "horses",
-    "maps",
+    "bows",
     "missions",
     "weather",
     "fps-boost",
@@ -35,7 +35,7 @@
   "archive": null,
   "workshop": {
     "collectionId": "0",
-    "downloadBytes": 3081875661,
+    "downloadBytes": 2727822959,
     "items": [
       {
         "id": "3619862853",
@@ -152,12 +152,6 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "3615135168",
-        "name": "Zombie Virus Vaccine [B42.14 to B42.20 - SP/MP]",
-        "sizeBytes": 83594074,
-        "group": "Survival and QoL"
-      },
-      {
         "id": "3387110070",
         "name": "They Knew [B42]",
         "sizeBytes": 265499,
@@ -170,9 +164,9 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "3779561845",
-        "name": "LG Extended Plumbing",
-        "sizeBytes": 1466549,
+        "id": "2713921292",
+        "name": "Undead Survivor [B41/B42]",
+        "sizeBytes": 17987763,
         "group": "Survival and QoL"
       },
       {
@@ -194,12 +188,6 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "2804531012",
-        "name": "Draw On The Map - Free Hand Drawing [DISCONTINUED]",
-        "sizeBytes": 5429892,
-        "group": "Survival and QoL"
-      },
-      {
         "id": "2503622437",
         "name": "Skill Recovery Journal",
         "sizeBytes": 4460232,
@@ -218,12 +206,6 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "3772052709",
-        "name": "Spawn Selector [B42 Stable]",
-        "sizeBytes": 574320,
-        "group": "Survival and QoL"
-      },
-      {
         "id": "3817413313",
         "name": "Project Viewpoint - Immersive Driving",
         "sizeBytes": 120306,
@@ -236,9 +218,9 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "3758880254",
-        "name": "PZ Simple Crossbows [B42.21 MP]",
-        "sizeBytes": 5284802,
+        "id": "3776949545",
+        "name": "[SVRP] ClassicBows",
+        "sizeBytes": 22584314,
         "group": "Survival and QoL"
       },
       {
@@ -308,48 +290,6 @@
         "group": "Survival and QoL"
       },
       {
-        "id": "3814178814",
-        "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
-        "sizeBytes": 229203342,
-        "group": "Maps"
-      },
-      {
-        "id": "3816175183",
-        "name": "Big Bear Lake [ALPHA] [B42]",
-        "sizeBytes": 88770434,
-        "group": "Maps"
-      },
-      {
-        "id": "3480990544",
-        "name": "Constown (B42)",
-        "sizeBytes": 38204329,
-        "group": "Maps"
-      },
-      {
-        "id": "3484263516",
-        "name": "Raven Creek B42",
-        "sizeBytes": 120169463,
-        "group": "Maps"
-      },
-      {
-        "id": "3747595202",
-        "name": "Greenport, KY (B42)",
-        "sizeBytes": 37359556,
-        "group": "Maps"
-      },
-      {
-        "id": "3810223506",
-        "name": "Greenport, KY (B42) - Ground Item Fix",
-        "sizeBytes": 9241,
-        "group": "Maps"
-      },
-      {
-        "id": "2815966702",
-        "name": "Rabbit Hash, KY [B42+ Update]",
-        "sizeBytes": 8009049,
-        "group": "Maps"
-      },
-      {
         "id": "3661336777",
         "name": "Horse Mod [B42.20+/MP]",
         "sizeBytes": 58507343,
@@ -395,12 +335,6 @@
         "id": "3330403100",
         "name": "Trailers!",
         "sizeBytes": 11786296,
-        "group": "Horses, weather, and utility"
-      },
-      {
-        "id": "3815245833",
-        "name": "Visible Corpses in Trailers [B42]",
-        "sizeBytes": 3911813,
         "group": "Horses, weather, and utility"
       },
       {
@@ -536,6 +470,12 @@
         "group": "3D world"
       },
       {
+        "id": "3814178814",
+        "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
+        "sizeBytes": 229203342,
+        "group": "3D world"
+      },
+      {
         "id": "3820063546",
         "name": "Viewpoint: Free Aim",
         "sizeBytes": 161847,
@@ -545,12 +485,6 @@
         "id": "3821892101",
         "name": "Viewpoint Tension",
         "sizeBytes": 2874512,
-        "group": "Gameplay"
-      },
-      {
-        "id": "3812396995",
-        "name": "Viewpoint Threat Detector",
-        "sizeBytes": 4001291,
         "group": "Gameplay"
       },
       {
@@ -860,6 +794,12 @@
         "group": "Missions, events, transport, UI"
       },
       {
+        "id": "3782565181",
+        "name": "Simple Suppressors | Build 42",
+        "sizeBytes": 2160034,
+        "group": "Missions, events, transport, UI"
+      },
+      {
         "id": "3812559973",
         "name": "Viewpoint Turbo - Light Performance Improvement [B42]",
         "sizeBytes": 3012397,
@@ -881,16 +821,19 @@
   },
   "groups": [],
   "warnings": [
-    "This package downloads 140 items from Steam Workshop and can take a long time.",
-    "Start a new save. Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash add map cells and are not safe to remove mid-save.",
-    "Big Bear Lake is an alpha map. Some depth-map and first-person Viewpoint visuals may be unfinished.",
+    "This package downloads 130 items from Steam Workshop and can take a long time.",
+    "Start a new save. This version removes the custom maps Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash; saves created with them may lose map cells.",
+    "Spawn Selector was removed. Starting locations now use vanilla spawns or map-provided spawn points.",
     "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability. Expanded Helicopter Events is Build 41 only and is not included.",
     "They Knew [B42] must load before its 42.19 Fix patch. Do not enable They Knew Continued or other They Knew patches at the same time.",
-    "Zombie Camouflage is a stealth mechanic. Viewpoint Tension and Threat Detector may still warn about zombies that cannot see you, and multiplayer requires the mod's own setup steps.",
+    "ClassicBows is Build 42.20+ and multiplayer, but has a known arrow duplication bug when reloading; PvP is unreliable.",
+    "Simple Suppressors adds firearm muzzle suppressors. Test it with Viewpoint True Ballistics, Recoil & ADS, and Attachments UI.",
+    "Undead Survivor adds outfits to zombies and may reduce They Knew hazmat spawn rates.",
+    "Zombie Camouflage is a stealth mechanic. Viewpoint Tension may still warn about zombies that cannot see you, and multiplayer requires the mod's own setup steps.",
     "Common Sense adds its own ammo counter. Viewpoint Interface already shows firearm rounds, so disable one if the HUD is cluttered.",
     "Has Been Read may lose map read status after reconnecting on B42.20 multiplayer; this does not affect revealed map areas.",
     "FPS Boost is available in EasyPZ Settings: it applies the Viewpoint floor atlas, lighter True Weathers, blood/ragdoll and vehicle texture limits without removing visual mods.",
-    "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items and maps.",
+    "Every player on a co-op server must use the same Ultra item list and update state. The server needs the same Workshop items.",
     "Workshop updates can change this pack at any time. Update all clients and the server together.",
     "Faster Reading is placed last in the item list for load order. If books are still slow, verify it is enabled and check console.txt for Lua errors.",
     "ZombieBuddy may ask you to approve its JAR on first launch."
@@ -900,5 +843,5 @@
     "This catalog entry uses public Steam Workshop item IDs; it is not claimed as original work.",
     "Not affiliated with The Indie Stone."
   ],
-  "updatedAt": "2026-10-23"
+  "updatedAt": "2026-10-24"
 }
