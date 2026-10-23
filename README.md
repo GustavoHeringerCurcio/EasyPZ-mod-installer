@@ -137,8 +137,11 @@ pnpm package:win
 Outputs:
 
 - `release/EasyPZ-<version>-setup.exe` — per-user NSIS installer
-- `release/EasyPZ-<version>-x64.zip` — portable build
+- `release/EasyPZ-<version>-portable.exe` — single-file portable build
+- `release/EasyPZ-<version>-x64.zip` — portable folder build
 - `release/*.blockmap` and `release/SHA256SUMS.txt` on CI
+
+The ZIP and installed app include `START-HERE.txt` with launch and SmartScreen instructions. Because the repository is private, share builds through a file link rather than a GitHub release link.
 
 Builds are unsigned. `win.signAndEditExecutable` is disabled so packaging works without symlink privileges; code signing hooks can be enabled later.
 
@@ -146,10 +149,11 @@ Builds are unsigned. `win.signAndEditExecutable` is disabled so packaging works 
 
 Read [docs/alpha.md](docs/alpha.md). In short:
 
-1. Download the installer from the private release and share it directly with testers.
+1. Build with `pnpm package:win`, then share the setup, portable EXE, or ZIP directly with testers.
 2. Expect SmartScreen on unsigned builds (More info → Run anyway).
-3. Test a fresh install and a legacy migration.
-4. Report errors with the log file at `%LOCALAPPDATA%\EasyPZ\logs\main.log`.
+3. For the ZIP, tell testers to extract the whole archive before running the app.
+4. Test a fresh install and a legacy migration.
+5. Report errors with the log file at `%LOCALAPPDATA%\EasyPZ\logs\main.log`.
 
 ## Data locations
 

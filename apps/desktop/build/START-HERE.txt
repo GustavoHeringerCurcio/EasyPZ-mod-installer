@@ -1,0 +1,31 @@
+EasyPZ Mod Installer - Start Here
+=================================
+
+1. Extract the entire ZIP to a folder first (right-click > Extract All).
+   Do not run "EasyPZ Mod Installer.exe" from inside the ZIP preview.
+   Keep the .exe together with all the other extracted files.
+
+2. Open the extracted folder and run:
+   EasyPZ Mod Installer.exe
+
+3. If Windows shows "Windows protected your PC":
+   - Click "More info"
+   - Click "Run anyway"
+   The alpha build is unsigned.
+
+4. Close Project Zomboid before installing or changing a modpack.
+
+5. Requirements:
+   - Windows 10/11 64-bit
+   - Project Zomboid Build 42.21
+   - 8 GB RAM minimum, 16 GB recommended
+
+6. In the app:
+   - Pick a pack in the Catalog.
+   - Click Install and keep the app open while it downloads.
+   - Use the Library to switch packs, verify files, or manage individual mods.
+
+If something fails:
+- Open the Logs page in the app, or send the file at:
+  %LOCALAPPDATA%\EasyPZ\logs\main.log
+- EasyPZ does not back up your saves. Make a manual backup if needed.

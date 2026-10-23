@@ -10,6 +10,10 @@ files:
   - out/**/*
   - package.json
 
+extraFiles:
+  - from: build/START-HERE.txt
+    to: START-HERE.txt
+
 extraResources:
   - from: ../../catalog
     to: catalog
@@ -22,9 +26,14 @@ win:
       arch: [x64]
     - target: zip
       arch: [x64]
+    - target: portable
+      arch: [x64]
   icon: build/icon.png
   signAndEditExecutable: false
   artifactName: EasyPZ-${version}-${arch}.${ext}
+
+portable:
+  artifactName: EasyPZ-${version}-portable.${ext}
 
 nsis:
   oneClick: false

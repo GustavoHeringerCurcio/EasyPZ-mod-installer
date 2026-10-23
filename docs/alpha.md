@@ -4,10 +4,22 @@
 
 The repository is private, so testers do not need GitHub access. Build the app, then share the installer directly:
 
-- `release/EasyPZ-0.1.0-alpha.0-setup.exe` (recommended)
-- `release/EasyPZ-0.1.0-alpha.0-x64.zip` (portable)
+- `release/EasyPZ-0.1.0-alpha.0-setup.exe` (recommended for non-technical testers)
+- `release/EasyPZ-0.1.0-alpha.0-portable.exe` (single file, no installation)
+- `release/EasyPZ-0.1.0-alpha.0-x64.zip` (portable folder; extract everything first)
 
-The alpha catalog is bundled in the app. Mod archives are downloaded from the existing public legacy releases, so no token is needed.
+The ZIP and installed app include `START-HERE.txt` with the same steps as this guide. The alpha catalog is bundled in the app. Mod archives are downloaded from the existing public legacy releases, so no token is needed.
+
+## Sharing a build
+
+1. Run `pnpm package:win`.
+2. Choose one file:
+   - **Non-technical tester:** send `EasyPZ-<version>-setup.exe`.
+   - **No-install tester:** send `EasyPZ-<version>-portable.exe`.
+   - **ZIP requested:** send `EasyPZ-<version>-x64.zip` and tell the tester to extract the whole archive first.
+3. Upload the file to a shared drive and send the link. GitHub release links do not work while the repository is private.
+4. Send the SHA256 from `Get-FileHash <file> -Algorithm SHA256`.
+5. Tell the tester to close Project Zomboid before installing a pack.
 
 ## SmartScreen
 
