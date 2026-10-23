@@ -1,14 +1,14 @@
-# Private alpha guide
+# Alpha guide
 
 ## What testers receive
 
-The repository is private, so testers do not need GitHub access. Build the app, then share the installer directly:
+Build the app, then share the installer directly:
 
-- `release/EasyPZ-0.1.0-alpha.0-setup.exe` (recommended for non-technical testers)
-- `release/EasyPZ-0.1.0-alpha.0-portable.exe` (single file, no installation)
-- `release/EasyPZ-0.1.0-alpha.0-x64.zip` (portable folder; extract everything first)
+- `release/EasyPZ-0.1.0-alpha.1-setup.exe` (recommended for non-technical testers)
+- `release/EasyPZ-0.1.0-alpha.1-portable.exe` (single file, no installation)
+- `release/EasyPZ-0.1.0-alpha.1-x64.zip` (portable folder; extract everything first)
 
-The ZIP and installed app include `START-HERE.txt` with the same steps as this guide. The alpha catalog is bundled in the app. Mod archives are downloaded from the existing public legacy releases, so no token is needed.
+The ZIP and installed app include `START-HERE.txt` with the same steps as this guide. The catalog is fetched from the public `EasyPZ-assets` repository, with a bundled fallback for offline use. Mod archives and Workshop items are downloaded from their public sources, so no token is needed.
 
 ## Sharing a build
 
@@ -17,7 +17,7 @@ The ZIP and installed app include `START-HERE.txt` with the same steps as this g
    - **Non-technical tester:** send `EasyPZ-<version>-setup.exe`.
    - **No-install tester:** send `EasyPZ-<version>-portable.exe`.
    - **ZIP requested:** send `EasyPZ-<version>-x64.zip` and tell the tester to extract the whole archive first.
-3. Upload the file to a shared drive and send the link. GitHub release links do not work while the repository is private.
+3. Publish the files as a release in `EasyPZ-assets` and send the release asset link.
 4. Send the SHA256 from `Get-FileHash <file> -Algorithm SHA256`.
 5. Tell the tester to close Project Zomboid before installing a pack.
 
@@ -81,7 +81,7 @@ When reporting a bug, include:
 
 ## Known alpha limitations
 
-- Catalog and artwork are bundled; remote catalog and auto-update are off.
+- The catalog is fetched remotely with a bundled fallback. App updates are manual; the portable build does not self-update.
 - Builds are unsigned.
 - ZombieBuddy’s official interactive installer is not launched; the app uses the manual jar/DLL path and warns when files are missing.
 - Steam detection is best-effort; use **Settings → Change folder** if needed.

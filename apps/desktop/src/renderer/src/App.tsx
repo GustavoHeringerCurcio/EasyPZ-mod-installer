@@ -130,22 +130,29 @@ export default function App() {
       setCanceling(false)
       setInstall(createInstallState(packId))
       setInstallSuiteId(uiSuiteId ?? null)
-      const result = await window.easypz.startInstall(packId, uiSuiteId)
 
-      if (!result.ok) {
-        if (result.needsElevation) {
-          setInstall(emptyInstallState())
-          setElevation({ packId, uiSuiteId: uiSuiteId ?? null })
+      try {
+        const result = await window.easypz.startInstall(packId, uiSuiteId)
+
+        if (!result.ok) {
+          if (result.needsElevation) {
+            setInstall(emptyInstallState())
+            setElevation({ packId, uiSuiteId: uiSuiteId ?? null })
+            return
+          }
+          setInstall((current) => failInstallState(current, result.code, result.message))
+          if (result.code !== 'CANCELLED') showToast('error', result.message)
           return
         }
-        setInstall((current) => failInstallState(current, result.code, result.message))
-        if (result.code !== 'CANCELLED') showToast('error', result.message)
-        return
-      }
 
-      await refreshBootstrap()
-      const packName = bootstrap?.catalog.packs.find((pack) => pack.id === packId)?.name ?? packId
-      showToast('success', t('toast.installDone', { pack: packName }))
+        await refreshBootstrap()
+        const packName = bootstrap?.catalog.packs.find((pack) => pack.id === packId)?.name ?? packId
+        showToast('success', t('toast.installDone', { pack: packName }))
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        setInstall((current) => failInstallState(current, 'IO', message))
+        showToast('error', message)
+      }
     },
     [bootstrap, refreshBootstrap, showToast, t],
   )
@@ -411,8 +418,9 @@ export default function App() {
             previous: packNameFor(activePackId),
           }),
           confirmLabel: t('confirm.installAction'),
-          onConfirm: async () => {
-            await startInstall(packId, uiSuiteId)
+          onConfirm: () => {
+            setConfirmRequest(null)
+            void startInstall(packId, uiSuiteId)
           },
         })
         return

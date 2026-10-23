@@ -2,7 +2,7 @@
 
 A desktop catalog and installer for Project Zomboid modpacks. Pick a pack, see exactly what is inside, and install it in one click — no terminal, no typing `1` or `2`.
 
-> **Status: private alpha (`v0.1.0-alpha.0`).** The repository is private while the app is tested. Builds are unsigned for now, so Windows SmartScreen may ask for confirmation.
+> **Status: alpha (`v0.1.0-alpha.1`).** Builds are unsigned for now, so Windows SmartScreen may ask for confirmation.
 
 EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/GustavoHeringerCurcio/pz-viewpoint-starter) installer. The old repository remains online and untouched for existing users; this project is a clean rebuild.
 
@@ -141,7 +141,7 @@ Outputs:
 - `release/EasyPZ-<version>-x64.zip` — portable folder build
 - `release/*.blockmap` and `release/SHA256SUMS.txt` on CI
 
-The ZIP and installed app include `START-HERE.txt` with launch and SmartScreen instructions. Because the repository is private, share builds through a file link rather than a GitHub release link.
+The ZIP and installed app include `START-HERE.txt` with launch and SmartScreen instructions. Public alpha builds are published as releases in `EasyPZ-assets`; share the release asset link directly.
 
 Builds are unsigned. `win.signAndEditExecutable` is disabled so packaging works without symlink privileges; code signing hooks can be enabled later.
 
@@ -149,7 +149,7 @@ Builds are unsigned. `win.signAndEditExecutable` is disabled so packaging works 
 
 Read [docs/alpha.md](docs/alpha.md). In short:
 
-1. Build with `pnpm package:win`, then share the setup, portable EXE, or ZIP directly with testers.
+1. Build with `pnpm package:win`, publish the setup, portable EXE, or ZIP to `EasyPZ-assets`, then share the release asset link with testers.
 2. Expect SmartScreen on unsigned builds (More info → Run anyway).
 3. For the ZIP, tell testers to extract the whole archive before running the app.
 4. Test a fresh install and a legacy migration.
