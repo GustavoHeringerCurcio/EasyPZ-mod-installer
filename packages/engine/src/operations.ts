@@ -575,6 +575,29 @@ export async function repairPack(options: {
     throw new EasyPzError('GAME_RUNNING', 'Close Project Zomboid before repairing a pack.')
   }
 
+  const pack = getPack(catalog, packId)
+  if (pack.source === 'workshop') {
+    const state = await loadState(paths, { catalog, migrate: true })
+    const previousPackId = state.activePackId
+    const suiteId = state.installs[packId]?.uiSuiteId ?? null
+    const { installPack } = await import('./install.js')
+    const summary = await installPack({
+      catalog,
+      packId,
+      paths,
+      uiSuiteId: suiteId,
+      gamePathOverride,
+      heapMB: options.heapMB,
+      onEvent,
+    })
+    const nextState = await loadState(paths, { catalog, migrate: true })
+    return {
+      activePackId: nextState.activePackId,
+      modCount: summary.clientMods,
+      previousPackId,
+    }
+  }
+
   await assertPackAvailable(catalog, packId, paths)
   const toggle = await setPackEnabled({
     catalog,

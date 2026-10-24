@@ -16,12 +16,15 @@ import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.j
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
 import {
+  computeItemManifest,
   filterExcludedMods,
   findItemRoot,
   getSteamClientContentRoot,
   getStoreItemRoot,
+  needsWorkshopRefresh,
   parseSteamCmdDownloadedBytes,
   parseSteamCmdProgress,
+  workshopStoreLooksOlder,
 } from './workshop.js'
 
 const temps: string[] = []
@@ -409,6 +412,50 @@ describe('workshop exclusions', () => {
 
     expect(filterExcludedMods(mods, ['Skip']).map((mod) => mod.id)).toEqual(['Keep'])
     expect(filterExcludedMods(mods, undefined)).toBe(mods)
+  })
+})
+
+describe('workshop metadata', () => {
+  it('detects changed Workshop revisions', () => {
+    const local = {
+      schemaVersion: 1,
+      id: '1',
+      timeUpdated: 100,
+      fileSize: 10,
+      manifestHash: 'x',
+      fileCount: 1,
+      totalBytes: 10,
+      maxMtime: 1000,
+    }
+
+    expect(needsWorkshopRefresh(null, { timeUpdated: 100, fileSize: 10 })).toBe(true)
+    expect(needsWorkshopRefresh(local, { timeUpdated: 100, fileSize: 10 })).toBe(false)
+    expect(needsWorkshopRefresh(local, { timeUpdated: 101, fileSize: 10 })).toBe(true)
+    expect(needsWorkshopRefresh(local, { timeUpdated: 100, fileSize: 11 })).toBe(true)
+    expect(needsWorkshopRefresh(local, null)).toBe(false)
+  })
+
+  it('flags stores older than the Workshop revision', () => {
+    expect(workshopStoreLooksOlder({ maxMtime: 1000 }, { timeUpdated: 100, fileSize: 10 })).toBe(
+      true,
+    )
+    expect(workshopStoreLooksOlder({ maxMtime: 200_000 }, { timeUpdated: 100, fileSize: 10 })).toBe(
+      false,
+    )
+  })
+
+  it('changes the manifest when a file is added', async () => {
+    const dir = await tempDir('manifest')
+    await fs.writeFile(path.join(dir, 'a.lua'), 'abc', 'utf8')
+    const first = await computeItemManifest(dir)
+    await fs.writeFile(path.join(dir, 'b.lua'), 'de', 'utf8')
+    const second = await computeItemManifest(dir)
+
+    expect(first.fileCount).toBe(1)
+    expect(first.totalBytes).toBe(3)
+    expect(second.fileCount).toBe(2)
+    expect(second.totalBytes).toBe(5)
+    expect(second.manifestHash).not.toBe(first.manifestHash)
   })
 })
 

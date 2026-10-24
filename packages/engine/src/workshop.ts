@@ -1,4 +1,5 @@
 ﻿import { execFile, spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -34,6 +35,175 @@ export function getSteamClientContentRoot(workshopRoot: string, workshopId: stri
 
 export function getStoreItemRoot(paths: AppPaths, workshopId: string): string {
   return path.join(paths.storeDir, APP_ID, workshopId)
+}
+
+const WORKSHOP_META_FILE = '.easypz-workshop-meta.json'
+const WORKSHOP_META_SCHEMA = 1
+const WORKSHOP_DETAILS_URL =
+  'https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/'
+const WORKSHOP_UPDATE_TOLERANCE_MS = 60_000
+
+export interface WorkshopRemoteMeta {
+  timeUpdated: number
+  fileSize: number
+}
+
+export interface WorkshopLocalMeta {
+  schemaVersion: number
+  id: string
+  timeUpdated: number | null
+  fileSize: number | null
+  manifestHash: string
+  fileCount: number
+  totalBytes: number
+  maxMtime: number
+}
+
+export interface WorkshopManifest {
+  manifestHash: string
+  fileCount: number
+  totalBytes: number
+  maxMtime: number
+}
+
+/**
+ * A cached Workshop item is stale when Steam reports a different revision or
+ * size than the one recorded when it was installed here.
+ */
+export function needsWorkshopRefresh(
+  local: WorkshopLocalMeta | null,
+  remote: WorkshopRemoteMeta | null,
+): boolean {
+  if (!local) return true
+  if (!remote) return false
+  if (remote.timeUpdated > 0 && local.timeUpdated !== remote.timeUpdated) return true
+  if (remote.fileSize > 0 && local.fileSize !== remote.fileSize) return true
+  return false
+}
+
+/**
+ * Migration check for stores created before metadata was recorded: a store
+ * whose newest file predates the Workshop revision is assumed stale.
+ */
+export function workshopStoreLooksOlder(
+  manifest: Pick<WorkshopManifest, 'maxMtime'>,
+  remote: WorkshopRemoteMeta | null,
+): boolean {
+  if (!remote || remote.timeUpdated <= 0) return false
+  return (
+    manifest.maxMtime > 0 &&
+    remote.timeUpdated * 1000 > manifest.maxMtime + WORKSHOP_UPDATE_TOLERANCE_MS
+  )
+}
+
+export async function computeItemManifest(root: string): Promise<WorkshopManifest> {
+  const entries: string[] = []
+  let fileCount = 0
+  let totalBytes = 0
+  let maxMtime = 0
+
+  const walk = async (directory: string, relative: string): Promise<void> => {
+    let dirents
+    try {
+      dirents = await fs.readdir(directory, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of dirents) {
+      if (entry.name === WORKSHOP_META_FILE || entry.name === '.easypz-workshop-complete') continue
+      const full = path.join(directory, entry.name)
+      const rel = relative ? `${relative}/${entry.name}` : entry.name
+      if (entry.isDirectory()) {
+        await walk(full, rel)
+        continue
+      }
+      if (!entry.isFile()) continue
+      try {
+        const stat = await fs.stat(full)
+        fileCount += 1
+        totalBytes += stat.size
+        maxMtime = Math.max(maxMtime, stat.mtimeMs)
+        entries.push(`${rel}|${stat.size}`)
+      } catch {
+        // Skip files that disappear while the manifest is built.
+      }
+    }
+  }
+
+  await walk(root, '')
+  entries.sort()
+  const manifestHash = createHash('sha256').update(entries.join('\n')).digest('hex')
+  return { manifestHash, fileCount, totalBytes, maxMtime }
+}
+
+export async function readWorkshopItemMeta(
+  paths: AppPaths,
+  workshopId: string,
+): Promise<WorkshopLocalMeta | null> {
+  try {
+    const raw = await fs.readFile(
+      path.join(getStoreItemRoot(paths, workshopId), WORKSHOP_META_FILE),
+      'utf8',
+    )
+    const parsed = JSON.parse(raw) as WorkshopLocalMeta
+    if (parsed.schemaVersion !== WORKSHOP_META_SCHEMA || parsed.id !== workshopId) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+export async function writeWorkshopItemMeta(
+  paths: AppPaths,
+  workshopId: string,
+  meta: WorkshopLocalMeta,
+): Promise<void> {
+  const root = getStoreItemRoot(paths, workshopId)
+  await fs.mkdir(root, { recursive: true })
+  await fs.writeFile(
+    path.join(root, WORKSHOP_META_FILE),
+    `${JSON.stringify(meta, null, 2)}\n`,
+    'utf8',
+  )
+}
+
+async function fetchWorkshopRemoteMeta(ids: string[]): Promise<Map<string, WorkshopRemoteMeta>> {
+  const result = new Map<string, WorkshopRemoteMeta>()
+  if (ids.length === 0) return result
+
+  const body = new URLSearchParams()
+  body.set('itemcount', String(ids.length))
+  ids.forEach((id, index) => body.set(`publishedfileids[${index}]`, id))
+
+  try {
+    const response = await fetch(WORKSHOP_DETAILS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      signal: AbortSignal.timeout(15_000),
+    })
+    if (!response.ok) return result
+    const payload = (await response.json()) as {
+      response?: {
+        publishedfiledetails?: Array<{
+          publishedfileid?: string
+          time_updated?: number
+          file_size?: number
+        }>
+      }
+    }
+    for (const detail of payload.response?.publishedfiledetails ?? []) {
+      if (!detail.publishedfileid) continue
+      result.set(detail.publishedfileid, {
+        timeUpdated: Number(detail.time_updated ?? 0),
+        fileSize: Number(detail.file_size ?? 0),
+      })
+    }
+  } catch {
+    // Offline metadata is best-effort; local manifest checks still apply.
+  }
+  return result
 }
 
 /**
@@ -539,6 +709,57 @@ export async function downloadWorkshopPack(options: {
   }
 
   const items = collection.items
+  const remoteMeta = await fetchWorkshopRemoteMeta(items.map((item) => item.id))
+  const refreshIds = new Set<string>()
+
+  for (const item of items) {
+    const storeRoot = getStoreItemRoot(paths, item.id)
+    if (!existsSync(storeRoot)) {
+      refreshIds.add(item.id)
+      continue
+    }
+
+    const localMeta = await readWorkshopItemMeta(paths, item.id)
+    const remote = remoteMeta.get(item.id) ?? null
+
+    if (localMeta) {
+      const manifest = await computeItemManifest(storeRoot)
+      const metadataChanged = needsWorkshopRefresh(localMeta, remote)
+      const filesChanged =
+        manifest.manifestHash !== localMeta.manifestHash ||
+        manifest.fileCount !== localMeta.fileCount ||
+        manifest.totalBytes !== localMeta.totalBytes
+      if (metadataChanged || filesChanged) {
+        refreshIds.add(item.id)
+        await fs.rm(storeRoot, { recursive: true, force: true }).catch(() => undefined)
+      }
+      continue
+    }
+
+    const manifest = await computeItemManifest(storeRoot)
+    if (manifest.fileCount === 0 || workshopStoreLooksOlder(manifest, remote)) {
+      refreshIds.add(item.id)
+      await fs.rm(storeRoot, { recursive: true, force: true }).catch(() => undefined)
+      continue
+    }
+
+    await writeWorkshopItemMeta(paths, item.id, {
+      schemaVersion: WORKSHOP_META_SCHEMA,
+      id: item.id,
+      timeUpdated: remote?.timeUpdated ?? null,
+      fileSize: remote?.fileSize ?? null,
+      ...manifest,
+    })
+  }
+
+  if (refreshIds.size > 0) {
+    onEvent?.({
+      type: 'log',
+      level: 'info',
+      message: `Refreshing ${refreshIds.size} Workshop item(s) whose files are missing or out of date.`,
+    })
+  }
+
   const failedItems: Array<{ id: string; name: string; reason: string }> = []
   const discovered: DiscoveredMod[] = []
   let downloadedItems = 0
@@ -640,6 +861,7 @@ export async function downloadWorkshopPack(options: {
   const batchCandidates: Array<{ item: (typeof items)[number]; index: number }> = []
   for (const [index, item] of items.entries()) {
     if ((item.sizeBytes ?? 0) > WORKSHOP_BATCH_MAX_ITEM_BYTES) continue
+    if (refreshIds.has(item.id)) continue
     if (await findItemRoot(item.id, workshopRoot, paths)) continue
     batchCandidates.push({ item, index: index + 1 })
   }
@@ -728,7 +950,7 @@ export async function downloadWorkshopPack(options: {
   for (const item of items) {
     ensureNotCancelled(signal)
     const itemIndex = processed + 1
-    let root = await findItemRoot(item.id, workshopRoot, paths)
+    let root = refreshIds.has(item.id) ? null : await findItemRoot(item.id, workshopRoot, paths)
     const wasCached = Boolean(root) && !prefetchedIds.has(item.id)
     emitCurrentItem(itemIndex, item.name)
 
@@ -865,6 +1087,15 @@ export async function downloadWorkshopPack(options: {
           `${new Date().toISOString()}\n`,
           'utf8',
         )
+        const manifest = await computeItemManifest(storeRoot)
+        const remote = remoteMeta.get(item.id) ?? null
+        await writeWorkshopItemMeta(paths, item.id, {
+          schemaVersion: WORKSHOP_META_SCHEMA,
+          id: item.id,
+          timeUpdated: remote?.timeUpdated ?? null,
+          fileSize: remote?.fileSize ?? null,
+          ...manifest,
+        })
         completedIds.add(item.id)
         await writeProgress(paths, packId, collection.collectionId, [...completedIds])
 
