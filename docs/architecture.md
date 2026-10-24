@@ -168,3 +168,7 @@ pnpm dev
 ```
 
 Publishing the catalog to `EasyPZ-assets` means new packs, archive fixes, and hash changes no longer require an app release. The schemas and app code do not change; only the catalog source and archive URLs change.
+
+## Dev comparison mode
+
+Development builds can compare the mods of two packs. Create a `.env` file at the repository root with `ADMIN=1` (or a bare `ADMIN` line), then run `pnpm dev`. The Mods tab shows a dev-only dropdown that highlights rows also used by the selected pack, using that pack's accent color. The flag is read only when `app.isPackaged` is false, so packaged builds never expose the dropdown.

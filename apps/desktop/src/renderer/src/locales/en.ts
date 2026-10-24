@@ -389,6 +389,13 @@
     modEnabled: '{{mod}} enabled.',
     modDisabled: '{{mod}} disabled. Its files stay installed.',
   },
+  dev: {
+    compare: 'Dev: compare with',
+    none: 'No comparison',
+    overlap: '{{count}} in common with {{pack}}',
+    noOverlap: 'Nothing in common with {{pack}}',
+    hint: 'Highlighted rows are also used by {{pack}}.',
+  },
   common: {
     cancel: 'Cancel',
     close: 'Close',

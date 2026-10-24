@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import {
   ArrowLeft,
@@ -7,6 +7,7 @@ import {
   Cpu,
   Download,
   ExternalLink,
+  FlaskConical,
   Gamepad2,
   HardDrive,
   Layers3,
@@ -30,6 +31,43 @@ import { packAccent } from '../lib/packTheme'
 import { packUpdateAvailable } from '../lib/packStatus'
 
 export type PackTab = 'overview' | 'mods' | 'requirements'
+
+type CompareIndex = {
+  pack: PackView
+  accent: string
+  isWorkshopPack: boolean
+  modIds: Set<string>
+  keys: Set<string>
+  workshopIds: Set<string>
+}
+
+function compareAccentForMod(
+  compare: CompareIndex | null,
+  mod: { id: string; folder: string; workshopId: string },
+): string | null {
+  if (!compare) return null
+  if (compare.isWorkshopPack) {
+    return compare.workshopIds.has(mod.workshopId) ? compare.accent : null
+  }
+  return compare.modIds.has(mod.id) || compare.keys.has(`${mod.workshopId}:${mod.folder}`)
+    ? compare.accent
+    : null
+}
+
+function compareAccentForWorkshopItem(
+  compare: CompareIndex | null,
+  item: { id: string },
+): string | null {
+  if (!compare) return null
+  return compare.workshopIds.has(item.id) ? compare.accent : null
+}
+
+function highlightStyle(color: string): CSSProperties {
+  return {
+    boxShadow: `inset 3px 0 0 ${color}`,
+    backgroundColor: `${color}0f`,
+  }
+}
 
 export function PackDetailPage({
   bootstrap,
@@ -60,6 +98,11 @@ export function PackDetailPage({
 }) {
   const { t } = useTranslation()
   const [modSearch, setModSearch] = useState('')
+  const [comparePackId, setComparePackId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setComparePackId(null)
+  }, [pack.id])
 
   const available = bootstrap.availablePackIds.includes(pack.id)
   const active = bootstrap.state.activePackId === pack.id && available
@@ -82,6 +125,43 @@ export function PackDetailPage({
     pickDefaultSuite(bootstrap.catalog.uiSuites) ??
     null
   const workshopItems = pack.workshop?.items ?? []
+  const compare = useMemo<CompareIndex | null>(() => {
+    if (!bootstrap.devAdmin || !comparePackId || comparePackId === pack.id) return null
+
+    const other = bootstrap.catalog.packs.find((candidate) => candidate.id === comparePackId)
+    if (!other) return null
+
+    const modIds = new Set<string>()
+    const keys = new Set<string>()
+    const workshopIds = new Set<string>()
+
+    if (other.source === 'workshop') {
+      for (const item of other.workshop?.items ?? []) workshopIds.add(item.id)
+    } else {
+      for (const mod of getEffectiveMods(bootstrap.catalog, other.id)) {
+        modIds.add(mod.id)
+        keys.add(`${mod.workshopId}:${mod.folder}`)
+        workshopIds.add(mod.workshopId)
+      }
+    }
+
+    return {
+      pack: other,
+      accent: packAccent(other),
+      isWorkshopPack: other.source === 'workshop',
+      modIds,
+      keys,
+      workshopIds,
+    }
+  }, [bootstrap.catalog, bootstrap.devAdmin, comparePackId, pack.id])
+  const comparisonCount = useMemo(() => {
+    if (!compare) return 0
+    if (!isWorkshop) return mods.filter((mod) => compareAccentForMod(compare, mod)).length
+    if (installRecord && installRecord.mods.length > 0) {
+      return installRecord.mods.filter((mod) => compareAccentForMod(compare, mod)).length
+    }
+    return workshopItems.filter((item) => compareAccentForWorkshopItem(compare, item)).length
+  }, [compare, installRecord, isWorkshop, mods, workshopItems])
   const modCount = isWorkshop ? workshopItems.length : mods.length
   const downloadBytes = pack.archive?.sizeBytes ?? pack.workshop?.downloadBytes ?? 0
   const requiredDiskGB = pack.archive?.requiredDiskGB ?? pack.requirements.freeDiskGB
@@ -119,6 +199,24 @@ export function PackDetailPage({
     mod.name.toLowerCase().includes(normalized) ||
     mod.folder.toLowerCase().includes(normalized)
   const filteredInstalledMods = (installRecord?.mods ?? []).filter(matchesSearch)
+  const installedModGroups = useMemo(() => {
+    if (!isWorkshop || !installRecord) return []
+
+    const groupByWorkshopId = new Map<string, string | undefined>()
+    for (const item of workshopItems) groupByWorkshopId.set(item.id, item.group)
+
+    const grouped = new Map<string, typeof filteredInstalledMods>()
+    for (const mod of filteredInstalledMods) {
+      const topic = groupByWorkshopId.has(mod.workshopId)
+        ? (groupByWorkshopId.get(mod.workshopId) ?? t('pack.installedMods'))
+        : t('pack.suiteMods')
+      const current = grouped.get(topic) ?? []
+      current.push(mod)
+      grouped.set(topic, current)
+    }
+
+    return Array.from(grouped, ([name, groupMods]) => ({ name, mods: groupMods }))
+  }, [filteredInstalledMods, installRecord, isWorkshop, t, workshopItems])
   const catalogModIds = new Set(mods.map((mod) => mod.id))
   const filteredExtraMods = (installRecord?.mods ?? [])
     .filter((mod) => !catalogModIds.has(mod.id))
@@ -321,6 +419,52 @@ export function PackDetailPage({
                 />
               </div>
 
+              {bootstrap.devAdmin ? (
+                <div className="rounded-xl border border-dashed border-white/15 bg-panel-2/40 px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+                      <FlaskConical className="size-3.5 text-warn" />
+                      {t('dev.compare')}
+                    </div>
+                    <select
+                      value={comparePackId ?? ''}
+                      onChange={(event) => setComparePackId(event.target.value || null)}
+                      className="h-9 min-w-48 rounded-lg border border-line bg-panel px-3 text-xs text-bone outline-none transition-colors focus:border-white/30"
+                    >
+                      <option value="">{t('dev.none')}</option>
+                      {bootstrap.catalog.packs
+                        .filter((candidate) => candidate.id !== pack.id)
+                        .map((candidate) => (
+                          <option key={candidate.id} value={candidate.id}>
+                            {candidate.name}
+                          </option>
+                        ))}
+                    </select>
+                    {compare ? (
+                      <div className="flex items-center gap-2 text-[11px] text-muted">
+                        <span
+                          className="size-2 rounded-full"
+                          style={{ backgroundColor: compare.accent }}
+                        />
+                        <span>
+                          {comparisonCount > 0
+                            ? t('dev.overlap', {
+                                count: comparisonCount,
+                                pack: compare.pack.name,
+                              })
+                            : t('dev.noOverlap', { pack: compare.pack.name })}
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+                  {compare && comparisonCount > 0 ? (
+                    <p className="mt-2 text-[10px] leading-relaxed text-muted">
+                      {t('dev.hint', { pack: compare.pack.name })}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
               {installRecord ? (
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-panel-2/50 px-4 py-3">
                   <span className="text-[11px] text-muted">
@@ -337,28 +481,33 @@ export function PackDetailPage({
 
               {isWorkshop ? (
                 installRecord && installRecord.mods.length > 0 ? (
-                  <section>
-                    <div className="mb-3 flex items-center gap-3">
-                      <h3 className="font-display text-sm font-semibold text-bone">
-                        {t('pack.installedMods')}
-                      </h3>
-                      <Badge tone="muted">{filteredInstalledMods.length}</Badge>
-                      <div className="h-px flex-1 bg-line" />
-                    </div>
-                    <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                      {filteredInstalledMods.map((mod) => (
-                        <ModRow
-                          key={`${mod.workshopId}-${mod.folder}`}
-                          mod={mod}
-                          disabled={disabledModIds.has(mod.id)}
-                          core={isCoreModId(mod.id)}
-                          canToggle
-                          toggleDisabled={switchDisabled}
-                          onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
-                        />
-                      ))}
-                    </div>
-                  </section>
+                  <div className="space-y-6">
+                    {installedModGroups.map((group) => (
+                      <section key={group.name}>
+                        <div className="mb-3 flex items-center gap-3">
+                          <h3 className="font-display text-sm font-semibold text-bone">
+                            {group.name}
+                          </h3>
+                          <Badge tone="muted">{group.mods.length}</Badge>
+                          <div className="h-px flex-1 bg-line" />
+                        </div>
+                        <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
+                          {group.mods.map((mod) => (
+                            <ModRow
+                              key={`${mod.workshopId}-${mod.folder}`}
+                              mod={mod}
+                              disabled={disabledModIds.has(mod.id)}
+                              core={isCoreModId(mod.id)}
+                              highlightColor={compareAccentForMod(compare, mod)}
+                              canToggle
+                              toggleDisabled={switchDisabled}
+                              onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
                 ) : (
                   <div className="space-y-6">
                     {filteredWorkshopGroups.map((group) => (
@@ -371,28 +520,37 @@ export function PackDetailPage({
                           <div className="h-px flex-1 bg-line" />
                         </div>
                         <div className="divide-y divide-line/70 overflow-hidden rounded-xl border border-line">
-                          {group.items.map((item) => (
-                            <a
-                              key={item.id}
-                              href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
-                            >
-                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
-                                <Sparkles className="size-3.5 text-bone/70" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="truncate text-[13px] font-medium text-bone">
-                                  {item.name}
+                          {group.items.map((item) => {
+                            const highlightColor = compareAccentForWorkshopItem(compare, item)
+                            return (
+                              <a
+                                key={item.id}
+                                href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-4 bg-panel-2/35 px-4 py-3 transition-colors hover:bg-panel-2"
+                                style={highlightColor ? highlightStyle(highlightColor) : undefined}
+                              >
+                                <div
+                                  className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel"
+                                  style={
+                                    highlightColor ? { borderColor: highlightColor } : undefined
+                                  }
+                                >
+                                  <Sparkles className="size-3.5 text-bone/70" />
                                 </div>
-                                <div className="truncate font-mono text-[10px] text-muted">
-                                  {item.id}
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate text-[13px] font-medium text-bone">
+                                    {item.name}
+                                  </div>
+                                  <div className="truncate font-mono text-[10px] text-muted">
+                                    {item.id}
+                                  </div>
                                 </div>
-                              </div>
-                              <ExternalLink className="size-3.5 shrink-0 text-muted" />
-                            </a>
-                          ))}
+                                <ExternalLink className="size-3.5 shrink-0 text-muted" />
+                              </a>
+                            )
+                          })}
                         </div>
                       </section>
                     ))}
@@ -418,6 +576,7 @@ export function PackDetailPage({
                             mod={mod}
                             disabled={disabledModIds.has(mod.id)}
                             core={isCoreModId(mod.id)}
+                            highlightColor={compareAccentForMod(compare, mod)}
                             canToggle={installedModIds.has(mod.id)}
                             toggleDisabled={switchDisabled}
                             onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
@@ -443,6 +602,7 @@ export function PackDetailPage({
                             mod={mod}
                             disabled={disabledModIds.has(mod.id)}
                             core={isCoreModId(mod.id)}
+                            highlightColor={compareAccentForMod(compare, mod)}
                             canToggle
                             toggleDisabled={switchDisabled}
                             onToggle={(enabled) => onSetModEnabled(pack.id, mod.id, enabled)}
@@ -621,6 +781,7 @@ function ModRow({
   mod,
   disabled,
   core,
+  highlightColor,
   canToggle,
   toggleDisabled,
   onToggle,
@@ -635,6 +796,7 @@ function ModRow({
   }
   disabled: boolean
   core: boolean
+  highlightColor?: string | null
   canToggle: boolean
   toggleDisabled: boolean
   onToggle: (enabled: boolean) => void
@@ -644,8 +806,12 @@ function ModRow({
   return (
     <div
       className={cn('flex items-center gap-4 bg-panel-2/35 px-4 py-3', disabled && 'opacity-60')}
+      style={highlightColor ? highlightStyle(highlightColor) : undefined}
     >
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel">
+      <div
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel"
+        style={highlightColor ? { borderColor: highlightColor } : undefined}
+      >
         {mod.serverOnly ? (
           <Server className="size-3.5 text-muted" />
         ) : (

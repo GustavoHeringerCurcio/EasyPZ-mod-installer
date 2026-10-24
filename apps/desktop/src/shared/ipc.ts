@@ -62,6 +62,7 @@ export interface AppPathView {
 export interface Bootstrap {
   appVersion: string
   isPackaged: boolean
+  devAdmin: boolean
   catalog: CatalogView
   catalogSource: 'remote' | 'bundled'
   catalogBaseUrl: string | null

@@ -382,6 +382,13 @@ const ptBR = {
     modEnabled: '{{mod}} ativado.',
     modDisabled: '{{mod}} desativado. Os arquivos continuam instalados.',
   },
+  dev: {
+    compare: 'Dev: comparar com',
+    none: 'Sem comparação',
+    overlap: '{{count}} em comum com {{pack}}',
+    noOverlap: 'Nada em comum com {{pack}}',
+    hint: 'As linhas destacadas também são usadas por {{pack}}.',
+  },
   common: {
     cancel: 'Cancelar',
     close: 'Fechar',

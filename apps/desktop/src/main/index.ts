@@ -45,6 +45,7 @@ import type {
 } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { clearCatalogCache, getCatalogSource, loadCatalog, toCatalogView } from './catalog'
+import { isDevAdmin, loadDevEnv } from './devEnv'
 import { ensureLogsDir, log, logsDir } from './logger'
 import { isLanguage, readSettings, updateSettings } from './settings'
 
@@ -179,12 +180,13 @@ async function buildBootstrap(): Promise<Bootstrap> {
     (await fileExists(paths.legacyInstallerDir))
 
   log.info(
-    `Bootstrap: catalog=${catalog.mode}/${catalog.packs.length} packs (${getCatalogSource().source}), game=${game.found ? 'found' : 'missing'}, active=${state.activePackId ?? 'none'}, legacy=${legacyDetected}, elevated=${game.elevated}`,
+    `Bootstrap: catalog=${catalog.mode}/${catalog.packs.length} packs (${getCatalogSource().source}), game=${game.found ? 'found' : 'missing'}, active=${state.activePackId ?? 'none'}, legacy=${legacyDetected}, elevated=${game.elevated}, devAdmin=${isDevAdmin()}`,
   )
 
   return {
     appVersion: app.getVersion(),
     isPackaged: app.isPackaged,
+    devAdmin: isDevAdmin(),
     catalog: catalogView,
     catalogSource: catalogSource.source,
     catalogBaseUrl: catalogSource.baseUrl,
@@ -777,6 +779,7 @@ function installContentSecurityPolicy(): void {
 }
 
 app.whenReady().then(async () => {
+  loadDevEnv()
   app.setAppUserModelId('com.easypz.installer')
   Menu.setApplicationMenu(null)
   await ensureLogsDir()
