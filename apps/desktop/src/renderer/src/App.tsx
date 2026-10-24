@@ -472,14 +472,16 @@ export default function App() {
 
     setSuiteBusy(true)
     try {
-      const result = await window.easypz.applyUiSuite(suiteDialog.packId, suiteDialog.value)
+      const packId = suiteDialog.packId
+      const result = await window.easypz.applyUiSuite(packId, suiteDialog.value)
       if (!result.ok) {
         showToast('error', result.message)
         return
       }
       setBootstrap(result.data)
       setSuiteDialog(null)
-      showToast('success', t('toast.uiSuiteChanged'))
+      const applied = result.data.state.activePackId === packId
+      showToast('success', t(applied ? 'toast.uiSuiteChanged' : 'toast.uiSuiteSaved'))
     } finally {
       setSuiteBusy(false)
     }

@@ -20,6 +20,7 @@ import {
   reconcileActivePack,
   setModEnabled,
   setPackEnabled,
+  suiteManagedMods,
 } from './operations.js'
 import { createEmptyState, loadState, recordInstall, saveState, setActivePack } from './state.js'
 import { getAvailablePackIds, recoverStorageJournal } from './storage.js'
@@ -156,6 +157,50 @@ function makeCatalog(): Catalog {
         stats: { clientMods: 2, serverMods: 0, totalMods: 2, workshopCount: 2 },
       },
     ],
+    uiSuites: [
+      {
+        id: 'viewpoint',
+        name: 'Viewpoint UI',
+        tagline: 'Default',
+        description: 'Default UI',
+        cover: 'assets/ui-suites/viewpoint.svg',
+        gallery: [],
+        accent: null,
+        order: 10,
+        recommended: true,
+        add: [],
+        remove: [],
+        removedItems: [],
+        items: [],
+        requires: [],
+        conflicts: [],
+      },
+      {
+        id: 'dayz',
+        name: 'DayZ UI',
+        tagline: 'Test suite',
+        description: 'Test suite',
+        cover: 'assets/ui-suites/dayz.svg',
+        gallery: [],
+        accent: null,
+        order: 20,
+        recommended: false,
+        add: [
+          {
+            id: 'ModDayZ',
+            name: 'Mod DayZ',
+            folder: 'ModDayZ',
+            workshopId: '444',
+            serverOnly: false,
+          },
+        ],
+        remove: ['ModShared'],
+        removedItems: [],
+        items: [],
+        requires: [],
+        conflicts: [],
+      },
+    ],
   }
 }
 
@@ -198,6 +243,40 @@ describe('pack storage', () => {
     const state = await loadState(paths, { catalog })
     expect(state.activePackId).toBe('medium')
     expect(state.layoutVersion).toBe(2)
+  })
+
+  it('activates the requested suite when no install record exists', async () => {
+    const { paths, catalog } = await setup()
+    await writeModInfo(storeModPath(paths, '444', 'ModDayZ'))
+
+    const result = await setPackEnabled({
+      catalog,
+      packId: 'medium',
+      paths,
+      enabled: true,
+      suiteId: 'dayz',
+      skipGameCheck: true,
+    })
+
+    expect(result.activePackId).toBe('medium')
+    expect(await hasModInfo(activeModPath(paths, 'ModA'))).toBe(true)
+    expect(await hasModInfo(activeModPath(paths, 'ModDayZ'))).toBe(true)
+    expect(await hasModInfo(activeModPath(paths, 'ModShared'))).toBe(false)
+
+    const ids = parseDefaultModIds(await fs.readFile(defaultTxtPath(paths), 'utf8'))
+    expect(ids).toContain('ModDayZ')
+    expect(ids).not.toContain('ModShared')
+  })
+
+  it('collects every mod that can belong to a pack across suites', async () => {
+    const { catalog } = await setup()
+    const state = recordInstall(createEmptyState(), catalog, 'medium', { uiSuiteId: 'dayz' })
+    const mods = suiteManagedMods(catalog, 'medium', state.installs.medium)
+
+    expect(mods.map((mod) => mod.id)).toEqual(
+      expect.arrayContaining(['ModA', 'ModShared', 'ModDayZ']),
+    )
+    expect(mods.filter((mod) => mod.id === 'ModA')).toHaveLength(1)
   })
 
   it('switches packs, disables to storage, and keeps only one active pack', async () => {

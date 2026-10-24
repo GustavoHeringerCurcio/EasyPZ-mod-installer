@@ -57,9 +57,10 @@ let mainWindow: BrowserWindow | null = null
 let activeInstall: AbortController | null = null
 let activeDelete = false
 let activeModToggle = false
+let activeSuiteApply = false
 
 function operationBusy(): boolean {
-  return activeInstall !== null || activeDelete || activeModToggle
+  return activeInstall !== null || activeDelete || activeModToggle || activeSuiteApply
 }
 
 function pendingActionPath(): string {
@@ -356,6 +357,7 @@ function registerIpc(): void {
       } satisfies OperationResult<never>
     }
     try {
+      activeSuiteApply = true
       const settings = await readSettings()
       await applyUiSuite({
         catalog: await loadCatalogForOperation(),
@@ -368,6 +370,8 @@ function registerIpc(): void {
       return { ok: true, data: await buildBootstrap() } satisfies OperationResult<Bootstrap>
     } catch (error) {
       return fail(error)
+    } finally {
+      activeSuiteApply = false
     }
   })
 

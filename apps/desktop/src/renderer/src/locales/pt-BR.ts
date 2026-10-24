@@ -377,6 +377,7 @@ const ptBR = {
     defaultsRestored: 'Configurações padrão restauradas. Reinicie o Project Zomboid.',
     copied: 'Copiado para a área de transferência.',
     uiSuiteChanged: 'UI suite aplicada.',
+    uiSuiteSaved: 'UI suite salva. Ela será aplicada quando este pack for ativado.',
     catalogRefreshed: 'Catálogo atualizado.',
     modEnabled: '{{mod}} ativado.',
     modDisabled: '{{mod}} desativado. Os arquivos continuam instalados.',

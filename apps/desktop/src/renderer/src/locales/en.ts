@@ -385,6 +385,7 @@
     defaultsRestored: 'Default performance settings restored. Restart Project Zomboid.',
     copied: 'Copied to clipboard.',
     uiSuiteChanged: 'UI suite applied.',
+    uiSuiteSaved: 'UI suite saved. It applies the next time this pack is enabled.',
     modEnabled: '{{mod}} enabled.',
     modDisabled: '{{mod}} disabled. Its files stay installed.',
   },

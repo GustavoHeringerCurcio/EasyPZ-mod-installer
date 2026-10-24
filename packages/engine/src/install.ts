@@ -12,8 +12,8 @@ import { ensureZombieBuddy, isZombieBuddyInstalled, type ZombieBuddyStatus } fro
 import type { EngineEvent, EventSink, InstallSummary } from './events.js'
 import { EasyPzError, cancelledError, isEasyPzError, toError } from './errors.js'
 import { loadState, recordInstall, saveState } from './state.js'
-import { storePackMods } from './storage.js'
-import { setPackEnabled } from './operations.js'
+import { modIsActive, storePackMods, type StorageMod } from './storage.js'
+import { dedupeMods, setPackEnabled, suiteManagedMods } from './operations.js'
 import { downloadWorkshopPack } from './workshop.js'
 import { ensureUiSuiteMods } from './uiSuite.js'
 
@@ -291,6 +291,7 @@ async function installWorkshopPack(args: {
       packId,
       paths,
       enabled: true,
+      suiteId,
       signal,
       onEvent,
       skipGameCheck: true,
@@ -507,7 +508,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
       workshopId: mod.workshopId,
       serverOnly: mod.serverOnly,
     }))
-    const allMods = [...baseMods, ...suiteMods.mods]
+    const allMods = dedupeMods([...baseMods, ...suiteMods.mods])
     downloadedBytes += suiteMods.downloadedBytes
 
     ensureNotCancelled(signal)
@@ -556,6 +557,33 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
 
     ensureNotCancelled(signal)
 
+    const beforeStage = await loadState(paths, { catalog, migrate: true })
+    if (!options.skipActivate && beforeStage.activePackId === packId) {
+      const previousInstall = beforeStage.installs[packId]
+      const deactivationMods: StorageMod[] = []
+      for (const mod of suiteManagedMods(catalog, packId, previousInstall)) {
+        if (await modIsActive(paths, mod.folder)) deactivationMods.push(mod)
+      }
+      await setPackEnabled({
+        catalog,
+        packId,
+        paths,
+        enabled: false,
+        suiteId: previousInstall?.uiSuiteId,
+        deactivationMods,
+        onEvent,
+        skipGameCheck: true,
+      })
+    }
+
+    const stagedState = await loadState(paths, { catalog, migrate: true })
+    const stagedInstall = recordInstall(stagedState, catalog, packId, {
+      mods: allMods,
+      allMods,
+      uiSuiteId: suiteId,
+    })
+    await saveState(paths, { ...stagedInstall, activePackId: stagedState.activePackId })
+
     stageEvent(onEvent, 'activate', 'start')
     if (options.skipActivate) {
       stageEvent(onEvent, 'activate', 'skip')
@@ -565,6 +593,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
         packId,
         paths,
         enabled: true,
+        suiteId,
         signal,
         onEvent,
         skipGameCheck: true,
@@ -580,6 +609,7 @@ export async function installPack(options: InstallOptions): Promise<InstallSumma
     const finalState = await loadState(paths, { catalog, migrate: true })
     const nextState = recordInstall(finalState, catalog, packId, {
       mods: allMods,
+      allMods,
       uiSuiteId: suiteId,
     })
     await saveState(paths, nextState)

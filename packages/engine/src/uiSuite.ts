@@ -2,7 +2,7 @@
 import type { Catalog } from '@easypz/catalog'
 import { getUiSuite } from '@easypz/catalog'
 import type { AppPaths } from './paths.js'
-import { storeModPath } from './paths.js'
+import { activeModPath, storeModPath } from './paths.js'
 import { hasModInfo } from './archive.js'
 import { EasyPzError, cancelledError, toError } from './errors.js'
 import type { EventSink } from './events.js'
@@ -44,6 +44,8 @@ export async function ensureUiSuiteMods(options: {
 
   const wanted = new Map(suite.add.map((mod) => [mod.id, mod]))
   const wantedIds = new Set(wanted.keys())
+  const explicitItemIds = new Set(suite.add.map((mod) => mod.workshopId))
+  const removed = new Set(suite.remove)
   const found = new Map<string, InstalledMod>()
   const failedItems: UiSuiteInstallResult['failedItems'] = []
   let downloadedItems = 0
@@ -116,10 +118,15 @@ export async function ensureUiSuiteMods(options: {
 
     try {
       const discovered = await discoverItemMods(root, item.id)
+      const explicit = explicitItemIds.has(item.id)
       for (const mod of discovered) {
-        if (!wantedIds.has(mod.id) || found.has(mod.id)) continue
+        if (removed.has(mod.id) || found.has(mod.id)) continue
+        if (explicit && !wantedIds.has(mod.id)) continue
         const destination = storeModPath(paths, mod.workshopId, mod.folder)
-        if (!(await hasModInfo(destination))) {
+        if (
+          !(await hasModInfo(destination)) &&
+          !(await hasModInfo(activeModPath(paths, mod.folder)))
+        ) {
           await fs.mkdir(paths.storeDir, { recursive: true })
           await fs.cp(mod.source, destination, { recursive: true, force: true })
         }

@@ -39,6 +39,7 @@ import {
   getPackStorageMods,
   modIsActive,
   runMoveTransaction,
+  type StorageMod,
 } from './storage.js'
 
 function allPackClientIds(catalog: Catalog, state: AppState): string[] {
@@ -67,6 +68,8 @@ export async function setPackEnabled(options: {
   packId: string
   paths: AppPaths
   enabled: boolean
+  suiteId?: string | null
+  deactivationMods?: StorageMod[]
   signal?: AbortSignal
   onEvent?: EventSink
   skipGameCheck?: boolean
@@ -83,11 +86,12 @@ export async function setPackEnabled(options: {
   const state = await loadState(paths, { catalog, migrate: true })
   const previousPackId = state.activePackId
   const allIds = allPackClientIds(catalog, state)
-  const targetMods = await getPackStorageMods(catalog, packId, paths, state)
+  const targetMods = await getPackStorageMods(catalog, packId, paths, state, options.suiteId)
   const disabled = getDisabledModIds(state, packId)
   const targetIds = targetMods
     .filter((mod) => !mod.serverOnly && !disabled.has(mod.id))
     .map((mod) => mod.id)
+  const deactivationRemoveIds = (options.deactivationMods ?? []).map((mod) => mod.id)
   const duplicateRoot = path.join(paths.backupDir, 'easypz-duplicates')
 
   if (enabled) {
@@ -99,7 +103,7 @@ export async function setPackEnabled(options: {
         : []
 
     const entries = [
-      ...deactivationEntriesForMods(previousMods, paths),
+      ...deactivationEntriesForMods(options.deactivationMods ?? previousMods, paths),
       ...activationEntriesForMods(targetMods, paths),
     ]
 
@@ -120,7 +124,7 @@ export async function setPackEnabled(options: {
       async () => {
         await updateDefaultTxt({
           addIds: targetIds,
-          removeIds: allIds,
+          removeIds: [...allIds, ...deactivationRemoveIds],
           modsDir: modsDir(paths),
           backupDir: paths.backupDir,
         })
@@ -142,13 +146,13 @@ export async function setPackEnabled(options: {
   }
 
   await runMoveTransaction(
-    deactivationEntriesForMods(targetMods, paths),
+    deactivationEntriesForMods(options.deactivationMods ?? targetMods, paths),
     paths.journalFile,
     { signal, duplicateRoot },
     async () => {
       await updateDefaultTxt({
         addIds: [],
-        removeIds: allIds,
+        removeIds: [...allIds, ...deactivationRemoveIds],
         modsDir: modsDir(paths),
         backupDir: paths.backupDir,
       })
@@ -256,15 +260,7 @@ function suiteAddIds(catalog: Catalog): Set<string> {
   return new Set((catalog.uiSuites ?? []).flatMap((suite) => suite.add.map((mod) => mod.id)))
 }
 
-function dedupeMods(
-  mods: Array<{
-    id: string
-    name: string
-    folder: string
-    workshopId: string
-    serverOnly: boolean
-  }>,
-) {
+export function dedupeMods(mods: StorageMod[]): StorageMod[] {
   const seen = new Set<string>()
   return mods.filter((mod) => {
     const key = `${mod.workshopId}:${mod.folder}`
@@ -272,6 +268,41 @@ function dedupeMods(
     seen.add(key)
     return true
   })
+}
+
+/**
+ * Collects every mod that can belong to a pack for any UI suite. Used to clean
+ * stale folders left behind by an interrupted or incorrect suite switch.
+ */
+export function suiteManagedMods(
+  catalog: Catalog,
+  packId: string,
+  install: AppState['installs'][string] | undefined,
+): StorageMod[] {
+  const candidates: StorageMod[] = [
+    ...getEffectiveMods(catalog, packId).map((mod) => ({
+      id: mod.id,
+      name: mod.name,
+      folder: mod.folder,
+      workshopId: mod.workshopId,
+      serverOnly: mod.serverOnly,
+    })),
+    ...(install?.mods ?? []),
+    ...(install?.allMods ?? []),
+    ...(catalog.uiSuites ?? []).flatMap((suite) => suite.add),
+  ]
+  return dedupeMods(candidates)
+}
+
+async function findPhysicallyActiveMods(
+  paths: AppPaths,
+  mods: StorageMod[],
+): Promise<StorageMod[]> {
+  const active: StorageMod[] = []
+  for (const mod of mods) {
+    if (await modIsActive(paths, mod.folder)) active.push(mod)
+  }
+  return active
 }
 
 export async function applyUiSuite(options: {
@@ -334,51 +365,97 @@ export async function applyUiSuite(options: {
     throw new EasyPzError('MISSING_MODS', `The ${suite.name} suite produced no installable mods.`)
   }
 
-  const wasActive = state.activePackId === packId
-  if (wasActive) {
-    await setPackEnabled({
-      catalog,
-      packId,
-      paths,
-      enabled: false,
-      signal,
-      onEvent,
-      skipGameCheck: true,
-    })
+  const staleActive = await findPhysicallyActiveMods(
+    paths,
+    suiteManagedMods(catalog, packId, install),
+  )
+  // Never touch files when another pack is the active one: shared base folders
+  // would otherwise look like stale files belonging to this pack.
+  const wasActive =
+    state.activePackId === packId || (state.activePackId === null && staleActive.length > 0)
+  const previous = {
+    mods: install.mods,
+    allMods: install.allMods,
+    uiSuiteId: install.uiSuiteId,
+    disabledModIds: install.disabledModIds,
   }
 
-  const current = await loadState(paths, { catalog, migrate: true })
-  const nextState = recordInstall(current, catalog, packId, {
-    mods: nextMods,
-    allMods,
-    uiSuiteId: suite.id,
-  })
-  await saveState(paths, { ...nextState, activePackId: current.activePackId })
+  try {
+    if (wasActive) {
+      await setPackEnabled({
+        catalog,
+        packId,
+        paths,
+        enabled: false,
+        suiteId: install.uiSuiteId,
+        deactivationMods: staleActive,
+        signal,
+        onEvent,
+        skipGameCheck: true,
+      })
+    }
 
-  if (wasActive) {
-    const result = await setPackEnabled({
-      catalog,
-      packId,
-      paths,
-      enabled: true,
-      signal,
-      onEvent,
-      skipGameCheck: true,
+    const current = await loadState(paths, { catalog, migrate: true })
+    const nextState = recordInstall(current, catalog, packId, {
+      mods: nextMods,
+      allMods,
+      uiSuiteId: suite.id,
+      disabledModIds: install.disabledModIds,
     })
+    await saveState(paths, { ...nextState, activePackId: current.activePackId })
+
+    if (wasActive) {
+      const result = await setPackEnabled({
+        catalog,
+        packId,
+        paths,
+        enabled: true,
+        suiteId: suite.id,
+        signal,
+        onEvent,
+        skipGameCheck: true,
+      })
+      onEvent?.({
+        type: 'log',
+        level: 'info',
+        message: `UI suite changed to ${suite.name}: ${result.modCount} client mods.`,
+      })
+      return result
+    }
+
     onEvent?.({
       type: 'log',
       level: 'info',
-      message: `UI suite changed to ${suite.name}: ${result.modCount} client mods.`,
+      message: `UI suite saved for ${getPack(catalog, packId).name}: ${suite.name}.`,
     })
-    return result
+    return { activePackId: current.activePackId, modCount: 0, previousPackId: null }
+  } catch (error) {
+    try {
+      const current = await loadState(paths, { catalog, migrate: true })
+      const restored = recordInstall(current, catalog, packId, {
+        mods: previous.mods,
+        allMods: previous.allMods,
+        uiSuiteId: previous.uiSuiteId,
+        disabledModIds: previous.disabledModIds,
+      })
+      await saveState(paths, { ...restored, activePackId: current.activePackId })
+      if (wasActive) {
+        await setPackEnabled({
+          catalog,
+          packId,
+          paths,
+          enabled: true,
+          suiteId: previous.uiSuiteId,
+          signal,
+          onEvent,
+          skipGameCheck: true,
+        })
+      }
+    } catch {
+      // Keep the original failure; the user can repair or retry.
+    }
+    throw error
   }
-
-  onEvent?.({
-    type: 'log',
-    level: 'info',
-    message: `UI suite saved for ${getPack(catalog, packId).name}: ${suite.name}.`,
-  })
-  return { activePackId: null, modCount: 0, previousPackId: null }
 }
 export async function activateInstalledPack(options: {
   catalog: Catalog

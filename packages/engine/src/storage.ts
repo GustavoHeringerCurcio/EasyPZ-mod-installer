@@ -187,13 +187,18 @@ export async function getPackStorageMods(
   packId: string,
   paths: AppPaths,
   state?: AppState,
+  suiteId?: string | null,
 ): Promise<StorageMod[]> {
   const pack = getPack(catalog, packId)
   const currentState = state ?? (await loadState(paths, { catalog, migrate: true }))
   const install = currentState.installs[packId]
   if (install) return install.mods
   if (pack.source === 'workshop') return []
-  return getEffectiveModsForSuite(catalog, packId, getDefaultUiSuite(catalog)?.id ?? null)
+  return getEffectiveModsForSuite(
+    catalog,
+    packId,
+    suiteId ?? getDefaultUiSuite(catalog)?.id ?? null,
+  )
 }
 
 export async function isPackAvailable(

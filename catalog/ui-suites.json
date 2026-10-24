@@ -34,7 +34,7 @@
     "id": "dayz",
     "name": "DayZ UI",
     "tagline": "DayZ HUD and inventory for Viewpoint",
-    "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed. Everyone on the server must use this same suite.",
+    "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed, and right-click world interactions stay available. Everyone on the server must use this same suite.",
     "cover": "assets/ui-suites/dayz-ui.webp",
     "gallery": [],
     "accent": "#d6b25e",
@@ -46,6 +46,14 @@
         "folder": "ViewpointDayZInventory",
         "workshopId": "3816819422",
         "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816819422",
+        "serverOnly": false
+      },
+      {
+        "id": "ViewpointRightClick",
+        "name": "Viewpoint - Right Click Fix",
+        "folder": "ViewpointRightClick",
+        "workshopId": "3819018807",
+        "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
         "serverOnly": false
       }
     ],
@@ -70,9 +78,14 @@
         "id": "3816819422",
         "name": "Viewpoint DayZ",
         "sizeBytes": 51657811
+      },
+      {
+        "id": "3819018807",
+        "name": "Viewpoint - Right Click Fix",
+        "sizeBytes": 355470
       }
     ],
-    "requires": ["Viewpoint", "ZombieBuddy", "ViewpointDayZInventory"],
+    "requires": ["Viewpoint", "ZombieBuddy", "ViewpointDayZInventory", "ViewpointRightClick"],
     "conflicts": ["ViewpointUI", "ProjectTarkovFramework"],
     "removedItems": ["3812616893", "3815739336"],
     "recommended": false
@@ -81,7 +94,7 @@
     "id": "tarkov",
     "name": "Tarkov UI",
     "tagline": "Project Tarkov HUD, inventory and Viewpoint loot",
-    "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together. Everyone on the server must use this same suite.",
+    "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together while keeping right-click world interactions. Everyone on the server must use this same suite.",
     "cover": "assets/ui-suites/tarkov-ui.webp",
     "gallery": [],
     "accent": "#c7a76a",
@@ -142,6 +155,14 @@
         "workshopId": "3820130782",
         "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820130782",
         "serverOnly": false
+      },
+      {
+        "id": "ViewpointRightClick",
+        "name": "Viewpoint - Right Click Fix",
+        "folder": "ViewpointRightClick",
+        "workshopId": "3819018807",
+        "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+        "serverOnly": false
       }
     ],
     "remove": ["ViewpointUI", "ViewpointVehicleTuningCompat", "ViewpointDayZInventory", "DayZ_HUD"],
@@ -165,6 +186,11 @@
         "id": "3820130782",
         "name": "Project Tarkov - HUD Addons",
         "sizeBytes": 36979
+      },
+      {
+        "id": "3819018807",
+        "name": "Viewpoint - Right Click Fix",
+        "sizeBytes": 355470
       }
     ],
     "requires": [
@@ -176,7 +202,8 @@
       "ProjectTarkovLootInventory",
       "INVENTORY_TETRIS",
       "ViewpointXTarkovHUD",
-      "TarkovHUDAddons"
+      "TarkovHUDAddons",
+      "ViewpointRightClick"
     ],
     "conflicts": ["ViewpointUI", "ViewpointDayZInventory"],
     "removedItems": ["3812616893", "3815739336", "3816819422"],
