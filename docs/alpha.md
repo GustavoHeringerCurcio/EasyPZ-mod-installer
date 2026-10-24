@@ -4,9 +4,9 @@
 
 Build the app, then share the installer directly:
 
-- `release/EasyPZ-0.1.0-alpha.1-setup.exe` (recommended for non-technical testers)
-- `release/EasyPZ-0.1.0-alpha.1-portable.exe` (single file, no installation)
-- `release/EasyPZ-0.1.0-alpha.1-x64.zip` (portable folder; extract everything first)
+- `release/EasyPZ-0.1.0-alpha.2-setup.exe` (recommended for non-technical testers)
+- `release/EasyPZ-0.1.0-alpha.2-portable.exe` (single file, no installation)
+- `release/EasyPZ-0.1.0-alpha.2-x64.zip` (portable folder; extract everything first)
 
 The ZIP and installed app include `START-HERE.txt` with the same steps as this guide. The catalog is fetched from the public `EasyPZ-assets` repository, with a bundled fallback for offline use. Mod archives and Workshop items are downloaded from their public sources, so no token is needed.
 
