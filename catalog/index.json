@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-24T00:00:09.909Z",
+  "generatedAt": "2026-10-24T00:24:00.739Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -1345,7 +1345,7 @@
         "This catalog entry uses public Steam Workshop item IDs; it is not claimed as original work.",
         "Not affiliated with The Indie Stone."
       ],
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-24T00:23:49.656Z",
       "stats": {
         "clientMods": 95,
         "serverMods": 0,
