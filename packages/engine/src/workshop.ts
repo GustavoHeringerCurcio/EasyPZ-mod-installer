@@ -96,7 +96,10 @@ export function workshopStoreLooksOlder(
   )
 }
 
-export async function computeItemManifest(root: string): Promise<WorkshopManifest> {
+export async function computeItemManifest(
+  root: string,
+  options: { hashContents?: boolean } = {},
+): Promise<WorkshopManifest> {
   const entries: string[] = []
   let fileCount = 0
   let totalBytes = 0
@@ -124,7 +127,14 @@ export async function computeItemManifest(root: string): Promise<WorkshopManifes
         fileCount += 1
         totalBytes += stat.size
         maxMtime = Math.max(maxMtime, stat.mtimeMs)
-        entries.push(`${rel}|${stat.size}`)
+        if (options.hashContents) {
+          const fileHash = createHash('sha256')
+            .update(await fs.readFile(full))
+            .digest('hex')
+          entries.push(`${rel}|${stat.size}|${fileHash}`)
+        } else {
+          entries.push(`${rel}|${stat.size}`)
+        }
       } catch {
         // Skip files that disappear while the manifest is built.
       }
@@ -675,8 +685,8 @@ export async function findItemRoot(
 ): Promise<string | null> {
   const candidates = [
     getStoreItemRoot(paths, workshopId),
-    getSteamClientContentRoot(workshopRoot, workshopId),
     getSteamCmdContentRoot(paths, workshopId),
+    getSteamClientContentRoot(workshopRoot, workshopId),
   ]
   for (const candidate of candidates) {
     if (!existsSync(candidate)) continue

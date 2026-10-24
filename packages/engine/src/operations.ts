@@ -714,6 +714,7 @@ export async function getPackHealth(options: {
     paths: options.paths,
     pzPath: game.pzPath,
     hostIniPath: hostIniPath(options.paths),
+    workshopRoot: game.workshopRoot,
     disabledModIds,
   })
 }

@@ -457,6 +457,17 @@ describe('workshop metadata', () => {
     expect(second.totalBytes).toBe(5)
     expect(second.manifestHash).not.toBe(first.manifestHash)
   })
+
+  it('hashes file contents when requested', async () => {
+    const dir = await tempDir('manifest-content')
+    await fs.writeFile(path.join(dir, 'a.lua'), 'abc', 'utf8')
+    const first = await computeItemManifest(dir, { hashContents: true })
+    await fs.writeFile(path.join(dir, 'a.lua'), 'abd', 'utf8')
+    const second = await computeItemManifest(dir, { hashContents: true })
+
+    expect(second.totalBytes).toBe(first.totalBytes)
+    expect(second.manifestHash).not.toBe(first.manifestHash)
+  })
 })
 
 describe('state migration', () => {
