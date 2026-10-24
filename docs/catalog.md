@@ -131,6 +131,18 @@ A Workshop pack does not need to mirror a real Steam collection. Use `"collectio
 
 Pinned lists are the safest choice for a curated base pack: Workshop edits to the source collection cannot silently change which items ship. Keep item order stable and put late-loading overrides at the end of `items`.
 
+Use `excludeModIds` on an item when a Workshop item contains optional submods or patches that should stay out of the pack:
+
+```json
+{
+  "id": "3812510377",
+  "name": "Project Viewpoint - Fixes",
+  "excludeModIds": ["ViewpointHideCamera", "ViewpointOpenContainers"]
+}
+```
+
+The item is still downloaded and cached, but the excluded mod IDs are not copied into the EasyPZ store or activated.
+
 ## Modes
 
 `catalog/index.json` records `"mode": "alpha" | "public"`.

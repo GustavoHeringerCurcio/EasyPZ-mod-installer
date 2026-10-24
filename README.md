@@ -29,9 +29,9 @@ EasyPZ is the successor to the legacy [pz-viewpoint-starter](https://github.com/
 | **Essentials**                   |                  6 |  ~515 MB | Core Viewpoint, 3D models, interface, ADS, right-click fix                                   |
 | **Medium**                       |                 38 |  ~1.1 GB | Balanced Viewpoint pack                                                                      |
 | **Advanced**                     |                 45 |  ~1.0 GB | Medium plus mechanics, realism, and swimming                                                 |
-| **Ultra**                        | 127 Workshop items |  ~2.5 GB | Advanced plus horses, 3D world, missions, bows/crossbows, and curated vehicles (vanilla map) |
+| **Ultra**                        |  95 Workshop items |  ~2.0 GB | Advanced plus horses, 3D world, missions, bows/crossbows, and curated vehicles (vanilla map) |
 | **Project Viewpoint Collection** |  90 Workshop items |  ~2.2 GB | Full Workshop collection, downloaded through SteamCMD                                        |
-| **Project Viewpoint - Addons**   | 198 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons                                              |
+| **Project Viewpoint - Addons**   | 197 Workshop items |  ~6.0 GB | Large reference collection of Viewpoint add-ons                                              |
 
 Essentials is standalone. Medium and Advanced are additive to each other, but Essentials is a smaller independent starter pack.
 
@@ -61,9 +61,9 @@ Only one EasyPZ modpack can be ready to play at a time.
 
 ## Workshop collection packs
 
-The **Project Viewpoint Collection** (`3820219222`, 90 items) and **Project Viewpoint - Addons** (`3812839109`, 198 items) are not prebuilt archives. They use public Steam Workshop collections and download through SteamCMD.
+The **Project Viewpoint Collection** (`3820219222`, 90 items) and **Project Viewpoint - Addons** (`3812839109`, 197 items) are not prebuilt archives. They use public Steam Workshop collections and download through SteamCMD.
 
-The Addons collection is a reference index, not a tested modpack. It contains obsolete and conflicting alternatives, so expect conflicts if all 198 items are enabled together.
+The Addons collection is a reference index, not a tested modpack. It contains obsolete and conflicting alternatives, so expect conflicts if all 197 items are enabled together.
 
 - SteamCMD is downloaded automatically to `%LOCALAPPDATA%\EasyPZ\steamcmd`.
 - Items already present in the Steam client’s Workshop folder are reused.

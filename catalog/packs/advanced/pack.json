@@ -32,45 +32,21 @@
   },
   "groups": [
     {
-      "name": "Advanced Fixes",
+      "name": "Movement",
       "mods": [
         {
-          "id": "ProjectViewpointQOL",
-          "name": "Viewpoint QOL",
-          "folder": "ProjectViewpointQOL",
-          "workshopId": "3811256204",
-          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3811256204",
-          "serverOnly": false
-        },
-        {
-          "id": "ViewpointRightClick",
-          "name": "Right Click Fix",
-          "folder": "ViewpointRightClick",
-          "workshopId": "3819018807",
-          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+          "id": "TrueSwimming",
+          "name": "True Swimming",
+          "folder": "TrueSwimming",
+          "workshopId": "3802372726",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802372726",
           "serverOnly": false
         }
       ]
     },
     {
-      "name": "Advanced Realism",
+      "name": "Survival",
       "mods": [
-        {
-          "id": "ViewpointTrueWeathersGameplay",
-          "name": "True Weathers Gameplay",
-          "folder": "ViewpointTrueWeathersGameplay",
-          "workshopId": "3813908957",
-          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
-          "serverOnly": false
-        },
-        {
-          "id": "ViewpointImmersiveMap",
-          "name": "Immersive Map",
-          "folder": "ViewpointImmersiveMap",
-          "workshopId": "3815544725",
-          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3815544725",
-          "serverOnly": false
-        },
         {
           "id": "ViewpointForaging",
           "name": "Foraging",
@@ -86,13 +62,57 @@
           "workshopId": "3814560827",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3814560827",
           "serverOnly": false
-        },
+        }
+      ]
+    },
+    {
+      "name": "World & Atmosphere",
+      "mods": [
         {
-          "id": "TrueSwimming",
-          "name": "True Swimming",
-          "folder": "TrueSwimming",
-          "workshopId": "3802372726",
-          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802372726",
+          "id": "ViewpointTrueWeathersGameplay",
+          "name": "True Weathers Gameplay",
+          "folder": "ViewpointTrueWeathersGameplay",
+          "workshopId": "3813908957",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Map & Navigation",
+      "mods": [
+        {
+          "id": "ViewpointImmersiveMap",
+          "name": "Immersive Map",
+          "folder": "ViewpointImmersiveMap",
+          "workshopId": "3815544725",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3815544725",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Quality of Life",
+      "mods": [
+        {
+          "id": "ProjectViewpointQOL",
+          "name": "Viewpoint QOL",
+          "folder": "ProjectViewpointQOL",
+          "workshopId": "3811256204",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3811256204",
+          "serverOnly": false
+        }
+      ]
+    },
+    {
+      "name": "Fixes & Patches",
+      "mods": [
+        {
+          "id": "ViewpointRightClick",
+          "name": "Right Click Fix",
+          "folder": "ViewpointRightClick",
+          "workshopId": "3819018807",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
           "serverOnly": false
         }
       ]

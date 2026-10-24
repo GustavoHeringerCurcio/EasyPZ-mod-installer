@@ -3,7 +3,7 @@
   "id": "viewpoint-addons",
   "name": "Project Viewpoint - Addons",
   "tagline": "A curated index of Viewpoint add-ons.",
-  "description": "The full 198-item Project Viewpoint - Addons Workshop collection. Includes Viewpoint add-ons, fixes, HUDs, shaders, 3D content, vehicles, compatibility patches, and experimental entries. This is a large reference collection, not a tested modpack.",
+  "description": "The full 197-item Project Viewpoint - Addons Workshop collection. Includes Viewpoint add-ons, fixes, HUDs, shaders, 3D content, vehicles, compatibility patches, and experimental entries. This is a large reference collection, not a tested modpack.",
   "cover": "packs/viewpoint-addons/cover.jpg",
   "gallery": [],
   "accent": "#38bdf8",
@@ -173,11 +173,6 @@
         "id": "3813032735",
         "name": "Shoot to Thrill (formerly I SEE THEM)",
         "sizeBytes": 214733007
-      },
-      {
-        "id": "3817137006",
-        "name": "Viewpoint - World Actions Fix",
-        "sizeBytes": 1164625
       },
       {
         "id": "3812312558",
@@ -1019,7 +1014,7 @@
   },
   "groups": [],
   "warnings": [
-    "This package downloads 198 items from Steam Workshop and can take a long time.",
+    "This package downloads 197 items from Steam Workshop and can take a long time.",
     "This is a reference collection, not a tested modpack. It contains obsolete and conflicting alternatives.",
     "Some Workshop items may be incompatible with each other. Start a new save for a stable test.",
     "Back up your save manually before switching an existing world.",

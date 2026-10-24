@@ -54,6 +54,7 @@ export const workshopItemSchema = z
     name: z.string().min(1),
     sizeBytes: z.number().int().nonnegative().optional(),
     group: z.string().min(1).optional(),
+    excludeModIds: z.array(z.string().min(1)).optional(),
   })
   .strict()
 
@@ -210,13 +211,34 @@ export function getPackChain(catalog: Catalog, packId: string): IndexedPack[] {
 }
 
 export function getEffectiveGroups(catalog: Catalog, packId: string): EffectiveGroup[] {
-  return getPackChain(catalog, packId).flatMap((pack) =>
-    pack.groups.map((group) => ({
-      name: group.name,
-      packId: pack.id,
-      mods: group.mods,
-    })),
-  )
+  const groups: EffectiveGroup[] = []
+  const byName = new Map<string, EffectiveGroup>()
+  const seenMods = new Map<string, Set<string>>()
+
+  for (const pack of getPackChain(catalog, packId)) {
+    for (const group of pack.groups) {
+      const existing = byName.get(group.name)
+      const target = existing ?? { name: group.name, packId: pack.id, mods: [] }
+
+      if (!existing) {
+        byName.set(group.name, target)
+        groups.push(target)
+        seenMods.set(group.name, new Set())
+      }
+
+      const seen = seenMods.get(group.name)
+      if (!seen) continue
+
+      for (const mod of group.mods) {
+        const key = `${mod.workshopId}:${mod.folder}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        target.mods.push(mod)
+      }
+    }
+  }
+
+  return groups
 }
 
 export function getEffectiveMods(catalog: Catalog, packId: string): EffectiveMod[] {

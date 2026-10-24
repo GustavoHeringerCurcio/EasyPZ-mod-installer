@@ -16,6 +16,7 @@ import { applyHostIni, buildHostModsLine, buildHostWorkshopLine } from './host.j
 import { getAppPaths } from './paths.js'
 import { loadState, recordInstall, saveState } from './state.js'
 import {
+  filterExcludedMods,
   findItemRoot,
   getSteamClientContentRoot,
   getStoreItemRoot,
@@ -87,6 +88,7 @@ function makeCatalog(): Catalog {
         stats: { clientMods: 2, serverMods: 1, totalMods: 3, workshopCount: 3 },
       },
     ],
+    uiSuites: [],
   }
 }
 
@@ -395,6 +397,18 @@ describe('workshop progress', () => {
     await fs.writeFile(path.join(modDir, 'mod.info'), 'name=Test\nid=Test\n', 'utf8')
 
     expect(await findItemRoot('123', steamRoot, paths)).toBe(steamItem)
+  })
+})
+
+describe('workshop exclusions', () => {
+  it('filters catalog exclusions by mod id', () => {
+    const mods = [
+      { id: 'Keep', name: 'Keep', folder: 'Keep', workshopId: '1', serverOnly: false, source: 'a' },
+      { id: 'Skip', name: 'Skip', folder: 'Skip', workshopId: '1', serverOnly: false, source: 'b' },
+    ]
+
+    expect(filterExcludedMods(mods, ['Skip']).map((mod) => mod.id)).toEqual(['Keep'])
+    expect(filterExcludedMods(mods, undefined)).toBe(mods)
   })
 })
 

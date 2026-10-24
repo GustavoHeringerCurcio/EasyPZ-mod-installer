@@ -431,6 +431,15 @@ async function parseModInfo(
   }
 }
 
+export function filterExcludedMods<T extends { id: string }>(
+  mods: T[],
+  excludeModIds: string[] | undefined,
+): T[] {
+  if (!excludeModIds || excludeModIds.length === 0) return mods
+  const excluded = new Set(excludeModIds)
+  return mods.filter((mod) => !excluded.has(mod.id))
+}
+
 export async function discoverItemMods(
   itemRoot: string,
   workshopId: string,
@@ -803,8 +812,9 @@ export async function downloadWorkshopPack(options: {
     }
 
     try {
-      const itemMods = await discoverItemMods(root, item.id)
-      if (itemMods.length === 0) {
+      const discoveredMods = await discoverItemMods(root, item.id)
+      const itemMods = filterExcludedMods(discoveredMods, item.excludeModIds)
+      if (discoveredMods.length === 0) {
         failedItems.push({ id: item.id, name: item.name, reason: 'No mod.info found.' })
         onEvent?.({
           type: 'workshop-item',
@@ -818,6 +828,13 @@ export async function downloadWorkshopPack(options: {
           },
         })
       } else {
+        if (itemMods.length === 0) {
+          onEvent?.({
+            type: 'log',
+            level: 'info',
+            message: `All mods in ${item.name} are excluded by the catalog.`,
+          })
+        }
         for (const mod of itemMods) {
           const destination = storeModPath(paths, mod.workshopId, mod.folder)
           if (!(await hasModInfo(destination))) {

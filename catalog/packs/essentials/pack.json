@@ -49,7 +49,12 @@
           "workshopId": "3809306528",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528",
           "serverOnly": false
-        },
+        }
+      ]
+    },
+    {
+      "name": "3D Models",
+      "mods": [
         {
           "id": "PZVoxelStudioViewpoint",
           "name": "6277 3D models for Viewpoint [sour_kisel]",
@@ -57,7 +62,12 @@
           "workshopId": "3810302175",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810302175",
           "serverOnly": false
-        },
+        }
+      ]
+    },
+    {
+      "name": "Interface",
+      "mods": [
         {
           "id": "ViewpointUI",
           "name": "Viewpoint - Interface",
@@ -69,7 +79,7 @@
       ]
     },
     {
-      "name": "Aim & Fixes",
+      "name": "Combat & Aim",
       "mods": [
         {
           "id": "ProjectViewpointADS",
@@ -78,7 +88,12 @@
           "workshopId": "3812612054",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
           "serverOnly": false
-        },
+        }
+      ]
+    },
+    {
+      "name": "Fixes & Patches",
+      "mods": [
         {
           "id": "ViewpointRightClick",
           "name": "Viewpoint - Right Click Fix",

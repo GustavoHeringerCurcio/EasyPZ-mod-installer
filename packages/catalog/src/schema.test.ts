@@ -3,6 +3,7 @@ import { buildCatalog } from './build.js'
 import {
   catalogSchema,
   getActiveModIds,
+  getEffectiveGroups,
   getEffectiveMods,
   getEffectiveModsForSuite,
   getManagedFolders,
@@ -28,9 +29,9 @@ describe('catalog', () => {
     expect(getPack(catalog, 'essentials').stats.clientMods).toBe(6)
     expect(getPack(catalog, 'medium').stats.clientMods).toBe(38)
     expect(getPack(catalog, 'advanced').stats.clientMods).toBe(45)
-    expect(getPack(catalog, 'ultra').stats.clientMods).toBe(127)
+    expect(getPack(catalog, 'ultra').stats.clientMods).toBe(95)
     expect(getPack(catalog, 'viewpoint-collection').stats.clientMods).toBe(90)
-    expect(getPack(catalog, 'viewpoint-addons').stats.clientMods).toBe(198)
+    expect(getPack(catalog, 'viewpoint-addons').stats.clientMods).toBe(197)
     expect(getPack(catalog, 'essentials').extends).toBeNull()
     expect(getPack(catalog, 'advanced').extends).toBe('medium')
     expect(getPack(catalog, 'essentials').archive?.url).toContain('EasyPZ-assets')
@@ -45,7 +46,7 @@ describe('catalog', () => {
     expect(ultra.source).toBe('workshop')
     expect(ultra.archive).toBeNull()
     expect(ultra.workshop?.collectionId).toBe('0')
-    expect(ultra.workshop?.items).toHaveLength(127)
+    expect(ultra.workshop?.items).toHaveLength(95)
     const ultraIds = new Set(ultra.workshop?.items.map((item) => item.id) ?? [])
     expect(ultraIds).not.toContain('3822754688')
     expect(ultraIds).not.toContain('3810071828')
@@ -62,10 +63,21 @@ describe('catalog', () => {
     expect(ultraIds).not.toContain('3456675747')
     expect(ultraIds).not.toContain('2503622437')
     expect(ultraIds).not.toContain('3815931973')
-    expect(new Set(ultra.workshop?.items.map((item) => item.group)).size).toBe(8)
+    expect(new Set(ultra.workshop?.items.map((item) => item.group)).size).toBe(16)
     expect(ultra.workshop?.items.at(0)?.group).toBe('Core')
-    expect(ultra.workshop?.items.at(-1)?.group).toBe('Missions, events, transport, UI')
+    expect(ultra.workshop?.items.at(-1)?.group).toBe('Quality of Life')
     expect(ultra.workshop?.items.at(-1)?.id).toBe('3713362869')
+    expect(ultra.workshop?.items.find((item) => item.id === '3810302175')?.group).toBe('3D Models')
+    expect(ultraIds).not.toContain('3812510377')
+    expect(ultraIds).not.toContain('3815223174')
+    expect(ultraIds).not.toContain('2870394916')
+    expect(ultraIds).not.toContain('3823702935')
+    expect(ultra.workshop?.items.find((item) => item.id === '3614034284')?.excludeModIds).toEqual([
+      '85chevyStepVanexpanded',
+    ])
+    expect(ultra.workshop?.items.find((item) => item.id === '3812702301')?.excludeModIds).toEqual([
+      'ViewpointClassicCamera',
+    ])
   })
 
   it('resolves UI suites and strips conflicting mods', async () => {
@@ -73,6 +85,7 @@ describe('catalog', () => {
 
     const dayz = getEffectiveModsForSuite(catalog, 'medium', 'dayz')
     expect(dayz.some((mod) => mod.id === 'ViewpointDayZInventory')).toBe(true)
+    expect(dayz.some((mod) => mod.id === 'ViewpointRightClick')).toBe(true)
     expect(dayz.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
     expect(dayz.some((mod) => mod.id === 'ViewpointVehicleTuningCompat')).toBe(false)
 
@@ -80,7 +93,16 @@ describe('catalog', () => {
     expect(tarkov.some((mod) => mod.id === 'ProjectTarkovHUD')).toBe(true)
     expect(tarkov.some((mod) => mod.id === 'ProjectTarkovLootInventory')).toBe(true)
     expect(tarkov.some((mod) => mod.id === 'INVENTORY_TETRIS')).toBe(true)
+    expect(tarkov.some((mod) => mod.id === 'ViewpointRightClick')).toBe(true)
     expect(tarkov.some((mod) => mod.id === 'ViewpointUI')).toBe(false)
+
+    const dayzItems = getWorkshopIdsForSuite(catalog, 'medium', 'dayz')
+    expect(dayzItems).toContain('3819018807')
+
+    const ultra = getPack(catalog, 'ultra')
+    expect(ultra.workshop?.items.some((item) => item.id === '3817137006')).toBe(false)
+    const addons = getPack(catalog, 'viewpoint-addons')
+    expect(addons.workshop?.items.some((item) => item.id === '3817137006')).toBe(false)
 
     const native = getEffectiveModsForSuite(catalog, 'medium', 'native')
     expect(native.some((mod) => mod.id === 'Viewpoint')).toBe(true)
@@ -114,6 +136,18 @@ describe('catalog', () => {
     expect(new Set(advanced.map((mod) => mod.folder)).size).toBe(advanced.length)
     expect(advanced.length).toBeGreaterThan(medium.length)
     expect(advanced.some((mod) => mod.id === 'TrueSwimming')).toBe(true)
+  })
+
+  it('merges inherited topics instead of duplicating them', async () => {
+    const catalog = await buildCatalog({ mode: 'alpha', write: false })
+    const groups = getEffectiveGroups(catalog, 'advanced')
+    const names = groups.map((group) => group.name)
+    const movement = groups.find((group) => group.name === 'Movement')
+
+    expect(new Set(names).size).toBe(names.length)
+    expect(movement?.mods.map((mod) => mod.id)).toEqual(
+      expect.arrayContaining(['ViewpointAdvancedMovement', 'TrueSwimming']),
+    )
   })
 
   it('excludes server-only entries from client activation', async () => {

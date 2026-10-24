@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "mode": "alpha",
-  "generatedAt": "2026-10-23T04:58:25.844Z",
+  "generatedAt": "2026-10-24T00:00:09.909Z",
   "packs": [
     {
       "schemaVersion": 1,
@@ -58,7 +58,12 @@
               "workshopId": "3809306528",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528",
               "serverOnly": false
-            },
+            }
+          ]
+        },
+        {
+          "name": "3D Models",
+          "mods": [
             {
               "id": "PZVoxelStudioViewpoint",
               "name": "6277 3D models for Viewpoint [sour_kisel]",
@@ -66,7 +71,12 @@
               "workshopId": "3810302175",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810302175",
               "serverOnly": false
-            },
+            }
+          ]
+        },
+        {
+          "name": "Interface",
+          "mods": [
             {
               "id": "ViewpointUI",
               "name": "Viewpoint - Interface",
@@ -78,7 +88,7 @@
           ]
         },
         {
-          "name": "Aim & Fixes",
+          "name": "Combat & Aim",
           "mods": [
             {
               "id": "ProjectViewpointADS",
@@ -87,7 +97,12 @@
               "workshopId": "3812612054",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
               "serverOnly": false
-            },
+            }
+          ]
+        },
+        {
+          "name": "Fixes & Patches",
+          "mods": [
             {
               "id": "ViewpointRightClick",
               "name": "Viewpoint - Right Click Fix",
@@ -174,7 +189,12 @@
               "workshopId": "3809306528",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528",
               "serverOnly": false
-            },
+            }
+          ]
+        },
+        {
+          "name": "3D Models",
+          "mods": [
             {
               "id": "PZVoxelStudioViewpoint",
               "name": "Viewpoint Voxel Studio",
@@ -184,17 +204,91 @@
               "serverOnly": false
             },
             {
+              "id": "ViewpointVisibleLoot",
+              "name": "Visible Loot",
+              "folder": "ViewpointVisibleLoot",
+              "workshopId": "3818189653",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3818189653",
+              "serverOnly": false
+            },
+            {
+              "id": "ViewpointRoofs",
+              "name": "Roofs (WIP)",
+              "folder": "ViewpointRoofs",
+              "workshopId": "3817294484",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817294484",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Interface",
+          "mods": [
+            {
               "id": "ViewpointUI",
               "name": "Viewpoint Interface",
               "folder": "ViewpointUI",
               "workshopId": "3812616893",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812616893",
               "serverOnly": false
+            },
+            {
+              "id": "ViewpointEquipmentOverlays",
+              "name": "Equipment Overlays",
+              "folder": "ViewpointEquipmentOverlays",
+              "workshopId": "3813230118",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813230118",
+              "serverOnly": false
             }
           ]
         },
         {
-          "name": "Tactical",
+          "name": "Combat & Aim",
+          "mods": [
+            {
+              "id": "ProjectViewpointADS",
+              "name": "Project Viewpoint ADS",
+              "folder": "ProjectViewpointADS",
+              "workshopId": "3812612054",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
+              "serverOnly": false
+            },
+            {
+              "id": "ViewpointTrueBallistics",
+              "name": "True Ballistics",
+              "folder": "ViewpointTrueBallistics",
+              "workshopId": "3812864848",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812864848",
+              "serverOnly": false
+            },
+            {
+              "id": "ViewpointAdvancedThrowables",
+              "name": "Advanced Throwables",
+              "folder": "ViewpointAdvancedThrowables",
+              "workshopId": "3813194971",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813194971",
+              "serverOnly": false
+            },
+            {
+              "id": "PZCrossbows",
+              "name": "Simple Crossbows",
+              "folder": "PZCrossbows",
+              "workshopId": "3758880254",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3758880254",
+              "serverOnly": false
+            },
+            {
+              "id": "alicesWeaponSling",
+              "name": "Alice's Weapon Sling",
+              "folder": "alicesWeaponSling",
+              "workshopId": "3775549570",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3775549570",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Movement",
           "mods": [
             {
               "id": "ViewpointAdvancedMovement",
@@ -211,99 +305,6 @@
               "workshopId": "3812702301",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812702301",
               "serverOnly": true
-            },
-            {
-              "id": "ViewpointEquipmentOverlays",
-              "name": "Equipment Overlays",
-              "folder": "ViewpointEquipmentOverlays",
-              "workshopId": "3813230118",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813230118",
-              "serverOnly": false
-            },
-            {
-              "id": "ViewpointAdvancedThrowables",
-              "name": "Advanced Throwables",
-              "folder": "ViewpointAdvancedThrowables",
-              "workshopId": "3813194971",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813194971",
-              "serverOnly": false
-            },
-            {
-              "id": "ViewpointTrueBallistics",
-              "name": "True Ballistics",
-              "folder": "ViewpointTrueBallistics",
-              "workshopId": "3812864848",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812864848",
-              "serverOnly": false
-            },
-            {
-              "id": "ProjectViewpointADS",
-              "name": "Project Viewpoint ADS",
-              "folder": "ProjectViewpointADS",
-              "workshopId": "3812612054",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3812612054",
-              "serverOnly": false
-            }
-          ]
-        },
-        {
-          "name": "Atmosphere",
-          "mods": [
-            {
-              "id": "ViewpointTrueWeathers",
-              "name": "True Weathers",
-              "folder": "ViewpointTrueWeathers",
-              "workshopId": "3813908957",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
-              "serverOnly": false
-            },
-            {
-              "id": "aparosa_pz3dMinimap",
-              "name": "3D Minimap",
-              "folder": "pz3dMinimap",
-              "workshopId": "3810179295",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810179295",
-              "serverOnly": false
-            },
-            {
-              "id": "RainCleansBlood",
-              "name": "Rain Cleans Blood",
-              "folder": "RainCleansBlood",
-              "workshopId": "2956146279",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2956146279",
-              "serverOnly": false
-            },
-            {
-              "id": "ImmersiveBlackouts",
-              "name": "Immersive Blackouts",
-              "folder": "ImmersiveBlackouts",
-              "workshopId": "3607686447",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3607686447",
-              "serverOnly": false
-            },
-            {
-              "id": "ThumpingWithFriends",
-              "name": "Thump With Friends",
-              "folder": "thumpwithfriends",
-              "workshopId": "3504753006",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3504753006",
-              "serverOnly": false
-            },
-            {
-              "id": "SkullysZombieCollision",
-              "name": "Skully's Zombie Collision",
-              "folder": "SkullysZombieCollision",
-              "workshopId": "3778511497",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3778511497",
-              "serverOnly": false
-            },
-            {
-              "id": "CyesPushDoors",
-              "name": "Push Doors",
-              "folder": "CyesPushDoors",
-              "workshopId": "3780683663",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3780683663",
-              "serverOnly": false
             }
           ]
         },
@@ -359,116 +360,42 @@
               "serverOnly": false
             },
             {
-              "id": "damnlib",
-              "name": "Damnlib",
-              "folder": "damnlib",
-              "workshopId": "3171167894",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3171167894",
-              "serverOnly": false
-            },
-            {
               "id": "isoContainers",
               "name": "Containers!",
               "folder": "isoContainers",
               "workshopId": "2625625421",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2625625421",
               "serverOnly": false
-            },
-            {
-              "id": "alicesWeaponSling",
-              "name": "Alice's Weapon Sling",
-              "folder": "alicesWeaponSling",
-              "workshopId": "3775549570",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3775549570",
-              "serverOnly": false
             }
           ]
         },
         {
-          "name": "Quality of Life",
+          "name": "World & Atmosphere",
           "mods": [
             {
-              "id": "DRAW_ON_MAP",
-              "name": "Draw On The Map",
-              "folder": "DrawOnMap",
-              "workshopId": "2804531012",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2804531012",
+              "id": "ViewpointTrueWeathers",
+              "name": "True Weathers",
+              "folder": "ViewpointTrueWeathers",
+              "workshopId": "3813908957",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
               "serverOnly": false
             },
             {
-              "id": "SkillRecoveryJournal",
-              "name": "Skill Recovery Journal",
-              "folder": "Skill Recovery Journal",
-              "workshopId": "2503622437",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2503622437",
+              "id": "RainCleansBlood",
+              "name": "Rain Cleans Blood",
+              "folder": "RainCleansBlood",
+              "workshopId": "2956146279",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2956146279",
               "serverOnly": false
             },
             {
-              "id": "errorMagnifier",
-              "name": "Error Magnifier",
-              "folder": "errorMagnifier",
-              "workshopId": "2896041179",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2896041179",
+              "id": "ImmersiveBlackouts",
+              "name": "Immersive Blackouts",
+              "folder": "ImmersiveBlackouts",
+              "workshopId": "3607686447",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3607686447",
               "serverOnly": false
             },
-            {
-              "id": "ChuckleberryFinnAlertSystem",
-              "name": "Mod Update Alert",
-              "folder": "chuckleberryModdingAlertSystem",
-              "workshopId": "3077900375",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3077900375",
-              "serverOnly": false
-            },
-            {
-              "id": "SpawnSelector",
-              "name": "Spawn Selector",
-              "folder": "SpawnSelector",
-              "workshopId": "3772052709",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3772052709",
-              "serverOnly": false
-            }
-          ]
-        },
-        {
-          "name": "Extras",
-          "mods": [
-            {
-              "id": "Faster Reading",
-              "name": "Faster Reading (B42)",
-              "folder": "[B42] Faster Reading",
-              "workshopId": "3713362869",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3713362869",
-              "serverOnly": false
-            },
-            {
-              "id": "ImmersiveDriving",
-              "name": "Immersive Driving",
-              "folder": "ImmersiveDriving",
-              "workshopId": "3817413313",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817413313",
-              "serverOnly": false
-            },
-            {
-              "id": "VisceralViewpoint",
-              "name": "Visceral",
-              "folder": "Visceral",
-              "workshopId": "3820965001",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820965001",
-              "serverOnly": false
-            },
-            {
-              "id": "PZCrossbows",
-              "name": "Simple Crossbows",
-              "folder": "PZCrossbows",
-              "workshopId": "3758880254",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3758880254",
-              "serverOnly": false
-            }
-          ]
-        },
-        {
-          "name": "Immersion",
-          "mods": [
             {
               "id": "ViewpointImmersiveEffects",
               "name": "Immersive Effects",
@@ -486,19 +413,132 @@
               "serverOnly": false
             },
             {
-              "id": "ViewpointVisibleLoot",
-              "name": "Visible Loot",
-              "folder": "ViewpointVisibleLoot",
-              "workshopId": "3818189653",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3818189653",
+              "id": "VisceralViewpoint",
+              "name": "Visceral",
+              "folder": "Visceral",
+              "workshopId": "3820965001",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820965001",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Mechanics",
+          "mods": [
+            {
+              "id": "ThumpingWithFriends",
+              "name": "Thump With Friends",
+              "folder": "thumpwithfriends",
+              "workshopId": "3504753006",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3504753006",
               "serverOnly": false
             },
             {
-              "id": "ViewpointRoofs",
-              "name": "Roofs (WIP)",
-              "folder": "ViewpointRoofs",
-              "workshopId": "3817294484",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817294484",
+              "id": "SkullysZombieCollision",
+              "name": "Skully's Zombie Collision",
+              "folder": "SkullysZombieCollision",
+              "workshopId": "3778511497",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3778511497",
+              "serverOnly": false
+            },
+            {
+              "id": "CyesPushDoors",
+              "name": "Push Doors",
+              "folder": "CyesPushDoors",
+              "workshopId": "3780683663",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3780683663",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Vehicles & Transport",
+          "mods": [
+            {
+              "id": "ImmersiveDriving",
+              "name": "Immersive Driving",
+              "folder": "ImmersiveDriving",
+              "workshopId": "3817413313",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3817413313",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Map & Navigation",
+          "mods": [
+            {
+              "id": "aparosa_pz3dMinimap",
+              "name": "3D Minimap",
+              "folder": "pz3dMinimap",
+              "workshopId": "3810179295",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3810179295",
+              "serverOnly": false
+            },
+            {
+              "id": "DRAW_ON_MAP",
+              "name": "Draw On The Map",
+              "folder": "DrawOnMap",
+              "workshopId": "2804531012",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2804531012",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Quality of Life",
+          "mods": [
+            {
+              "id": "Faster Reading",
+              "name": "Faster Reading (B42)",
+              "folder": "[B42] Faster Reading",
+              "workshopId": "3713362869",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3713362869",
+              "serverOnly": false
+            },
+            {
+              "id": "SkillRecoveryJournal",
+              "name": "Skill Recovery Journal",
+              "folder": "Skill Recovery Journal",
+              "workshopId": "2503622437",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2503622437",
+              "serverOnly": false
+            },
+            {
+              "id": "SpawnSelector",
+              "name": "Spawn Selector",
+              "folder": "SpawnSelector",
+              "workshopId": "3772052709",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3772052709",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Libraries & Utilities",
+          "mods": [
+            {
+              "id": "damnlib",
+              "name": "Damnlib",
+              "folder": "damnlib",
+              "workshopId": "3171167894",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3171167894",
+              "serverOnly": false
+            },
+            {
+              "id": "errorMagnifier",
+              "name": "Error Magnifier",
+              "folder": "errorMagnifier",
+              "workshopId": "2896041179",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=2896041179",
+              "serverOnly": false
+            },
+            {
+              "id": "ChuckleberryFinnAlertSystem",
+              "name": "Mod Update Alert",
+              "folder": "chuckleberryModdingAlertSystem",
+              "workshopId": "3077900375",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3077900375",
               "serverOnly": false
             }
           ]
@@ -560,45 +600,21 @@
       },
       "groups": [
         {
-          "name": "Advanced Fixes",
+          "name": "Movement",
           "mods": [
             {
-              "id": "ProjectViewpointQOL",
-              "name": "Viewpoint QOL",
-              "folder": "ProjectViewpointQOL",
-              "workshopId": "3811256204",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3811256204",
-              "serverOnly": false
-            },
-            {
-              "id": "ViewpointRightClick",
-              "name": "Right Click Fix",
-              "folder": "ViewpointRightClick",
-              "workshopId": "3819018807",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+              "id": "TrueSwimming",
+              "name": "True Swimming",
+              "folder": "TrueSwimming",
+              "workshopId": "3802372726",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802372726",
               "serverOnly": false
             }
           ]
         },
         {
-          "name": "Advanced Realism",
+          "name": "Survival",
           "mods": [
-            {
-              "id": "ViewpointTrueWeathersGameplay",
-              "name": "True Weathers Gameplay",
-              "folder": "ViewpointTrueWeathersGameplay",
-              "workshopId": "3813908957",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
-              "serverOnly": false
-            },
-            {
-              "id": "ViewpointImmersiveMap",
-              "name": "Immersive Map",
-              "folder": "ViewpointImmersiveMap",
-              "workshopId": "3815544725",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3815544725",
-              "serverOnly": false
-            },
             {
               "id": "ViewpointForaging",
               "name": "Foraging",
@@ -614,13 +630,57 @@
               "workshopId": "3814560827",
               "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3814560827",
               "serverOnly": false
-            },
+            }
+          ]
+        },
+        {
+          "name": "World & Atmosphere",
+          "mods": [
             {
-              "id": "TrueSwimming",
-              "name": "True Swimming",
-              "folder": "TrueSwimming",
-              "workshopId": "3802372726",
-              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3802372726",
+              "id": "ViewpointTrueWeathersGameplay",
+              "name": "True Weathers Gameplay",
+              "folder": "ViewpointTrueWeathersGameplay",
+              "workshopId": "3813908957",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3813908957",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Map & Navigation",
+          "mods": [
+            {
+              "id": "ViewpointImmersiveMap",
+              "name": "Immersive Map",
+              "folder": "ViewpointImmersiveMap",
+              "workshopId": "3815544725",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3815544725",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Quality of Life",
+          "mods": [
+            {
+              "id": "ProjectViewpointQOL",
+              "name": "Viewpoint QOL",
+              "folder": "ProjectViewpointQOL",
+              "workshopId": "3811256204",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3811256204",
+              "serverOnly": false
+            }
+          ]
+        },
+        {
+          "name": "Fixes & Patches",
+          "mods": [
+            {
+              "id": "ViewpointRightClick",
+              "name": "Right Click Fix",
+              "folder": "ViewpointRightClick",
+              "workshopId": "3819018807",
+              "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
               "serverOnly": false
             }
           ]
@@ -675,7 +735,7 @@
       "archive": null,
       "workshop": {
         "collectionId": "0",
-        "downloadBytes": 2517167619,
+        "downloadBytes": 2047022569,
         "items": [
           {
             "id": "3619862853",
@@ -693,751 +753,565 @@
             "id": "3810302175",
             "name": "6244 3D models for Viewpoint [sour_kisel]",
             "sizeBytes": 450786523,
-            "group": "Core"
+            "group": "3D Models"
           },
           {
             "id": "3812616893",
             "name": "Viewpoint - Interface",
             "sizeBytes": 2147565,
-            "group": "Core"
+            "group": "Interface"
           },
           {
             "id": "3812702301",
             "name": "Viewpoint Advanced Movement",
             "sizeBytes": 56134761,
-            "group": "Core"
+            "group": "Movement",
+            "excludeModIds": [
+              "ViewpointClassicCamera"
+            ]
           },
           {
             "id": "3813230118",
             "name": "Viewpoint - Equipment Overlays",
             "sizeBytes": 5717707,
-            "group": "Core"
+            "group": "Interface"
           },
           {
             "id": "3813194971",
             "name": "Viewpoint - Advanced Throwables",
             "sizeBytes": 1302734,
-            "group": "Core"
+            "group": "Combat & Aim"
           },
           {
             "id": "3812864848",
             "name": "Viewpoint True Ballistics",
             "sizeBytes": 772927,
-            "group": "Core"
+            "group": "Combat & Aim"
           },
           {
             "id": "3812612054",
             "name": "Project Viewpoint: Recoil & ADS",
             "sizeBytes": 1391740,
-            "group": "Core"
+            "group": "Combat & Aim"
           },
           {
             "id": "3813908957",
             "name": "Project Viewpoint: True Weathers & Lighting",
             "sizeBytes": 1815182,
-            "group": "Core"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3810179295",
             "name": "Project Viewpoint Minimap (PZ3D Minimap) [B42.21.0] [SP/MP]",
             "sizeBytes": 6331190,
-            "group": "Core"
+            "group": "Map & Navigation"
           },
           {
             "id": "2956146279",
             "name": "Rain Cleans Blood [B42.20 + MP]",
             "sizeBytes": 2315561,
-            "group": "Core"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3607686447",
             "name": "Immersive Blackouts [B42MP]",
             "sizeBytes": 149568,
-            "group": "Core"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3504753006",
             "name": "Thump with Friends [B42]",
             "sizeBytes": 480554,
-            "group": "Core"
+            "group": "Mechanics"
           },
           {
             "id": "3778511497",
             "name": "Skully's Zombie Collision [B42.20+]",
             "sizeBytes": 281781,
-            "group": "Core"
+            "group": "Mechanics"
           },
           {
             "id": "3780683663",
             "name": "Cye's Push Doors! [SP/MP]",
             "sizeBytes": 1244927,
-            "group": "Core"
+            "group": "Mechanics"
           },
           {
             "id": "3577903007",
             "name": "Vanilla Foods Expanded",
             "sizeBytes": 114166963,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3592172476",
             "name": "[B42:SP/MP] Take A Bath And Shower",
             "sizeBytes": 40044551,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "2142622992",
             "name": "Repair Any Clothes",
             "sizeBytes": 57680,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3387110070",
             "name": "They Knew [B42]",
             "sizeBytes": 265499,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3750289416",
             "name": "They Knew [B42] - 42.19 Fix",
             "sizeBytes": 33518,
-            "group": "Survival and QoL"
+            "group": "Fixes & Patches"
           },
           {
             "id": "2713921292",
             "name": "Undead Survivor [B41/B42]",
             "sizeBytes": 17987763,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3171167894",
             "name": "that DAMN Library",
             "sizeBytes": 42407848,
-            "group": "Survival and QoL"
+            "group": "Libraries & Utilities"
           },
           {
             "id": "2625625421",
             "name": "Containers!",
             "sizeBytes": 10907100,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3775549570",
             "name": "Alice's Weapon Sling",
             "sizeBytes": 1399513,
-            "group": "Survival and QoL"
+            "group": "Combat & Aim"
           },
           {
             "id": "2896041179",
             "name": "errorMagnifier",
             "sizeBytes": 394032,
-            "group": "Survival and QoL"
+            "group": "Libraries & Utilities"
           },
           {
             "id": "3077900375",
             "name": "Mod Update and Alert System",
             "sizeBytes": 674130,
-            "group": "Survival and QoL"
+            "group": "Libraries & Utilities"
           },
           {
             "id": "3817413313",
             "name": "Project Viewpoint - Immersive Driving",
             "sizeBytes": 120306,
-            "group": "Survival and QoL"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3820965001",
             "name": "Viewpoint - Visceral",
             "sizeBytes": 809551,
-            "group": "Survival and QoL"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3776949545",
             "name": "[SVRP] ClassicBows",
             "sizeBytes": 22584314,
-            "group": "Survival and QoL"
+            "group": "Combat & Aim"
           },
           {
             "id": "3812984535",
             "name": "Viewpoint - Immersive Effects",
             "sizeBytes": 403128,
-            "group": "Survival and QoL"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3818432217",
             "name": "Immersive Camera Motion : Project Viewpoint Add-on",
             "sizeBytes": 285234,
-            "group": "Survival and QoL"
+            "group": "World & Atmosphere"
           },
           {
             "id": "3818189653",
             "name": "Viewpoint - Visible Loot",
             "sizeBytes": 188736546,
-            "group": "Survival and QoL"
+            "group": "3D Models"
           },
           {
             "id": "3811256204",
             "name": "Project Viewpoint QOL",
             "sizeBytes": 1189002,
-            "group": "Survival and QoL"
+            "group": "Quality of Life"
           },
           {
             "id": "3819018807",
             "name": "Viewpoint - Right Click Fix",
             "sizeBytes": 355470,
-            "group": "Survival and QoL"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3815544725",
             "name": "Viewpoint Immersive Map",
             "sizeBytes": 702665,
-            "group": "Survival and QoL"
+            "group": "Map & Navigation"
           },
           {
             "id": "3814994364",
             "name": "Viewpoint Foraging",
             "sizeBytes": 1753896,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3814560827",
             "name": "Viewpoint Fishing",
             "sizeBytes": 310761,
-            "group": "Survival and QoL"
-          },
-          {
-            "id": "3802372726",
-            "name": "True Swimming",
-            "sizeBytes": 2652103,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "3750253491",
             "name": "Common Sense [B42.20+]",
             "sizeBytes": 883491,
-            "group": "Survival and QoL"
+            "group": "Survival"
           },
           {
             "id": "2544353492",
             "name": "Has Been Read",
             "sizeBytes": 1322250,
-            "group": "Survival and QoL"
+            "group": "Quality of Life"
           },
           {
             "id": "3661336777",
             "name": "Horse Mod [B42.20+/MP]",
             "sizeBytes": 58507343,
-            "group": "Horses, weather, and utility"
+            "group": "Horses & Animals"
           },
           {
             "id": "3784003967",
             "name": "Horse Utility Add-on",
             "sizeBytes": 434280,
-            "group": "Horses, weather, and utility"
+            "group": "Horses & Animals"
           },
           {
             "id": "3813760573",
             "name": "HorseMod + Viewpoint Controls Patch",
             "sizeBytes": 270690,
-            "group": "Horses, weather, and utility"
+            "group": "Horses & Animals"
           },
           {
             "id": "3820421584",
             "name": "Project Viewpoint - Solid Horses",
             "sizeBytes": 118763,
-            "group": "Horses, weather, and utility"
+            "group": "Horses & Animals"
           },
           {
             "id": "2584112711",
             "name": "[B41/B42] Faster Hood Opening",
             "sizeBytes": 50826,
-            "group": "Horses, weather, and utility"
+            "group": "Quality of Life"
           },
           {
             "id": "3816588758",
             "name": "Death Cam Mod for Project Viewpoint",
             "sizeBytes": 247908,
-            "group": "Horses, weather, and utility"
+            "group": "Mechanics"
           },
           {
             "id": "3774776279",
             "name": "Climb Ladders [B42SP & MP]",
             "sizeBytes": 59468,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3330403100",
-            "name": "Trailers!",
-            "sizeBytes": 11786296,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3815223174",
-            "name": "Viewpoint Better Terrain",
-            "sizeBytes": 6312501,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3815630947",
-            "name": "Viewpoint Rolling Hills",
-            "sizeBytes": 304280,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3817555882",
-            "name": "Rolling Hills Physics Addon (Project Viewpoint)",
-            "sizeBytes": 3022516,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3820772682",
-            "name": "Viewpoint Terrain Lights Fix [B42]",
-            "sizeBytes": 434852,
-            "group": "Horses, weather, and utility"
-          },
-          {
-            "id": "3817137006",
-            "name": "Viewpoint - World Actions Fix",
-            "sizeBytes": 1164625,
-            "group": "Fixes"
+            "group": "Movement"
           },
           {
             "id": "3816521966",
             "name": "Viewpoint Placement Fix",
             "sizeBytes": 267899,
-            "group": "Fixes"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3817129409",
             "name": "Viewpoint Stability Fix",
             "sizeBytes": 48607,
-            "group": "Fixes"
-          },
-          {
-            "id": "3817501459",
-            "name": "Viewpoint Texture Fix",
-            "sizeBytes": 64337,
-            "group": "Fixes"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3821308495",
             "name": "Viewpoint Visual Fixes",
             "sizeBytes": 50570,
-            "group": "Fixes"
-          },
-          {
-            "id": "3814208706",
-            "name": "Viewpoint Aim Smoothing",
-            "sizeBytes": 81059,
-            "group": "Fixes"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3822667831",
             "name": "Viewpoint Audio Fix",
             "sizeBytes": 429978,
-            "group": "Fixes"
-          },
-          {
-            "id": "3812510377",
-            "name": "Project Viewpoint - Fixes",
-            "sizeBytes": 387480,
-            "group": "Fixes"
-          },
-          {
-            "id": "3811344119",
-            "name": "Light Fix - Project Viewpoint",
-            "sizeBytes": 160248,
-            "group": "Fixes"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3814398576",
             "name": "Surface Fix - Project Viewpoint",
             "sizeBytes": 548863,
-            "group": "Fixes"
+            "group": "Fixes & Patches"
           },
           {
             "id": "3818859807",
             "name": "Project Viewpoint - 3D Doors, Gates & Garages",
             "sizeBytes": 36621221,
-            "group": "3D world"
+            "group": "3D Models"
           },
           {
             "id": "3820833348",
             "name": "3D All Windows for Viewpoint [B42] byDGV",
             "sizeBytes": 112303748,
-            "group": "3D world"
+            "group": "3D Models"
           },
           {
             "id": "3818873810",
             "name": "[V2] 3D Curtains & Blinds - Project Viewpoint [B42]",
             "sizeBytes": 24054024,
-            "group": "3D world"
-          },
-          {
-            "id": "3814486926",
-            "name": "Viewpoint - 3D Fences",
-            "sizeBytes": 2991662,
-            "group": "3D world"
-          },
-          {
-            "id": "3818605173",
-            "name": "Any Wall Posters 3D - Project Viewpoint [B42]",
-            "sizeBytes": 35307331,
-            "group": "3D world"
-          },
-          {
-            "id": "3818605688",
-            "name": "Any Wall Flags 3D - Project Viewpoint [B42]",
-            "sizeBytes": 26769811,
-            "group": "3D world"
-          },
-          {
-            "id": "3822411039",
-            "name": "Viewpoint - Forage 3D",
-            "sizeBytes": 239589,
-            "group": "3D world"
+            "group": "3D Models"
           },
           {
             "id": "3814178814",
             "name": "Viewpoint Tile Fix - Complete Roofs V1.3",
             "sizeBytes": 229203342,
-            "group": "3D world"
-          },
-          {
-            "id": "3820063546",
-            "name": "Viewpoint: Free Aim",
-            "sizeBytes": 161847,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3821892101",
-            "name": "Viewpoint Tension",
-            "sizeBytes": 2874512,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3816823515",
-            "name": "Project Viewpoint Free Look",
-            "sizeBytes": 11606,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3811645644",
-            "name": "Project Viewpoint Parkour",
-            "sizeBytes": 9402245,
-            "group": "Gameplay"
+            "group": "3D Models"
           },
           {
             "id": "3818585720",
             "name": "Viewpoint Binoculars",
             "sizeBytes": 486347,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3815538848",
-            "name": "Drag Bodies - Project Viewpoint (First & Third Person)",
-            "sizeBytes": 13867,
-            "group": "Gameplay"
+            "group": "Mechanics"
           },
           {
             "id": "3812518796",
             "name": "Project Viewpoint - Place Items (SUB-MOD)",
             "sizeBytes": 50863,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3812198995",
-            "name": "Project Viewpoint - Shovel Graves(SUBMOD)",
-            "sizeBytes": 224806,
-            "group": "Gameplay"
+            "group": "Mechanics"
           },
           {
             "id": "3742518185",
             "name": "Zombie Camouflage - Build 42",
             "sizeBytes": 655551,
-            "group": "Gameplay"
-          },
-          {
-            "id": "3026723485",
-            "name": "'67 Shelby GT500 + Eleanor",
-            "sizeBytes": 18168337,
-            "group": "Vehicles"
+            "group": "Mechanics"
           },
           {
             "id": "2991201484",
             "name": "'69 Chevrolet Camaro",
             "sizeBytes": 19382006,
-            "group": "Vehicles"
-          },
-          {
-            "id": "2873290424",
-            "name": "'70 Dodge Challenger",
-            "sizeBytes": 19081050,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3379334330",
             "name": "'82 Porsche 911",
             "sizeBytes": 26748311,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3631989559",
-            "name": "'69 Dodge Charger",
-            "sizeBytes": 21182272,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3253385114",
-            "name": "'81 DeLorean DMC-12",
-            "sizeBytes": 11324850,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3110913021",
-            "name": "'90 BMW 3 Series (E30)",
-            "sizeBytes": 37589795,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "2846036306",
             "name": "'92 NISSAN Skyline GT-R (R32)",
             "sizeBytes": 18649998,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3647735736",
-            "name": "'95 Subaru Impreza WRX STI",
-            "sizeBytes": 10569960,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3647736504",
             "name": "'96 Mitsubishi Lancer EVO IV",
             "sizeBytes": 11342232,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "2962175696",
             "name": "'92 Ford Crown Victoria",
             "sizeBytes": 20320227,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "2942793445",
             "name": "'90 Pierce Arrow Pumper and Ladder Trucks",
             "sizeBytes": 14320704,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "2952802178",
             "name": "'90 Ford F350 Ambulance",
             "sizeBytes": 10079679,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3041122351",
             "name": "'63 Volkswagen Type 2 Van",
             "sizeBytes": 26792604,
-            "group": "Vehicles"
-          },
-          {
-            "id": "2870394916",
-            "name": "'86 Ford Econoline E-150 + Pop Culture vans",
-            "sizeBytes": 56479405,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3614034284",
             "name": "'85 Chevrolet Step-Van",
             "sizeBytes": 28373857,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport",
+            "excludeModIds": [
+              "85chevyStepVanexpanded"
+            ]
           },
           {
             "id": "3812312558",
             "name": "Construction 1P Viewpoint",
             "sizeBytes": 745568,
-            "group": "Vehicles"
+            "group": "Mechanics"
           },
           {
             "id": "3821174725",
             "name": "Viewpoint - 3D RV Van",
             "sizeBytes": 57157437,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3817030886",
             "name": "RV Viewpoint Patch",
             "sizeBytes": 4083,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3814635273",
             "name": "RVV+Viewpoint",
             "sizeBytes": 798498,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3670064951",
             "name": "Campers!",
             "sizeBytes": 28114112,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3570973322",
             "name": "'89 LAND ROVER Defender",
             "sizeBytes": 29075908,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3435796523",
             "name": "'88 Toyota Hilux",
             "sizeBytes": 11811514,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "2705406713",
             "name": "Military Tool Kit",
             "sizeBytes": 31547512,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3823702935",
-            "name": "M3 Half-track [B42]",
-            "sizeBytes": 184249273,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3818039291",
             "name": "Steel Sights: Tank Gunner Overhaul + M1 Abrams [B42]",
             "sizeBytes": 26221527,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3783444342",
             "name": "[B42]Aviation Core (Beta)",
             "sizeBytes": 6270078,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3409723807",
             "name": "[B42] UH-1B Helicopter (Beta)",
             "sizeBytes": 14383910,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3818359767",
             "name": "3D Helicopter Event (Project Viewpoint)",
             "sizeBytes": 6564512,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3812896812",
             "name": "Helicopter Fix - Project Viewpoint",
             "sizeBytes": 233652,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3819322670",
             "name": "Project Viewpoint - Visible Helicopter Events",
             "sizeBytes": 935039,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3815019204",
             "name": "Project Viewpoint - KI5 Vehicle Parts Fix",
             "sizeBytes": 179498,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3818260104",
-            "name": "Viewpoint - Vehicle Mirrors",
-            "sizeBytes": 951147,
-            "group": "Vehicles"
-          },
-          {
-            "id": "3812659488",
-            "name": "Viewpoint - Papa_Chad Vehicle Compatibility [B42.21]",
-            "sizeBytes": 45070,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3815739336",
             "name": "Viewpoint Vehicle Tuning Compatibility",
             "sizeBytes": 5847,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3635856965",
             "name": "Better Auto Mechanics [B42.20.4+ MP+SP]",
             "sizeBytes": 1497871,
-            "group": "Vehicles"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3821554678",
             "name": "Brief Sprinters",
             "sizeBytes": 52546,
-            "group": "Missions, events, transport, UI"
+            "group": "Movement"
           },
           {
             "id": "3386906181",
             "name": "[B42+] Sandbox Options",
             "sizeBytes": 9300440,
-            "group": "Missions, events, transport, UI"
+            "group": "Libraries & Utilities"
           },
           {
             "id": "2987772693",
             "name": "Wolf Extraction Quest",
             "sizeBytes": 10323528,
-            "group": "Missions, events, transport, UI"
+            "group": "Missions & Events"
           },
           {
             "id": "3716405632",
             "name": "Dynamic Horde Events B42",
             "sizeBytes": 3158279,
-            "group": "Missions, events, transport, UI"
-          },
-          {
-            "id": "3738819163",
-            "name": "Airdrop B42.21",
-            "sizeBytes": 6136318,
-            "group": "Missions, events, transport, UI"
+            "group": "Missions & Events"
           },
           {
             "id": "3461415167",
             "name": "[B42.20+/MP] Bicycle!",
             "sizeBytes": 52932500,
-            "group": "Missions, events, transport, UI"
+            "group": "Vehicles & Transport"
           },
           {
             "id": "3816324722",
             "name": "Attachments UI [B42]",
             "sizeBytes": 980910,
-            "group": "Missions, events, transport, UI"
+            "group": "Interface"
           },
           {
             "id": "3782565181",
             "name": "Simple Suppressors | Build 42",
             "sizeBytes": 2160034,
-            "group": "Missions, events, transport, UI"
+            "group": "Combat & Aim"
           },
           {
             "id": "3812559973",
             "name": "Viewpoint Turbo - Light Performance Improvement [B42]",
             "sizeBytes": 3012397,
-            "group": "Missions, events, transport, UI"
+            "group": "Performance"
           },
           {
             "id": "3816442251",
             "name": "Viewpoint: Living Props",
             "sizeBytes": 81759686,
-            "group": "Missions, events, transport, UI"
+            "group": "3D Models"
           },
           {
             "id": "3713362869",
             "name": "[B42] Faster Reading",
             "sizeBytes": 88319,
-            "group": "Missions, events, transport, UI"
+            "group": "Quality of Life"
           }
         ]
       },
@@ -1449,7 +1323,7 @@
       },
       "groups": [],
       "warnings": [
-        "This package downloads 127 items from Steam Workshop and can take a long time.",
+        "This package downloads 126 items from Steam Workshop and can take a long time.",
         "Start a new save. This version removes the custom maps Big Bear Lake, Constown, Raven Creek, Greenport, and Rabbit Hash, plus Skateboard, Skill Recovery Journal, and KK's Shelves in 3D.",
         "Spawn Selector was removed. Starting locations now use vanilla spawns or map-provided spawn points.",
         "Directional Melee, PoolPit, The Only Cure+, Immersive Physics & Weather and the 99 CVPI are intentionally excluded from Ultra for stability. Expanded Helicopter Events is Build 41 only and is not included.",
@@ -1473,10 +1347,10 @@
       ],
       "updatedAt": "2026-10-25",
       "stats": {
-        "clientMods": 127,
+        "clientMods": 95,
         "serverMods": 0,
-        "totalMods": 127,
-        "workshopCount": 127
+        "totalMods": 95,
+        "workshopCount": 95
       }
     },
     {
@@ -1991,7 +1865,7 @@
       "id": "viewpoint-addons",
       "name": "Project Viewpoint - Addons",
       "tagline": "A curated index of Viewpoint add-ons.",
-      "description": "The full 198-item Project Viewpoint - Addons Workshop collection. Includes Viewpoint add-ons, fixes, HUDs, shaders, 3D content, vehicles, compatibility patches, and experimental entries. This is a large reference collection, not a tested modpack.",
+      "description": "The full 197-item Project Viewpoint - Addons Workshop collection. Includes Viewpoint add-ons, fixes, HUDs, shaders, 3D content, vehicles, compatibility patches, and experimental entries. This is a large reference collection, not a tested modpack.",
       "cover": "packs/viewpoint-addons/cover.jpg",
       "gallery": [],
       "accent": "#38bdf8",
@@ -2167,11 +2041,6 @@
             "id": "3813032735",
             "name": "Shoot to Thrill (formerly I SEE THEM)",
             "sizeBytes": 214733007
-          },
-          {
-            "id": "3817137006",
-            "name": "Viewpoint - World Actions Fix",
-            "sizeBytes": 1164625
           },
           {
             "id": "3812312558",
@@ -3013,7 +2882,7 @@
       },
       "groups": [],
       "warnings": [
-        "This package downloads 198 items from Steam Workshop and can take a long time.",
+        "This package downloads 197 items from Steam Workshop and can take a long time.",
         "This is a reference collection, not a tested modpack. It contains obsolete and conflicting alternatives.",
         "Some Workshop items may be incompatible with each other. Start a new save for a stable test.",
         "Back up your save manually before switching an existing world.",
@@ -3027,10 +2896,10 @@
       ],
       "updatedAt": "2026-10-20",
       "stats": {
-        "clientMods": 198,
+        "clientMods": 197,
         "serverMods": 0,
-        "totalMods": 198,
-        "workshopCount": 198
+        "totalMods": 197,
+        "workshopCount": 197
       }
     }
   ],
@@ -3076,7 +2945,7 @@
       "id": "dayz",
       "name": "DayZ UI",
       "tagline": "DayZ HUD and inventory for Viewpoint",
-      "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed. Everyone on the server must use this same suite.",
+      "description": "Viewpoint DayZ replaces the interface with a DayZ-style HUD, grid inventory where clothing is storage, character, crafting, building, mechanics and driving screens. Viewpoint Base and ZombieBuddy stay installed, and right-click world interactions stay available. Everyone on the server must use this same suite.",
       "cover": "assets/ui-suites/dayz-ui.webp",
       "gallery": [],
       "accent": "#d6b25e",
@@ -3089,6 +2958,14 @@
           "folder": "ViewpointDayZInventory",
           "workshopId": "3816819422",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3816819422",
+          "serverOnly": false
+        },
+        {
+          "id": "ViewpointRightClick",
+          "name": "Viewpoint - Right Click Fix",
+          "folder": "ViewpointRightClick",
+          "workshopId": "3819018807",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
           "serverOnly": false
         }
       ],
@@ -3117,12 +2994,18 @@
           "id": "3816819422",
           "name": "Viewpoint DayZ",
           "sizeBytes": 51657811
+        },
+        {
+          "id": "3819018807",
+          "name": "Viewpoint - Right Click Fix",
+          "sizeBytes": 355470
         }
       ],
       "requires": [
         "Viewpoint",
         "ZombieBuddy",
-        "ViewpointDayZInventory"
+        "ViewpointDayZInventory",
+        "ViewpointRightClick"
       ],
       "conflicts": [
         "ViewpointUI",
@@ -3133,7 +3016,7 @@
       "id": "tarkov",
       "name": "Tarkov UI",
       "tagline": "Project Tarkov HUD, inventory and Viewpoint loot",
-      "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together. Everyone on the server must use this same suite.",
+      "description": "Project Tarkov Framework, Health, HUD and Loot & Inventory, plus Inventory Tetris, the Viewpoint loot bridge and HUD Addons. This changes the HUD and the inventory system together while keeping right-click world interactions. Everyone on the server must use this same suite.",
       "cover": "assets/ui-suites/tarkov-ui.webp",
       "gallery": [],
       "accent": "#c7a76a",
@@ -3195,6 +3078,14 @@
           "workshopId": "3820130782",
           "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3820130782",
           "serverOnly": false
+        },
+        {
+          "id": "ViewpointRightClick",
+          "name": "Viewpoint - Right Click Fix",
+          "folder": "ViewpointRightClick",
+          "workshopId": "3819018807",
+          "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3819018807",
+          "serverOnly": false
         }
       ],
       "remove": [
@@ -3228,6 +3119,11 @@
           "id": "3820130782",
           "name": "Project Tarkov - HUD Addons",
           "sizeBytes": 36979
+        },
+        {
+          "id": "3819018807",
+          "name": "Viewpoint - Right Click Fix",
+          "sizeBytes": 355470
         }
       ],
       "requires": [
@@ -3239,7 +3135,8 @@
         "ProjectTarkovLootInventory",
         "INVENTORY_TETRIS",
         "ViewpointXTarkovHUD",
-        "TarkovHUDAddons"
+        "TarkovHUDAddons",
+        "ViewpointRightClick"
       ],
       "conflicts": [
         "ViewpointUI",
